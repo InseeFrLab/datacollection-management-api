@@ -1,0 +1,141 @@
+@startuml
+
+package Metadata {
+
+    class Source{
+    periodicity
+
+    }
+
+    class Owner{
+
+    }
+
+    class Support{
+
+    }
+
+    class Survey{
+    year
+    }
+
+    class Campaign{
+    period
+    }
+
+    class Partitionning{
+    status
+    calendar
+    }
+
+     class CampaignEvent {
+      date
+      type
+    }
+    CampaignEvent "0..*" -- "1" Campaign
+
+}
+
+Owner "1" -- "0..*" Source
+Support "1" -- "0..*" Source
+Source "1" -- "0..*" Survey
+Survey "1" -- "0..*" Campaign
+Campaign "1" -- "0..*" Partitionning
+
+package PiComm {
+    ' TODO
+
+}
+
+
+package Questionning {
+    class SurveyUnit{
+
+    }
+
+    class Questionning{
+      model
+    }
+
+    class QuestionningAccreditation{
+      isMain
+    }
+
+    QuestionningAccreditation "0..*" -- "1" Questionning
+    Questionning "0..*" -- "1" SurveyUnit
+    ' (Partionning, SurveyUnit) .. Questionning
+    Partitionning "1" -- "0..*" Questionning
+
+    class QuestionningEvent {
+      date
+      type
+    }
+    QuestionningEvent "0..*" -- "1" Questionning
+
+
+
+}
+
+
+package Contact {
+
+    class Contact{
+
+    }
+
+    class Address{
+
+    }
+    Contact "0..1" -- "0..1" Address
+    Contact "0..1" -- "0..*" QuestionningAccreditation
+
+     class ContactEvent {
+      date
+      type
+    }
+    ContactEvent "0..*" -- "1" Contact
+}
+
+
+
+package User {
+
+    class User{
+        role
+    }
+
+    class UserEvent{
+        date
+        type
+    }
+
+    SourceAccreditation "0..1" -- "0..*" User
+    Source "0..1" -- "0..*" SourceAccreditation
+    UserEvent "0..*" -- "1" User
+
+}
+
+
+
+package Reporting {
+
+
+
+}
+
+package Admin{
+
+    class Message{
+
+    }
+
+    class Params{
+
+    }
+
+    Campaign "0..*" -- "0..1" Params
+
+
+}
+
+@enduml
