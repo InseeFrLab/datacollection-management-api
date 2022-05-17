@@ -21,7 +21,7 @@ jobs:
         id: docker_meta
         uses: docker/metadata-action@v3
         with:
-          images: datacollection-management-api
+          images: inseefrlab/datacollection-management-api
       - name: Build and push
         id: docker_build
         uses: docker/build-push-action@v2
