@@ -7,9 +7,9 @@ metadata:
 spec:
   tls:
     - hosts:
-        - dc-management-api.dev.insee.io
+        - datacollection-management-api.dev.insee.io
   rules:
-    - host: dc-management-api.dev.insee.io
+    - host: datacollection-management-api.dev.insee.io
       http:
         paths:
           - path: /
