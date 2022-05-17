@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: datacollection-management-api-ingress
+spec:
+  rules:
+    - host: datacollection-management-api.dev.insee.io/
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: datacollection-management-api-svc
+                port:
+                  number: 8080

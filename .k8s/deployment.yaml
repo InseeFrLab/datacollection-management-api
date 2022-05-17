@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: datacollection-management-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: datacollection-management-api
+  template:
+    metadata:
+      labels:
+        app: datacollection-management-api
+    spec:
+      containers:
+        - name: datacollection-management-api
+          image: inseefrlab/datacollection-management-api
+          ports:
+            - containerPort: 8080
+          resources: {}
+      restartPolicy: Always
