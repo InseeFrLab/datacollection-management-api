@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: datacollection-management-api-svc
+  name: dc-management-api-svc
 spec:
   selector:
-    app: datacollection-management-api-svc
+    app: dc-management-api
   ports:
     - protocol: TCP
       port: 8080
