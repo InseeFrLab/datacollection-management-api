@@ -61,10 +61,20 @@ package Questionning {
       isMain
     }
 
+    class OperatorService{
+      
+    }
+
+    class Operator{
+      
+    }
+
     QuestionningAccreditation "0..*" -- "1" Questionning
     Questionning "0..*" -- "1" SurveyUnit
     ' (Partionning, SurveyUnit) .. Questionning
     Partitionning "1" -- "0..*" Questionning
+    OperatorService "1" -- "0..*" Questionning
+    Operator "0..*" -- "1" OperatorService
 
     class QuestionningEvent {
       date
