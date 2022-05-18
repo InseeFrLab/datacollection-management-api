@@ -2,10 +2,7 @@ package fr.insee.survey.datacollectionmanagement.questioning.domain;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.Date;
 import java.util.Set;
 
@@ -20,6 +17,6 @@ public class QuestioningEvent {
     private Date date;
     private String type;
 
-    @OneToMany
-    private Set<Questioning> questionings;
+    @ManyToOne
+    private Questioning questioning;
 }

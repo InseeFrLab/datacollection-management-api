@@ -22,8 +22,7 @@ public class Campaign {
     @OneToMany
     private Set<Partitioning> partitionings;
     
-    @OneToMany
-    private Set<CampaignEvent> capmpaignEvents;
+
     
 
 }

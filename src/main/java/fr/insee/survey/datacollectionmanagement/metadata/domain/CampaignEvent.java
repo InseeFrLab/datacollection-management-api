@@ -1,10 +1,9 @@
 package fr.insee.survey.datacollectionmanagement.metadata.domain;
 
 import java.util.Date;
+import java.util.Set;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 import lombok.Data;
 
@@ -18,5 +17,8 @@ public class CampaignEvent {
     
     private String type;
     private Date date;
+
+    @ManyToOne
+    private Campaign campaign;
     
 }
