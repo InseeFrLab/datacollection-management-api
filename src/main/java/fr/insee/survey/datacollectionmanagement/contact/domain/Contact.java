@@ -17,12 +17,12 @@ public class Contact {
     @Id
     private String identifier;
 
-    private String name;
+    private String lastName;
+    private String firstName;
     private String email;
     private String function;
     private String phone;
     private String comment;
-    private String zipCode;
 
     @OneToOne
     private Address address;

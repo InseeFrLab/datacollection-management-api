@@ -70,12 +70,14 @@ public class Dataloader {
             a.setCountryName(faker.country().name());
             a.setStreetNumber(generator.nextInt());
             a.setStreetName(faker.address().streetName());
+            a.setZipCode(faker.address().zipCode());
+            a.setCity(faker.address().cityName());          
             addressRepository.save(a);
 
-            c.setIdentifier("id-"+RandomStringUtils.randomAlphabetic(4));
-            c.setName(faker.name().lastName());
+            c.setIdentifier(RandomStringUtils.randomAlphanumeric(7).toUpperCase());
+            c.setLastName(name);
+            c.setFirstName(firstName);
             c.setPhone(faker.phoneNumber().phoneNumber());
-            c.setZipCode(faker.address().zipCode());
             c.setGender(Contact.Gender.male);
             c.setFunction(faker.job().title());          
             c.setComment(faker.beer().name());
