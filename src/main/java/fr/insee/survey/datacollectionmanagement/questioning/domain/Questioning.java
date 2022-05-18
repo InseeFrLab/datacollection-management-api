@@ -18,8 +18,6 @@ public class Questioning {
 
     private String modelName;
 
-    @OneToMany
-    private Set<QuestioningEvent> questioningEvents;
 
     @OneToMany
     private Set<QuestioningAccreditation> questioningAccreditations;

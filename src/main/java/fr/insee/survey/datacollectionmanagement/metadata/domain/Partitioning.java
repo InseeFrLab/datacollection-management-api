@@ -27,7 +27,5 @@ public class Partitioning {
     @OneToOne
     private Campaign campaign;
 
-    @OneToMany
-    private Set<Partitioning> partitionings;
 
 }

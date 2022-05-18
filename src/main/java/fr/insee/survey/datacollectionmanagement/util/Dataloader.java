@@ -1,6 +1,18 @@
 package fr.insee.survey.datacollectionmanagement.util;
 
 
+import java.util.Arrays;
+import java.util.HashSet;
+
+import javax.annotation.PostConstruct;
+
+import org.apache.commons.lang3.RandomStringUtils;
+import org.jeasy.random.EasyRandom;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.github.javafaker.Faker;
+
 import fr.insee.survey.datacollectionmanagement.contact.domain.Address;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
 import fr.insee.survey.datacollectionmanagement.contact.repository.AddressRepository;
@@ -14,13 +26,6 @@ import fr.insee.survey.datacollectionmanagement.metadata.repository.CampaignRepo
 import fr.insee.survey.datacollectionmanagement.metadata.repository.PartitioningRepository;
 import fr.insee.survey.datacollectionmanagement.metadata.repository.SourceRepository;
 import fr.insee.survey.datacollectionmanagement.metadata.repository.SurveyRepository;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-import java.util.Arrays;
-import java.util.HashSet;
 
 @Component
 public class Dataloader {
@@ -48,24 +53,33 @@ public class Dataloader {
 
     @PostConstruct
     public void init() {
+        
+        Faker faker = new Faker();
+        EasyRandom generator = new EasyRandom();
+        
         for (int i = 0; i < 10000; i++) {
             final Contact c = new Contact();
             final Address a = new Address();
 
 
-            a.setCountryName("country-"+ RandomStringUtils.randomAlphabetic(4));
-            a.setStreetNumber(15);
-            a.setStreetName("streetname-"+ RandomStringUtils.randomAlphabetic(4));
+
+            String name = faker.name().lastName();
+            String firstName = faker.name().firstName();
+            
+
+            a.setCountryName(faker.country().name());
+            a.setStreetNumber(generator.nextInt());
+            a.setStreetName(faker.address().streetName());
             addressRepository.save(a);
 
             c.setIdentifier("id-"+RandomStringUtils.randomAlphabetic(4));
-            c.setName("name-"+RandomStringUtils.randomAlphabetic(4));
-            c.setFunction("function-"+RandomStringUtils.randomAlphabetic(4));
-            c.setPhone("phone-"+RandomStringUtils.randomAlphabetic(4));
-            c.setZipCode("zipcode-"+RandomStringUtils.randomAlphabetic(4));
+            c.setName(faker.name().lastName());
+            c.setPhone(faker.phoneNumber().phoneNumber());
+            c.setZipCode(faker.address().zipCode());
             c.setGender(Contact.Gender.male);
-            c.setComment("comment-"+RandomStringUtils.randomAlphabetic(4));
-            c.setEmail("email-"+RandomStringUtils.randomAlphabetic(4));
+            c.setFunction(faker.job().title());          
+            c.setComment(faker.beer().name());
+            c.setEmail(name+"."+firstName+"@cocorico.fr");
             c.setAddress(a);
             contactRepository.save(c);
         }
