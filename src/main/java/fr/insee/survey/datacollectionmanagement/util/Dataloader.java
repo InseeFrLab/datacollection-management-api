@@ -87,26 +87,11 @@ public class Dataloader {
         source1.setPeriodicity("A");
         sourceRepository.save(source1);
 
-        Source source2 = new Source();
-        source2.setIdSource("CAILLE");
-        source2.setShortWording("Enquete caille");
-        source1.setPeriodicity("T");
-        sourceRepository.save(source2);
-
-
-
         Survey survey1 = new Survey();
         survey1.setId("POULET2022");
         survey1.setYear(2022);
         source1.setSurveys(new HashSet<>(Arrays.asList(survey1)));
         surveyRepository.save(survey1);
-
-        Survey survey2 = new Survey();
-        survey2.setId("CAILLE2022");
-        survey2.setYear(2022);
-        source2.setSurveys(new HashSet<>(Arrays.asList(survey2)));
-        surveyRepository.save(survey2);
-
 
         Campaign campaign1 = new Campaign();
         campaign1.setYear(2022); 
@@ -118,6 +103,25 @@ public class Dataloader {
         part1.setId("POULET2022A00-01");
         part1.setCampaign(campaign1);
         partitioningRepository.save(part1);
+        
+        
+
+        Source source2 = new Source();
+        source2.setIdSource("CAILLE");
+        source2.setShortWording("Enquete caille");
+        source1.setPeriodicity("T");
+        sourceRepository.save(source2);
+
+
+
+
+        Survey survey2 = new Survey();
+        survey2.setId("CAILLE2022");
+        survey2.setYear(2022);
+        source2.setSurveys(new HashSet<>(Arrays.asList(survey2)));
+        surveyRepository.save(survey2);
+
+
 
         Campaign campaign2 = new Campaign();
         campaign2.setYear(2022);
