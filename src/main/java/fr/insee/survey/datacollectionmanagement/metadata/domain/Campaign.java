@@ -15,7 +15,7 @@ public class Campaign {
     @Id
     private String campaignId;
     
-    private String year;    
+    private int year;    
     private String campaignWording;
     private String period;
     

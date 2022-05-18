@@ -70,6 +70,17 @@ public class Dataloader {
             contactRepository.save(c);
         }
 
+        initMetadata();
+
+
+
+
+
+
+    }
+
+    private void initMetadata() {
+        
         Source source1 = new Source();
         source1.setIdSource("POULET");
         source1.setShortWording("Enquete poulet");
@@ -98,30 +109,38 @@ public class Dataloader {
 
 
         Campaign campaign1 = new Campaign();
+        campaign1.setYear(2022); 
+        campaign1.setPeriod("A00");        
         campaign1.setCampaignId("POULET2022A00");
         campaignRepository.save(campaign1);
+        
+        Partitioning part1 = new Partitioning();
+        part1.setId("POULET2022A00-01");
+        part1.setCampaign(campaign1);
+        partitioningRepository.save(part1);
 
         Campaign campaign2 = new Campaign();
+        campaign2.setYear(2022);
+        campaign2.setPeriod("T01");
         campaign2.setCampaignId("CAILLE2022T01");
         campaignRepository.save(campaign2);
+        for(int i = 0;i<10;i++){
+            Partitioning part2= new Partitioning();
+            part2.setId("CAILLE2022T01-0"+i);
+            part2.setCampaign(campaign2);
+            partitioningRepository.save(part2);
+        }
 
         Campaign campaign3 = new Campaign();
         campaign3.setCampaignId("CAILLE2022T02");
+        campaign3.setYear(2022);       
+        campaign3.setPeriod("T02");
         campaignRepository.save(campaign3);
-
         for(int i = 0;i<10;i++){
             Partitioning part3= new Partitioning();
             part3.setId("CAILLE2022T02-0"+i);
             part3.setCampaign(campaign3);
             partitioningRepository.save(part3);
         }
-        Partitioning part1 = new Partitioning();
-        part1.setId("POULET2022A00-01");
-        part1.setCampaign(campaign1);
-        partitioningRepository.save(part1);
-
-
-
-
     }
 }
