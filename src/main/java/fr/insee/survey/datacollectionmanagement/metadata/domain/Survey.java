@@ -4,7 +4,9 @@ import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 import lombok.Data;
 
@@ -30,6 +32,10 @@ public class Survey {
     
     @OneToMany
     private Set<Campaign> campaigns;
+    
+    @OneToOne
+    private Source source;
+    
     
 
 }
