@@ -1,10 +1,12 @@
 package fr.insee.survey.datacollectionmanagement.contact.domain;
 
-import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningAccreditation;
-import lombok.Data;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
 
-import javax.persistence.*;
-import java.util.Set;
+import lombok.Data;
 
 @Entity
 @Data
@@ -30,7 +32,5 @@ public class Contact {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @OneToMany
-    private Set<QuestioningAccreditation> questioningAccreditations;
 
 }

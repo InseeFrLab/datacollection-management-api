@@ -65,7 +65,7 @@ public class Dataloader {
             String firstName = faker.name().firstName();
 
             a.setCountryName(faker.country().name());
-            a.setStreetNumber(generator.nextInt());
+            a.setStreetNumber(Integer.parseInt(RandomStringUtils.randomNumeric(3)));
             a.setStreetName(faker.address().streetName());
             a.setZipCode(faker.address().zipCode());
             a.setCity(faker.address().cityName());
@@ -98,38 +98,60 @@ public class Dataloader {
             source.setIdSource(animalName);
             source.setShortWording("Source about " + animalName);
             source.setPeriodicity("M");
-            sourceRepository.save(source);
-
+            Set<Survey> setSurveys = new HashSet<>();
+            
             for (int j = 0; j < 4; j ++ ) {
 
                 Survey survey = new Survey();
                 String id = animalName + (year - j);
                 survey.setId(id);
                 survey.setYear(year - j);
-                survey.setCommunication("Communication around "+id);
-                survey.setSpecimenUrl("http://specimenUrl/"+id);              
-                survey.setSource(source);
-                surveyRepository.save(survey);
-
+                survey.setLongObjectives("The purpose of this survey is to find out everything you can about "
+                    + animalName + ". Your response is essential to ensure the quality and reliability of the results of this survey.");
+                survey.setShortObjectives("All about " + id);
+                survey.setCommunication("Communication around " + id);
+                survey.setSpecimenUrl("http://specimenUrl/" + id);
+                survey.setDiffusionUrl("http://diffusion/" +id);
+                survey.setCnisUrl("http://cnis/" +id);
+                survey.setNoticeUrl("http://notice/" +id);
+                survey.setVisaNumber(year + RandomStringUtils.randomAlphanumeric(6).toUpperCase());
+                survey.setLongWording("Survey " + id);
+                survey.setShortWording(id);
+                survey.setSampleSize(Integer.parseInt(RandomStringUtils.randomNumeric(5)));
+                setSurveys.add(survey);
+                Set<Campaign> setCampaigns = new HashSet<>();
+                
+                
                 for (int k = 0; k < 11; k ++ ) {
                     Campaign campaign = new Campaign();
+                    int month = k + 1;
+                    String period = "M" + month;
                     campaign.setYear(year - j);
-                    campaign.setPeriod("M" + k + 1);
-                    campaign.setCampaignId(animalName + (year - j) + "M" + k + 1);
-                    campaign.setSurvey(survey);
-                    campaignRepository.save(campaign);
+                    campaign.setPeriod(period);
+                    campaign.setCampaignId(animalName + (year - j) + period);
+                    campaign.setCampaignWording("Campaign about " + animalName + " in " + year + " and period " + period);
+                    setCampaigns.add(campaign);
+                    Set<Partitioning> setParts = new HashSet<>();
 
+                    
                     for (int l = 0; l < 3; l ++ ) {
 
                         Partitioning part = new Partitioning();
-                        part.setId(animalName + (year - j) + "M" + k + 1 + "-00" + l);
-                        part.setCampaign(campaign);
+                        part.setId(animalName + (year - j) + "M" + month + "-00" + l);
+                        setParts.add(part);
                         partitioningRepository.save(part);
                     }
-
+                    campaign.setPartitionings(setParts);
+                    campaignRepository.save(campaign);
 
                 }
+                survey.setCampaigns(setCampaigns);
+                surveyRepository.save(survey);
             }
+            source.setSurveys(setSurveys);
+            sourceRepository.save(source);
+            
+
         }
     }
 }
