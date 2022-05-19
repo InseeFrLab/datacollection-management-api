@@ -1,8 +1,7 @@
 package fr.insee.survey.datacollectionmanagement.util;
 
-
-import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
@@ -11,6 +10,7 @@ import org.jeasy.random.EasyRandom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.github.javafaker.Animal;
 import com.github.javafaker.Faker;
 
 import fr.insee.survey.datacollectionmanagement.contact.domain.Address;
@@ -53,25 +53,22 @@ public class Dataloader {
 
     @PostConstruct
     public void init() {
-        
+
         Faker faker = new Faker();
         EasyRandom generator = new EasyRandom();
-        
-        for (int i = 0; i < 10000; i++) {
+
+        for (int i = 0; i < 10000; i ++ ) {
             final Contact c = new Contact();
             final Address a = new Address();
 
-
-
             String name = faker.name().lastName();
             String firstName = faker.name().firstName();
-            
 
             a.setCountryName(faker.country().name());
             a.setStreetNumber(generator.nextInt());
             a.setStreetName(faker.address().streetName());
             a.setZipCode(faker.address().zipCode());
-            a.setCity(faker.address().cityName());          
+            a.setCity(faker.address().cityName());
             addressRepository.save(a);
 
             c.setIdentifier(RandomStringUtils.randomAlphanumeric(7).toUpperCase());
@@ -79,88 +76,60 @@ public class Dataloader {
             c.setFirstName(firstName);
             c.setPhone(faker.phoneNumber().phoneNumber());
             c.setGender(Contact.Gender.male);
-            c.setFunction(faker.job().title());          
+            c.setFunction(faker.job().title());
             c.setComment(faker.beer().name());
-            c.setEmail(name+"."+firstName+"@cocorico.fr");
+            c.setEmail(name + "." + firstName + "@cocorico.fr");
             c.setAddress(a);
             contactRepository.save(c);
         }
 
-        initMetadata();
-
-
-
-
-
+        initMetadata(faker, generator);
 
     }
 
-    private void initMetadata() {
-        
-        Source source1 = new Source();
-        source1.setIdSource("POULET");
-        source1.setShortWording("Enquete poulet");
-        source1.setPeriodicity("A");
-        sourceRepository.save(source1);
+    private void initMetadata(Faker faker, EasyRandom generator2) {
 
-        Survey survey1 = new Survey();
-        survey1.setId("POULET2022");
-        survey1.setYear(2022);
-        source1.setSurveys(new HashSet<>(Arrays.asList(survey1)));
-        surveyRepository.save(survey1);
+        int year = 2022;
 
-        Campaign campaign1 = new Campaign();
-        campaign1.setYear(2022); 
-        campaign1.setPeriod("A00");        
-        campaign1.setCampaignId("POULET2022A00");
-        campaignRepository.save(campaign1);
-        
-        Partitioning part1 = new Partitioning();
-        part1.setId("POULET2022A00-01");
-        part1.setCampaign(campaign1);
-        partitioningRepository.save(part1);
-        
-        
+        for (int i = 0; i < 10; i ++ ) {
+            Source source = new Source();
+            Animal animal = faker.animal();
+            String animalName = animal.name().toUpperCase();
+            source.setIdSource(animalName);
+            source.setShortWording("Source about " + animalName);
+            source.setPeriodicity("M");
+            sourceRepository.save(source);
 
-        Source source2 = new Source();
-        source2.setIdSource("CAILLE");
-        source2.setShortWording("Enquete caille");
-        source1.setPeriodicity("T");
-        sourceRepository.save(source2);
+            for (int j = 0; j < 4; j ++ ) {
 
+                Survey survey = new Survey();
+                String id = animalName + (year - j);
+                survey.setId(id);
+                survey.setYear(year - j);
+                survey.setCommunication("Communication around "+id);
+                survey.setSpecimenUrl("http://specimenUrl/"+id);              
+                survey.setSource(source);
+                surveyRepository.save(survey);
 
+                for (int k = 0; k < 11; k ++ ) {
+                    Campaign campaign = new Campaign();
+                    campaign.setYear(year - j);
+                    campaign.setPeriod("M" + k + 1);
+                    campaign.setCampaignId(animalName + (year - j) + "M" + k + 1);
+                    campaign.setSurvey(survey);
+                    campaignRepository.save(campaign);
 
+                    for (int l = 0; l < 3; l ++ ) {
 
-        Survey survey2 = new Survey();
-        survey2.setId("CAILLE2022");
-        survey2.setYear(2022);
-        source2.setSurveys(new HashSet<>(Arrays.asList(survey2)));
-        surveyRepository.save(survey2);
+                        Partitioning part = new Partitioning();
+                        part.setId(animalName + (year - j) + "M" + k + 1 + "-00" + l);
+                        part.setCampaign(campaign);
+                        partitioningRepository.save(part);
+                    }
 
 
-
-        Campaign campaign2 = new Campaign();
-        campaign2.setYear(2022);
-        campaign2.setPeriod("T01");
-        campaign2.setCampaignId("CAILLE2022T01");
-        campaignRepository.save(campaign2);
-        for(int i = 0;i<10;i++){
-            Partitioning part2= new Partitioning();
-            part2.setId("CAILLE2022T01-0"+i);
-            part2.setCampaign(campaign2);
-            partitioningRepository.save(part2);
-        }
-
-        Campaign campaign3 = new Campaign();
-        campaign3.setCampaignId("CAILLE2022T02");
-        campaign3.setYear(2022);       
-        campaign3.setPeriod("T02");
-        campaignRepository.save(campaign3);
-        for(int i = 0;i<10;i++){
-            Partitioning part3= new Partitioning();
-            part3.setId("CAILLE2022T02-0"+i);
-            part3.setCampaign(campaign3);
-            partitioningRepository.save(part3);
+                }
+            }
         }
     }
 }
