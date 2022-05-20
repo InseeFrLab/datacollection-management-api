@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import com.github.javafaker.Animal;
 import com.github.javafaker.Faker;
+import com.github.javafaker.Name;
 
 import fr.insee.survey.datacollectionmanagement.contact.domain.Address;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
@@ -93,14 +94,16 @@ public class Dataloader {
             final Contact c = new Contact();
             final Address a = new Address();
 
-            String name = faker.name().lastName();
-            String firstName = faker.name().firstName();
+            Name n = faker.name();
+            String name = n.lastName();
+            String firstName = n.firstName();
+            com.github.javafaker.Address fakeAddress = faker.address();
 
-            a.setCountryName(faker.country().name());
-            a.setStreetNumber(Integer.parseInt(RandomStringUtils.randomNumeric(3)));
-            a.setStreetName(faker.address().streetName());
-            a.setZipCode(faker.address().zipCode());
-            a.setCity(faker.address().cityName());
+            a.setCountryName(fakeAddress.country());
+            a.setStreetNumber(fakeAddress.buildingNumber());
+            a.setStreetName(fakeAddress.streetName());
+            a.setZipCode(fakeAddress.zipCode());
+            a.setCity(fakeAddress.cityName());
             addressRepository.save(a);
 
             c.setIdentifier(RandomStringUtils.randomAlphanumeric(7).toUpperCase());
@@ -247,7 +250,6 @@ public class Dataloader {
         for (int i = 0; i < 10000; i ++ ) {
             SurveyUnit su = new SurveyUnit();
             Questioning qu = new Questioning();
-            QuestioningAccreditation accreditation = new QuestioningAccreditation();
             Set<QuestioningAccreditation> questioningAccreditations = new HashSet<>();
 
             String fakeSiren = RandomStringUtils.randomNumeric(9);
@@ -265,6 +267,7 @@ public class Dataloader {
             su.setQuestionings(setQuestioning);
 
             for (int j = 0; j < 2; j ++ ) {
+                QuestioningAccreditation accreditation = new QuestioningAccreditation();
                 accreditation.setIdContact(contactRepository.findRandomContact().getIdentifier());
                 accreditation.setQuestioning(qu);
                 questioningAccreditations.add(accreditation);
