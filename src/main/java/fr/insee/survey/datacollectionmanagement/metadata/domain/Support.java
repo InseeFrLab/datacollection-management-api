@@ -12,15 +12,14 @@ import lombok.Data;
 @Entity
 @Data
 public class Support {
-    
+
     @Id
     @GeneratedValue
     private Long id;
-    
+
     private String label;
-    
-     @OneToMany
-     private Set<Source> sources;
-     
+
+    @OneToMany
+    private Set<Source> sources;
 
 }

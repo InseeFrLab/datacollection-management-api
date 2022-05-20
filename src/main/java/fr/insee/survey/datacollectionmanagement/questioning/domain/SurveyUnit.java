@@ -1,14 +1,17 @@
 package fr.insee.survey.datacollectionmanagement.questioning.domain;
 
-import lombok.Data;
+import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import java.util.Set;
+
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
-@Data
+@Getter
+@Setter
 public class SurveyUnit {
 
     @Id

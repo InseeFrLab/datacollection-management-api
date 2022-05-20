@@ -1,17 +1,18 @@
 package fr.insee.survey.datacollectionmanagement.questioning.domain;
 
-import lombok.Data;
-import lombok.Generated;
+import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import java.util.Date;
-import java.util.Set;
+import javax.persistence.OneToOne;
+
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
-@Data
+@Getter
+@Setter
 public class QuestioningAccreditation {
 
     @Id
@@ -21,8 +22,9 @@ public class QuestioningAccreditation {
     private boolean isMain;
     private Date creationDate;
     private String creationAuthor;
+    private String idContact;
 
-    @OneToMany
-    private Set<Questioning> questionings;
+    @OneToOne
+    private Questioning questioning;
 
 }
