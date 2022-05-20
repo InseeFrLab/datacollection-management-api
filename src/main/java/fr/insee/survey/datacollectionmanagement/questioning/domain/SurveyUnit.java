@@ -20,7 +20,7 @@ public class SurveyUnit {
     @OneToMany
     private Set<Questioning> questionings;
 
-    private String siren;
+    private String surveyUnitId;
 
     //"Raison Sociale"
     private String companyName;

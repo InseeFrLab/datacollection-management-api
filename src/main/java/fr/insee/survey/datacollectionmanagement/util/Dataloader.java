@@ -1,6 +1,8 @@
 package fr.insee.survey.datacollectionmanagement.util;
 
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -118,6 +120,12 @@ public class Dataloader {
 
         int year = 2022;
 
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.MONTH, Calendar.DECEMBER);
+        calendar.set(Calendar.DAY_OF_MONTH, 31);
+        Date dateEndOfYear = calendar.getTime();
+
         Owner ownerInsee = new Owner();
         ownerInsee.setLabel("Insee");
         Set<Source> setSourcesInsee = new HashSet<>();
@@ -171,7 +179,7 @@ public class Dataloader {
                 survey.setCnisUrl("http://cnis/" + id);
                 survey.setNoticeUrl("http://notice/" + id);
                 survey.setVisaNumber(year + RandomStringUtils.randomAlphanumeric(6).toUpperCase());
-                survey.setLongWording("Survey " + id);
+                survey.setLongWording("Survey " + animalName + " " + (year - j));
                 survey.setShortWording(id);
                 survey.setSampleSize(Integer.parseInt(RandomStringUtils.randomNumeric(5)));
                 setSurveys.add(survey);
@@ -185,7 +193,7 @@ public class Dataloader {
                     campaign.setYear(year - j);
                     campaign.setPeriod(period);
                     campaign.setCampaignId(animalName + (year - j) + period);
-                    campaign.setCampaignWording("Campaign about " + animalName + " in " + year + " and period " + period);
+                    campaign.setCampaignWording("Campaign about " + animalName + " in " + (year - j) + " and period " + period);
                     setCampaigns.add(campaign);
                     campaignRepository.save(campaign);
                     Set<Partitioning> setParts = new HashSet<>();
@@ -194,9 +202,15 @@ public class Dataloader {
 
                         Partitioning part = new Partitioning();
                         part.setId(animalName + (year - j) + "M" + month + "-00" + l);
-                        part.setOpeningDate(faker.date().past(90, 0, TimeUnit.DAYS));
-                        part.setClosingDate(faker.date().future(90, 30, TimeUnit.DAYS));
-                        part.setReturnDate(faker.date().future(29, TimeUnit.DAYS));
+                        Date openingDate = faker.date().past(90, 0, TimeUnit.DAYS);
+                        Date closingDate = faker.date().between(openingDate, dateEndOfYear);
+                        Date returnDate = faker.date().between(openingDate, closingDate);
+                        Date today = new Date();
+
+                        part.setOpeningDate(openingDate);
+                        part.setClosingDate(closingDate);
+                        part.setReturnDate(returnDate);
+                        part.setStatus(today.compareTo(closingDate) < 0 ? "open" : "closed");
                         setParts.add(part);
                         part.setCampaign(campaign);
                         partitioningRepository.save(part);
@@ -239,7 +253,7 @@ public class Dataloader {
             String fakeSiren = RandomStringUtils.randomNumeric(9);
             su.setIdSu(fakeSiren);
             su.setCompanyName(faker.company().name());
-            su.setSiren(fakeSiren);
+            su.setSurveyUnitId(fakeSiren);
 
             Set<Questioning> setQuestioning = new HashSet<>();
             qu.setModelName("m" + RandomStringUtils.randomNumeric(2));
@@ -255,7 +269,7 @@ public class Dataloader {
                 accreditation.setQuestioning(qu);
                 questioningAccreditations.add(accreditation);
                 questioningAccreditationRepository.save(accreditation);
-                }
+            }
             qu.setQuestioningAccreditations(questioningAccreditations);
             questioningRepository.save(qu);
             surveyUnitRepository.save(su);
