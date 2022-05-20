@@ -1,4 +1,4 @@
-@startuml
+```plantuml
 
 package Metadata {
 
@@ -148,4 +148,4 @@ package Admin{
 
 }
 
-@enduml
+```
