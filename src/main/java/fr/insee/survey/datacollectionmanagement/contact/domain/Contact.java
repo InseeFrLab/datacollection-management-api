@@ -13,7 +13,7 @@ import lombok.Data;
 public class Contact {
 
     public enum Gender {
-        female, male, undefined
+        Female, Male, Undefined
     }
 
     @Id

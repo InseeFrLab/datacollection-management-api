@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 import fr.insee.survey.datacollectionmanagement.controller.dto.MySurveyDto;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Partitioning;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Survey;
-import fr.insee.survey.datacollectionmanagement.metadata.repository.PartitioningRepository;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningAccreditation;
-import fr.insee.survey.datacollectionmanagement.questioning.repository.QuestioningAccreditationRepository;
+import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningAccreditationServiceImpl;
+import fr.insee.survey.datacollectionmanagement.questioning.service.impl.PartitioningService;
 
 @RestController
 @CrossOrigin
@@ -25,21 +25,21 @@ public class MySurveysController {
     private static final String STROMAE_URL = "https://dev.insee.io/questionnaire/";
 
     @Autowired
-    private QuestioningAccreditationRepository questioningAccreditationRepository;
+    private QuestioningAccreditationServiceImpl questioningAccreditationService;
 
     @Autowired
-    private PartitioningRepository partitioningRepository;
+    private PartitioningService partitioningService;
 
     @GetMapping(value = "mySurveys/{id}")
     public List<MySurveyDto> findById(@PathVariable("id") String id) {
-        
+
         List<MySurveyDto> listSurveys = new ArrayList<>();
-        List<QuestioningAccreditation> accreditations = questioningAccreditationRepository.findByIdContact(id);
+        List<QuestioningAccreditation> accreditations = questioningAccreditationService.findByIdContact(id);
 
         for (QuestioningAccreditation questioningAccreditation : accreditations) {
             MySurveyDto surveyDto = new MySurveyDto();
             Questioning questioning = questioningAccreditation.getQuestioning();
-            Partitioning part = partitioningRepository.findById(questioning.getIdPartitioning()).orElse(null);
+            Partitioning part = partitioningService.findById(questioning.getIdPartitioning());
             if (part != null) {
                 Survey survey = part.getCampaign().getSurvey();
                 String surveyUnitId = questioning.getSurveyUnit().getSurveyUnitId();
