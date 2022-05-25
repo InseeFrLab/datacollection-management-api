@@ -2,37 +2,37 @@
 
 package Metadata {
 
-    class Source{
+  class Source{
     periodicity
 
-    }
+  }
 
-    class Owner{
+  class Owner{
 
-    }
+  }
 
-    class Support{
+  class Support{
 
-    }
+  }
 
-    class Survey{
+  class Survey{
     year
-    }
+  }
 
-    class Campaign{
+  class Campaign{
     period
-    }
+  }
 
-    class Partitionning{
+  class Partitionning{
     status
     calendar
-    }
+  }
 
-     class CampaignEvent {
-      date
-      type
-    }
-    CampaignEvent "0..*" -- "1" Campaign
+  class CampaignEvent {
+    date
+    type
+  }
+  CampaignEvent "0..*" -- "1" Campaign
 
 }
 
@@ -43,43 +43,43 @@ Survey "1" -- "0..*" Campaign
 Campaign "1" -- "0..*" Partitionning
 
 package PiComm {
-    ' TODO
+  ' TODO
 
 }
 
 
 package Questionning {
-    class SurveyUnit{
+  class SurveyUnit{
 
-    }
+  }
 
-    class Questionning{
-      model
-    }
+  class Questionning{
+    model
+  }
 
-    class QuestionningAccreditation{
-      isMain
-    }
+  class QuestionningAccreditation{
+    isMain
+  }
 
-    class OperatorService{
-      
-    }
+  class OperatorService{
 
-    class Operator{
-      
-    }
+  }
 
-    QuestionningAccreditation "0..*" -- "1" Questionning
-    Questionning "0..*" -- "1" SurveyUnit
-    Partitionning "1" .. "0..*" Questionning
-    OperatorService "1" -- "0..*" Questionning
-    Operator "0..*" -- "1" OperatorService
+  class Operator{
 
-    class QuestionningEvent {
-      date
-      type
-    }
-    QuestionningEvent "0..*" -- "1" Questionning
+  }
+
+  QuestionningAccreditation "0..*" -- "1" Questionning
+  Questionning "0..*" -- "1" SurveyUnit
+  Partitionning "1" .. "0..*" Questionning
+  OperatorService "1" -- "0..*" Questionning
+  Operator "0..*" -- "1" OperatorService
+
+  class QuestionningEvent {
+    date
+    type
+  }
+  QuestionningEvent "0..*" -- "1" Questionning
 
 
 
@@ -88,39 +88,39 @@ package Questionning {
 
 package Contact {
 
-    class Contact{
+  class Contact{
 
-    }
+  }
 
-    class Address{
+  class Address{
 
-    }
-    Contact "0..1" -- "0..1" Address
-    Contact "0..1" .. "0..*" QuestionningAccreditation
+  }
+  Contact "0..1" -- "0..1" Address
+  Contact "0..1" .. "0..*" QuestionningAccreditation
 
-     class ContactEvent {
-      date
-      type
-    }
-    ContactEvent "0..*" -- "1" Contact
+  class ContactEvent {
+    date
+    type
+  }
+  ContactEvent "0..*" -- "1" Contact
 }
 
 
 
 package User {
 
-    class User{
-        role
-    }
+  class User{
+    role
+  }
 
-    class UserEvent{
-        date
-        type
-    }
+  class UserEvent{
+    date
+    type
+  }
 
-    SourceAccreditation "0..1" -- "0..*" User
-    Source "0..1" .. "0..*" SourceAccreditation
-    UserEvent "0..*" -- "1" User
+  SourceAccreditation "0..1" -- "0..*" User
+  Source "0..1" .. "0..*" SourceAccreditation
+  UserEvent "0..*" -- "1" User
 
 }
 
@@ -134,15 +134,15 @@ package Reporting {
 
 package Admin{
 
-    class Message{
+  class Message{
 
-    }
+  }
 
-    class Params{
+  class Params{
 
-    }
+  }
 
-    Campaign "0..*" .. "0..1" Params
+  Campaign "0..*" .. "0..1" Params
 
 
 }
