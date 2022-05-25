@@ -71,8 +71,7 @@ package Questionning {
 
     QuestionningAccreditation "0..*" -- "1" Questionning
     Questionning "0..*" -- "1" SurveyUnit
-    ' (Partionning, SurveyUnit) .. Questionning
-    Partitionning "1" -- "0..*" Questionning
+    Partitionning "1" .. "0..*" Questionning
     OperatorService "1" -- "0..*" Questionning
     Operator "0..*" -- "1" OperatorService
 
@@ -97,7 +96,7 @@ package Contact {
 
     }
     Contact "0..1" -- "0..1" Address
-    Contact "0..1" -- "0..*" QuestionningAccreditation
+    Contact "0..1" .. "0..*" QuestionningAccreditation
 
      class ContactEvent {
       date
@@ -120,7 +119,7 @@ package User {
     }
 
     SourceAccreditation "0..1" -- "0..*" User
-    Source "0..1" -- "0..*" SourceAccreditation
+    Source "0..1" .. "0..*" SourceAccreditation
     UserEvent "0..*" -- "1" User
 
 }
@@ -143,7 +142,7 @@ package Admin{
 
     }
 
-    Campaign "0..*" -- "0..1" Params
+    Campaign "0..*" .. "0..1" Params
 
 
 }
