@@ -15,8 +15,8 @@ import fr.insee.survey.datacollectionmanagement.metadata.domain.Partitioning;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Survey;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningAccreditation;
-import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningAccreditationServiceImpl;
 import fr.insee.survey.datacollectionmanagement.questioning.service.impl.PartitioningService;
+import fr.insee.survey.datacollectionmanagement.questioning.service.impl.QuestioningAccreditationService;
 
 @RestController
 @CrossOrigin
@@ -25,7 +25,7 @@ public class MySurveysController {
     private static final String STROMAE_URL = "https://dev.insee.io/questionnaire/";
 
     @Autowired
-    private QuestioningAccreditationServiceImpl questioningAccreditationService;
+    private QuestioningAccreditationService questioningAccreditationService;
 
     @Autowired
     private PartitioningService partitioningService;
