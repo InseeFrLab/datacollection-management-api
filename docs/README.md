@@ -1,0 +1,1 @@
+![your-UML-diagram-name](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/benjb59/datacollection-management-api/master/docs/datacollection-uml.iuml)
