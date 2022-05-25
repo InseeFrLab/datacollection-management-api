@@ -110,7 +110,7 @@ public class Dataloader {
             c.setLastName(name);
             c.setFirstName(firstName);
             c.setPhone(faker.phoneNumber().phoneNumber());
-            c.setGender(Contact.Gender.male);
+            c.setGender(Contact.Gender.Male);
             c.setFunction(faker.job().title());
             c.setComment(faker.beer().name());
             c.setEmail(name + "." + firstName + "@cocorico.fr");
