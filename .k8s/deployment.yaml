@@ -21,7 +21,7 @@ spec:
           env:
             - name: SPRING_DATASOURCE_URL
               value: "jdbc:postgresql://my-postgresql:5432/postgres"
-            - name: SPRING_DATASOURCE_USER
+            - name: SPRING_DATASOURCE_USERNAME
               value: "postgres"
             - name: SPRING_DATASOURCE_PASSWORD
               valueFrom:
