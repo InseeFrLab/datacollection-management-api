@@ -9,12 +9,11 @@
 		<version>2.6.7</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>fr.insee</groupId>
-	<artifactId>coltapi</artifactId>
-	<version>1.0.5</version>
-	<name>coltapi</name>
-	<packaging>war</packaging>
-	<description>Api de consultation de Coltrane</description>
+	<groupId>fr.insee.survey</groupId>
+	<artifactId>datacollection-management</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>datacollection-management</name>
+	<description>Demo project for Spring Boot</description>
 	<properties>
 		<java.version>11</java.version>
 		<springdoc-version>1.6.8</springdoc-version>
