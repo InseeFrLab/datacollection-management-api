@@ -1,12 +1,10 @@
 package fr.insee.survey.datacollectionmanagement.questioning.domain;
 
-import lombok.Data;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
 
 @Entity
 @Data
