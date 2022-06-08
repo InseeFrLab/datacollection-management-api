@@ -14,8 +14,18 @@ spec:
     spec:
       containers:
         - name: dc-management-api
-          image: inseefrlab/datacollection-management-api:v0.0.5
+          image: inseefrlab/datacollection-management-api:v0.0.6
           ports:
             - containerPort: 8080
           resources: {}
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:postgresql://my-postgresql:5432/postgres"
+            - name: SPRING_DATASOURCE_USER
+              value: "postgres"
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: my-postgresql
+                  key: postgres-password
       restartPolicy: Always
