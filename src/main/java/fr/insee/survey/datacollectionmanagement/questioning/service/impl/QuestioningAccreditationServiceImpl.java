@@ -1,4 +1,4 @@
-package fr.insee.survey.datacollectionmanagement.questioning.service;
+package fr.insee.survey.datacollectionmanagement.questioning.service.impl;
 
 import java.util.List;
 
@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningAccreditation;
 import fr.insee.survey.datacollectionmanagement.questioning.repository.QuestioningAccreditationRepository;
-import fr.insee.survey.datacollectionmanagement.questioning.service.impl.QuestioningAccreditationService;
+import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningAccreditationService;
 
 @Service
 public class QuestioningAccreditationServiceImpl implements QuestioningAccreditationService {

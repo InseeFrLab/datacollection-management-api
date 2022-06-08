@@ -9,6 +9,10 @@ import java.util.Set;
 @Entity
 @Data
 public class QuestioningEvent {
+    
+    public enum QuestioningEventEnum {
+        REFUSAL, VALINT, VALPAP, HC, PARTIELINT, WASTE, PND, FOLLOWUP, INITLA    
+    }
 
     @Id
     @GeneratedValue

@@ -1,4 +1,4 @@
-package fr.insee.survey.datacollectionmanagement.questioning.service;
+package fr.insee.survey.datacollectionmanagement.questioning.service.impl;
 
 import java.util.NoSuchElementException;
 
@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Partitioning;
 import fr.insee.survey.datacollectionmanagement.metadata.repository.PartitioningRepository;
-import fr.insee.survey.datacollectionmanagement.questioning.service.impl.PartitioningService;
+import fr.insee.survey.datacollectionmanagement.questioning.service.PartitioningService;
 
 @Service
 public class PartioningServiceImpl implements PartitioningService {

@@ -1,4 +1,4 @@
-package fr.insee.survey.datacollectionmanagement.questioning.service.impl;
+package fr.insee.survey.datacollectionmanagement.questioning.service;
 
 import org.springframework.stereotype.Service;
 

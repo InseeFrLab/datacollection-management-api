@@ -1,15 +1,19 @@
 package fr.insee.survey.datacollectionmanagement.util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jeasy.random.EasyRandom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -20,6 +24,7 @@ import com.github.javafaker.Name;
 
 import fr.insee.survey.datacollectionmanagement.contact.domain.Address;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
+import fr.insee.survey.datacollectionmanagement.contact.domain.Contact.Gender;
 import fr.insee.survey.datacollectionmanagement.contact.repository.AddressRepository;
 import fr.insee.survey.datacollectionmanagement.contact.repository.ContactRepository;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Campaign;
@@ -43,6 +48,9 @@ import fr.insee.survey.datacollectionmanagement.questioning.repository.SurveyUni
 
 @Component
 public class Dataloader {
+
+    private static final Logger LOGGER = LogManager.getLogger(Dataloader.class);
+    
 
     @Autowired
     private ContactRepository contactRepository;
@@ -90,7 +98,18 @@ public class Dataloader {
     }
 
     private void initContact(Faker faker) {
-        for (int i = 0; i < 10000; i ++ ) {
+
+        List<Contact> listContact = new ArrayList<>();
+        List<Address> listAddresses = new ArrayList<>();
+        Long nbExistingContacts = contactRepository.count();
+
+        LOGGER.info("{} contacts exist in database", nbExistingContacts);
+
+        int nbContacts = 2000000;
+
+        for (Long i = nbExistingContacts; i < nbContacts; i ++ ) {
+            long start = System.currentTimeMillis();
+
             final Contact c = new Contact();
             final Address a = new Address();
 
@@ -104,19 +123,42 @@ public class Dataloader {
             a.setStreetName(fakeAddress.streetName());
             a.setZipCode(fakeAddress.zipCode());
             a.setCity(fakeAddress.cityName());
-            addressRepository.save(a);
+            // addressRepository.save(a);
+            listAddresses.add(a);
 
             c.setIdentifier(RandomStringUtils.randomAlphanumeric(7).toUpperCase());
             c.setLastName(name);
             c.setFirstName(firstName);
             c.setPhone(faker.phoneNumber().phoneNumber());
-            c.setGender(Contact.Gender.Male);
+            c.setGender(Gender.valueOf(faker.demographic().sex()));
             c.setFunction(faker.job().title());
             c.setComment(faker.beer().name());
-            c.setEmail(name + "." + firstName + "@cocorico.fr");
+            c.setEmail(firstName.toLowerCase() + "." + name.toLowerCase() + "@cocorico.fr");
             c.setAddress(a);
-            contactRepository.save(c);
+            listContact.add(c);
+            // contactRepository.save(c);
+
+            if ((i + 1) % 10000 == 0) {
+                addressRepository.saveAll(listAddresses);
+                contactRepository.saveAll(listContact);
+                listAddresses = new ArrayList<>();
+                listContact = new ArrayList<>();
+                long end = System.currentTimeMillis();
+
+                // LOGGER.info("It took {}ms to execute save() for 100 contacts.", (end - start));
+
+                LOGGER.info("It took {}ms to execute saveAll() for 10000 contacts.", (end - start));
+            }
+
         }
+        // addressRepository.saveAll(listAddresses);
+        // contactRepository.saveAll(listContact);
+        // long end = System.currentTimeMillis();
+        //
+        // LOGGER.info("It took {}ms to execute save() for {} contacts.", (end - start), (nbContacts - nbExistingContacts));
+
+        // LOGGER.info("It took {}ms to execute saveAll() for {} contacts.", (end - start), (nbContacts - nbExistingContacts));
+
     }
 
     private void initMetadata(Faker faker, EasyRandom generator2) {
@@ -145,7 +187,7 @@ public class Dataloader {
         supportSsne.setLabel("Insee Normandie - SSNE");
         Set<Source> setSourcesSupportSsne = new HashSet<>();
 
-        for (int i = 0; i < 10; i ++ ) {
+        for (Long i = sourceRepository.count(); i < 10; i ++ ) {
             Source source = new Source();
             Animal animal = faker.animal();
             String animalName = animal.name().toUpperCase();
@@ -189,7 +231,7 @@ public class Dataloader {
                 surveyRepository.save(survey);
                 Set<Campaign> setCampaigns = new HashSet<>();
 
-                for (int k = 0; k < 11; k ++ ) {
+                for (int k = 0; k < 12; k ++ ) {
                     Campaign campaign = new Campaign();
                     int month = k + 1;
                     String period = "M" + month;
@@ -247,17 +289,29 @@ public class Dataloader {
 
     private void initQuestionning(Faker faker, EasyRandom generator) {
 
-        for (int i = 0; i < 10000; i ++ ) {
-            SurveyUnit su = new SurveyUnit();
-            Questioning qu = new Questioning();
-            Set<QuestioningAccreditation> questioningAccreditations = new HashSet<>();
+        Long nbExistingQuestionings = questioningRepository.count();
 
-            String fakeSiren = RandomStringUtils.randomNumeric(9);
+        LOGGER.info("{} questionings exist in database", nbExistingQuestionings);
+
+        long start = System.currentTimeMillis();
+        SurveyUnit su ;
+        Questioning qu ;
+        Set<Questioning> setQuestioning ;
+        QuestioningAccreditation accreditation;
+        Set<QuestioningAccreditation> questioningAccreditations;
+        String fakeSiren;
+
+        for (Long i = nbExistingQuestionings; i < 1000000; i ++ ) {
+            su = new SurveyUnit();
+            qu = new Questioning();
+            questioningAccreditations = new HashSet<>();
+
+            fakeSiren = RandomStringUtils.randomNumeric(9);
             su.setIdSu(fakeSiren);
             su.setCompanyName(faker.company().name());
             su.setSurveyUnitId(fakeSiren);
 
-            Set<Questioning> setQuestioning = new HashSet<>();
+            setQuestioning = new HashSet<>();
             qu.setModelName("m" + RandomStringUtils.randomNumeric(2));
             qu.setIdPartitioning(partitioningRepository.findRandomPartitioning().getId());
             surveyUnitRepository.save(su);
@@ -266,9 +320,9 @@ public class Dataloader {
             setQuestioning.add(qu);
             su.setQuestionings(setQuestioning);
 
-            for (int j = 0; j < 2; j ++ ) {
-                QuestioningAccreditation accreditation = new QuestioningAccreditation();
-                accreditation.setIdContact(contactRepository.findRandomContact().getIdentifier());
+            for (int j = 0; j < 4; j ++ ) {
+                accreditation = new QuestioningAccreditation();
+                accreditation.setIdContact(contactRepository.findRandomIdentifierContact());
                 accreditation.setQuestioning(qu);
                 questioningAccreditations.add(accreditation);
                 questioningAccreditationRepository.save(accreditation);
@@ -276,6 +330,12 @@ public class Dataloader {
             qu.setQuestioningAccreditations(questioningAccreditations);
             questioningRepository.save(qu);
             surveyUnitRepository.save(su);
+            if (i % 100 == 0) {
+                long end = System.currentTimeMillis();
+                LOGGER.info("It took {}ms to execute save() for 100 questionings.", (end - start));
+                start = System.currentTimeMillis();
+            }
+
         }
     }
 }

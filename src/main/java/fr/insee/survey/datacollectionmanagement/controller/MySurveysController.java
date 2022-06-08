@@ -15,8 +15,8 @@ import fr.insee.survey.datacollectionmanagement.metadata.domain.Partitioning;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Survey;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningAccreditation;
-import fr.insee.survey.datacollectionmanagement.questioning.service.impl.PartitioningService;
-import fr.insee.survey.datacollectionmanagement.questioning.service.impl.QuestioningAccreditationService;
+import fr.insee.survey.datacollectionmanagement.questioning.service.PartitioningService;
+import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningAccreditationService;
 
 @RestController
 @CrossOrigin
