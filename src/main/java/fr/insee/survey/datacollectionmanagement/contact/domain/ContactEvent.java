@@ -1,9 +1,13 @@
 package fr.insee.survey.datacollectionmanagement.contact.domain;
 
-import lombok.Data;
-
-import javax.persistence.*;
 import java.util.Date;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+
+import lombok.Data;
 
 @Entity
 @Data
