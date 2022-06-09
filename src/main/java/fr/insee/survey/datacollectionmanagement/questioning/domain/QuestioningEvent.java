@@ -12,10 +12,6 @@ import lombok.Data;
 @Entity
 @Data
 public class QuestioningEvent {
-    
-    public enum QuestioningEventEnum {
-        REFUSAL, VALINT, VALPAP, HC, PARTIELINT, WASTE, PND, FOLLOWUP, INITLA    
-    }
 
     @Id
     @GeneratedValue
@@ -26,4 +22,13 @@ public class QuestioningEvent {
 
     @ManyToOne
     private Questioning questioning;
+
+    public QuestioningEvent(Date date, String type, Questioning questioning) {
+        this.date = date;
+        this.type = type;
+        this.questioning = questioning;
+    }
+
+    public QuestioningEvent() {
+    }
 }

@@ -1,16 +1,12 @@
 package fr.insee.survey.datacollectionmanagement.util;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
+import fr.insee.survey.datacollectionmanagement.questioning.domain.*;
+import fr.insee.survey.datacollectionmanagement.questioning.repository.*;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,12 +35,6 @@ import fr.insee.survey.datacollectionmanagement.metadata.repository.Partitioning
 import fr.insee.survey.datacollectionmanagement.metadata.repository.SourceRepository;
 import fr.insee.survey.datacollectionmanagement.metadata.repository.SupportRepository;
 import fr.insee.survey.datacollectionmanagement.metadata.repository.SurveyRepository;
-import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
-import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningAccreditation;
-import fr.insee.survey.datacollectionmanagement.questioning.domain.SurveyUnit;
-import fr.insee.survey.datacollectionmanagement.questioning.repository.QuestioningAccreditationRepository;
-import fr.insee.survey.datacollectionmanagement.questioning.repository.QuestioningRepository;
-import fr.insee.survey.datacollectionmanagement.questioning.repository.SurveyUnitRepository;
 
 @Component
 public class Dataloader {
@@ -85,16 +75,37 @@ public class Dataloader {
     @Autowired
     private PartitioningRepository partitioningRepository;
 
+    @Autowired
+    private EventOrderRepository orderRepository;
+
+    @Autowired
+    private QuestioningEventRepository questioningEventRepository;
+
     @PostConstruct
     public void init() {
 
         Faker faker = new Faker();
         EasyRandom generator = new EasyRandom();
 
+        initOrder();
         initContact(faker);
         initMetadata(faker, generator);
         initQuestionning(faker, generator);
 
+
+
+    }
+
+    private void initOrder() {
+        // Creating table order
+        orderRepository.saveAndFlush(new EventOrder(Long.parseLong("8"), TypeQuestioningEvent.REFUSAL.toString(), 8));
+        orderRepository.saveAndFlush(new EventOrder(Long.parseLong("7"), TypeQuestioningEvent.VALINT.toString(), 7));
+        orderRepository.saveAndFlush(new EventOrder(Long.parseLong("6"), TypeQuestioningEvent.VALPAP.toString(), 6));
+        orderRepository.saveAndFlush(new EventOrder(Long.parseLong("5"), TypeQuestioningEvent.HC.toString(), 5));
+        orderRepository.saveAndFlush(new EventOrder(Long.parseLong("4"), TypeQuestioningEvent.PARTIELINT.toString(), 4));
+        orderRepository.saveAndFlush(new EventOrder(Long.parseLong("3"), TypeQuestioningEvent.WASTE.toString(), 3));
+        orderRepository.saveAndFlush(new EventOrder(Long.parseLong("2"), TypeQuestioningEvent.PND.toString(), 2));
+        orderRepository.saveAndFlush(new EventOrder(Long.parseLong("1"), TypeQuestioningEvent.INITLA.toString(), 1));
     }
 
     private void initContact(Faker faker) {
@@ -296,14 +307,18 @@ public class Dataloader {
         long start = System.currentTimeMillis();
         SurveyUnit su ;
         Questioning qu ;
+        QuestioningEvent qe;
         Set<Questioning> setQuestioning ;
         QuestioningAccreditation accreditation;
         Set<QuestioningAccreditation> questioningAccreditations;
         String fakeSiren;
+        Random qeRan = new Random();
 
         for (Long i = nbExistingQuestionings; i < 1000000; i ++ ) {
             su = new SurveyUnit();
             qu = new Questioning();
+            qe= new QuestioningEvent();
+            List<QuestioningEvent> qeList = new ArrayList<>();
             questioningAccreditations = new HashSet<>();
 
             fakeSiren = RandomStringUtils.randomNumeric(9);
@@ -319,6 +334,47 @@ public class Dataloader {
             questioningRepository.save(qu);
             setQuestioning.add(qu);
             su.setQuestionings(setQuestioning);
+
+            //questioning events
+            //everybody in INITLA
+            Optional<Partitioning> part= partitioningRepository.findById(qu.getIdPartitioning());
+            Date eventDate = faker.date().between(part.get().getOpeningDate(), part.get().getClosingDate());
+            qe.setType(TypeQuestioningEvent.INITLA.toString());
+            qe.setDate(eventDate);
+            qe.setQuestioning(qu);
+            qeList.add(qe);
+
+            int qeProfile = qeRan.nextInt(10);
+
+            switch(qeProfile){
+                case 0:
+                    qeList.add(new QuestioningEvent(faker.date().between(part.get().getOpeningDate(), part.get().getClosingDate()),TypeQuestioningEvent.REFUSAL.toString(),qu));
+                        break;
+                case 1:
+                    qeList.add(new QuestioningEvent(faker.date().between(part.get().getOpeningDate(), part.get().getClosingDate()),TypeQuestioningEvent.PND.toString(),qu));
+                    break;
+                case 2:
+                    qeList.add(new QuestioningEvent(faker.date().between(part.get().getOpeningDate(), part.get().getClosingDate()),TypeQuestioningEvent.FOLLOWUP.toString(),qu));
+                    qeList.add(new QuestioningEvent(faker.date().between(part.get().getOpeningDate(), part.get().getClosingDate()),TypeQuestioningEvent.FOLLOWUP.toString(),qu));
+                    qeList.add(new QuestioningEvent(faker.date().between(part.get().getOpeningDate(), part.get().getClosingDate()),TypeQuestioningEvent.PARTIELINT.toString(),qu));
+                    break;
+                case 3:
+                case 4:
+                    qeList.add(new QuestioningEvent(faker.date().between(part.get().getOpeningDate(), part.get().getClosingDate()),TypeQuestioningEvent.FOLLOWUP.toString(),qu));
+                    qeList.add(new QuestioningEvent(faker.date().between(part.get().getOpeningDate(), part.get().getClosingDate()),TypeQuestioningEvent.FOLLOWUP.toString(),qu));
+                    qeList.add(new QuestioningEvent(faker.date().between(part.get().getOpeningDate(), part.get().getClosingDate()),TypeQuestioningEvent.VALINT.toString(),qu));
+                    break;
+                case 5:
+                case 6:
+                case 7:
+                    qeList.add(new QuestioningEvent(faker.date().between(part.get().getOpeningDate(), part.get().getClosingDate()),TypeQuestioningEvent.PARTIELINT.toString(),qu));
+                    qeList.add(new QuestioningEvent(faker.date().between(part.get().getOpeningDate(), part.get().getClosingDate()),TypeQuestioningEvent.VALINT.toString(),qu));
+                    break;
+            }
+
+            qeList.stream().forEach(questEvent -> questioningEventRepository.save(questEvent));
+
+
 
             for (int j = 0; j < 4; j ++ ) {
                 accreditation = new QuestioningAccreditation();
