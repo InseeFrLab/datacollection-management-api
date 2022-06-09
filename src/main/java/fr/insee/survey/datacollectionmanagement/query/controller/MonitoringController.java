@@ -15,13 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class MonitoringController {
     static final Logger LOGGER = LoggerFactory.getLogger(MonitoringController.class);
 
-    @GetMapping(value = "/campaigns/{idCampaign}/monitoring/progress", produces = "application/json")
+    @GetMapping(value = "/moog/campaigns/{idCampaign}/monitoring/progress", produces = "application/json")
     public JSONCollectionWrapper<MoogProgressDto> getDataForProgress(@PathVariable String idCampaign) {
         LOGGER.info("Request GET for monitoring table for campaign : {}", idCampaign);
         return null;
     }
 
-    @GetMapping(value = "campaigns/{idCampaign}/monitoring/follow-up", produces = "application/json")
+    @GetMapping(value = "/moog/campaigns/{idCampaign}/monitoring/follow-up", produces = "application/json")
     public JSONCollectionWrapper<MoogFollowUpDto> getDataToFollowUp(@PathVariable String idCampaign) {
         LOGGER.info("Request GET for following table for campaign : {}", idCampaign);
         return null;
