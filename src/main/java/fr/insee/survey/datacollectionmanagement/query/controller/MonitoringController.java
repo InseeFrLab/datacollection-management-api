@@ -17,7 +17,7 @@ public class MonitoringController {
 
     @GetMapping(value = "/moog/campaigns/{idCampaign}/monitoring/progress", produces = "application/json")
     public JSONCollectionWrapper<MoogProgressDto> getDataForProgress(@PathVariable String idCampaign) {
-        LOGGER.info("Request GET for monitoring table for campaign : {}", idCampaign);
+        LOGGER.info("Request GET for monitoring moog progress table for campaign : {}", idCampaign);
         return null;
     }
 
