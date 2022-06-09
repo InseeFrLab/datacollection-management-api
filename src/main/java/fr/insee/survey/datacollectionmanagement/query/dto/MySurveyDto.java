@@ -1,4 +1,4 @@
-package fr.insee.survey.datacollectionmanagement.controller.dto;
+package fr.insee.survey.datacollectionmanagement.query.dto;
 
 import java.sql.Timestamp;
 
