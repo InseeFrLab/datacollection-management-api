@@ -1,4 +1,4 @@
-package fr.insee.survey.datacollectionmanagement.controller;
+package fr.insee.survey.datacollectionmanagement.query.controller;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import fr.insee.survey.datacollectionmanagement.controller.dto.MySurveyDto;
+import fr.insee.survey.datacollectionmanagement.query.dto.MySurveyDto;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Partitioning;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Survey;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
