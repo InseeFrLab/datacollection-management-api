@@ -97,15 +97,21 @@ public class Dataloader {
     }
 
     private void initOrder() {
-        // Creating table order
-        orderRepository.saveAndFlush(new EventOrder(Long.parseLong("8"), TypeQuestioningEvent.REFUSAL.toString(), 8));
-        orderRepository.saveAndFlush(new EventOrder(Long.parseLong("7"), TypeQuestioningEvent.VALINT.toString(), 7));
-        orderRepository.saveAndFlush(new EventOrder(Long.parseLong("6"), TypeQuestioningEvent.VALPAP.toString(), 6));
-        orderRepository.saveAndFlush(new EventOrder(Long.parseLong("5"), TypeQuestioningEvent.HC.toString(), 5));
-        orderRepository.saveAndFlush(new EventOrder(Long.parseLong("4"), TypeQuestioningEvent.PARTIELINT.toString(), 4));
-        orderRepository.saveAndFlush(new EventOrder(Long.parseLong("3"), TypeQuestioningEvent.WASTE.toString(), 3));
-        orderRepository.saveAndFlush(new EventOrder(Long.parseLong("2"), TypeQuestioningEvent.PND.toString(), 2));
-        orderRepository.saveAndFlush(new EventOrder(Long.parseLong("1"), TypeQuestioningEvent.INITLA.toString(), 1));
+
+        Long nbExistingOrders = orderRepository.count();
+
+        if(nbExistingOrders==0) {
+            // Creating table order
+            LOGGER.info("loading eventorder data");
+            orderRepository.saveAndFlush(new EventOrder(Long.parseLong("8"), TypeQuestioningEvent.REFUSAL.toString(), 8));
+            orderRepository.saveAndFlush(new EventOrder(Long.parseLong("7"), TypeQuestioningEvent.VALINT.toString(), 7));
+            orderRepository.saveAndFlush(new EventOrder(Long.parseLong("6"), TypeQuestioningEvent.VALPAP.toString(), 6));
+            orderRepository.saveAndFlush(new EventOrder(Long.parseLong("5"), TypeQuestioningEvent.HC.toString(), 5));
+            orderRepository.saveAndFlush(new EventOrder(Long.parseLong("4"), TypeQuestioningEvent.PARTIELINT.toString(), 4));
+            orderRepository.saveAndFlush(new EventOrder(Long.parseLong("3"), TypeQuestioningEvent.WASTE.toString(), 3));
+            orderRepository.saveAndFlush(new EventOrder(Long.parseLong("2"), TypeQuestioningEvent.PND.toString(), 2));
+            orderRepository.saveAndFlush(new EventOrder(Long.parseLong("1"), TypeQuestioningEvent.INITLA.toString(), 1));
+        }
     }
 
     private void initContact(Faker faker) {
@@ -376,14 +382,14 @@ public class Dataloader {
 
 
 
-            for (int j = 0; j < 4; j ++ ) {
+          /*  for (int j = 0; j < 4; j ++ ) {
                 accreditation = new QuestioningAccreditation();
                 accreditation.setIdContact(contactRepository.findRandomIdentifierContact());
                 accreditation.setQuestioning(qu);
                 questioningAccreditations.add(accreditation);
                 questioningAccreditationRepository.save(accreditation);
             }
-            qu.setQuestioningAccreditations(questioningAccreditations);
+            qu.setQuestioningAccreditations(questioningAccreditations);*/
             questioningRepository.save(qu);
             surveyUnitRepository.save(su);
             if (i % 100 == 0) {

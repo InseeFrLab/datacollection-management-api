@@ -4,5 +4,5 @@ import fr.insee.survey.datacollectionmanagement.questioning.domain.EventOrder;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 
-public interface EventOrderRepository extends JpaRepository<EventOrder, String> {
+public interface EventOrderRepository extends JpaRepository<EventOrder, Long> {
 }
