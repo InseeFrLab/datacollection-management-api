@@ -1,14 +1,12 @@
 package fr.insee.survey.datacollectionmanagement.query.controller;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -17,24 +15,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
-import fr.insee.survey.datacollectionmanagement.contact.service.ContactService;
-import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningAccreditation;
-import fr.insee.survey.datacollectionmanagement.questioning.domain.SurveyUnit;
-import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningAccreditationService;
-import fr.insee.survey.datacollectionmanagement.questioning.service.SurveyUnitService;
+import fr.insee.survey.datacollectionmanagement.query.service.SearchContactService;
 
 @RestController
 @CrossOrigin
 public class SearchContactController {
 
     @Autowired
-    private ContactService contactService;
-
-    @Autowired
-    private QuestioningAccreditationService questioningAccreditationService;
-
-    @Autowired
-    private SurveyUnitService surveyUnitService;
+    private SearchContactService searchContactService;
 
     @GetMapping(path = "contacts/search")
     public ResponseEntity<?> search(
@@ -49,71 +37,22 @@ public class SearchContactController {
         @RequestParam(required = false) String year,
         @RequestParam(required = false) String period,
         @RequestParam(defaultValue = "0") Integer pageNo,
-        @RequestParam(defaultValue = "10") Integer pageSize,
-        @RequestParam(defaultValue = "identifier") String sortBy) {
+        @RequestParam(defaultValue = "10") Integer pageSize) {
 
-        List<Contact> initList = new ArrayList<>();
-        List<Contact> listC = new ArrayList<>();
-        List<SurveyUnit> listSu = new ArrayList<>();
+        List<Contact> listContacts =
+            searchContactService.searchContactCrossDomain(identifier, lastName, firstName, email, idSu, surveyUnitId, companyName, source, year, period);
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        int start = (int) pageable.getOffset();
+        int end = (int) ((start + pageable.getPageSize()) > listContacts.size() ? listContacts.size() : (start + pageable.getPageSize()));
 
-        if ( !StringUtils.isEmpty(idSu)) {
-            listSu.add(surveyUnitService.findbyId(idSu));
-        }
-        else if ( !StringUtils.isEmpty(surveyUnitId)) {
-            listSu.addAll(surveyUnitService.findbySurveyUnitId(surveyUnitId));
-        }
-        else if ( !StringUtils.isEmpty(companyName)) {
-            listSu.addAll(surveyUnitService.findbyCompanyName(companyName));
-        }
-        
-        for (SurveyUnit surveyUnit : listSu) {
-            listC.addAll(findContactBySurveyUnit(surveyUnit));
-        }
-        
-        final List<Contact> listContactsSu = listC;
+        if ( !listContacts.isEmpty() && start < end) {
+            Page<Contact> page = new PageImpl<Contact>(listContacts.subList(start, end), pageable, listContacts.size());
+            return new ResponseEntity<>(page, HttpStatus.OK);
 
-        if ( !StringUtils.isEmpty(identifier)) {
-            try {
-                initList = Arrays.asList(contactService.findByIdentifier(identifier));
-            }
-            catch (NoSuchElementException e) {
-                return new ResponseEntity<>("0 contact found ", HttpStatus.NOT_FOUND);
-            }
         }
-        else if ( !StringUtils.isEmpty(lastName)) {
-            initList = contactService.findByLastName(lastName);
-        }
-        else if ( !StringUtils.isEmpty(firstName)) {
-            initList = contactService.findByFirstName(firstName);
-        }
-        else if ( !StringUtils.isEmpty(idSu)) {
-            initList = listContactsSu;
-        }
-        else if ( !StringUtils.isEmpty(surveyUnitId)) {
-            initList = listContactsSu;
-        }
-        else if ( !StringUtils.isEmpty(companyName)) {
-            initList = listContactsSu;
-        }
-        
-        if ( !initList.isEmpty())
-            return new ResponseEntity<>(initList.stream().filter(c -> !StringUtils.isEmpty(lastName) ? c.getLastName().equalsIgnoreCase(lastName) : c != null)
-                .filter(c -> !StringUtils.isEmpty(firstName) ? c.getFirstName().equalsIgnoreCase(firstName) : c != null)
-                .filter(c -> !StringUtils.isEmpty(email) ? c.getEmail().equalsIgnoreCase(email) : c != null)
-                .filter(c -> !listContactsSu.isEmpty() ? listContactsSu.contains(c) : c != null).collect(Collectors.toList()), HttpStatus.OK);
         else
             return new ResponseEntity<>("0 contact found ", HttpStatus.NOT_FOUND);
 
-    }
-
-    private List<Contact> findContactBySurveyUnit(SurveyUnit su) {
-        List<Contact> listReturn = new ArrayList<>();
-        Set<QuestioningAccreditation> setAccreditations = questioningAccreditationService.findBySurveyUnit(su);
-        for (QuestioningAccreditation qu : setAccreditations) {
-            String ident = qu.getIdContact();
-            listReturn.add(contactService.findByIdentifier(ident));
-        }
-        return listReturn;
     }
 
 }
