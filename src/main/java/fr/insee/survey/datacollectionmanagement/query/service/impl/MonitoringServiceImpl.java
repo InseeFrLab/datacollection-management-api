@@ -69,6 +69,6 @@ public class MonitoringServiceImpl implements MonitoringService {
 
     @Override
     public JSONCollectionWrapper<MoogFollowUpDto> getFollowUp(String idCampaign) {
-        return null;
+        return new JSONCollectionWrapper<MoogFollowUpDto>(monitoringRepository.getFollowUp(idCampaign));
     }
 }

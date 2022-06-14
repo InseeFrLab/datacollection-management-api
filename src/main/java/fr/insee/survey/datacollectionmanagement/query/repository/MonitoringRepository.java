@@ -1,5 +1,6 @@
 package fr.insee.survey.datacollectionmanagement.query.repository;
 
+import fr.insee.survey.datacollectionmanagement.query.dto.MoogFollowUpDto;
 import fr.insee.survey.datacollectionmanagement.query.dto.MoogRowProgressDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -27,6 +28,8 @@ public class MonitoringRepository {
             " ORDER BY survey_unit_id_su, event_order DESC) AS m " +
             " GROUP BY status, batch_num";
 
+    final String followUpQuery = "";
+
     public List<MoogRowProgressDto> getProgress(String idCampaign) {
         List<MoogRowProgressDto> progress = jdbcTemplate.query(progressQuery, new RowMapper<MoogRowProgressDto>() {
             public MoogRowProgressDto mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -40,5 +43,21 @@ public class MonitoringRepository {
         }, new Object[]{idCampaign});
 
         return progress;
+    }
+
+    public List<MoogFollowUpDto> getFollowUp(String idCampaign) {
+        List<MoogFollowUpDto> relance = jdbcTemplate.query(followUpQuery, new RowMapper<MoogFollowUpDto>() {
+            public MoogFollowUpDto mapRow(ResultSet rs, int rowNum) throws SQLException {
+                MoogFollowUpDto rel = new MoogFollowUpDto();
+                rel.setFreq(rs.getString("freq") != null ? Integer.parseInt(rs.getString("freq")) : 0);
+                rel.setBatchNum(Integer.parseInt(rs.getString("batch_num").substring(rs.getString("batch_num").length() - 1)));
+                rel.setNb(Integer.parseInt(rs.getString("nb")));
+
+                return rel;
+            }
+        }, new Object[]{idCampaign, idCampaign});
+
+        return relance;
+
     }
 }
