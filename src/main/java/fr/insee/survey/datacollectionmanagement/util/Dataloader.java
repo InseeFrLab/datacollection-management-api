@@ -87,10 +87,10 @@ public class Dataloader {
         Faker faker = new Faker();
         EasyRandom generator = new EasyRandom();
 
-        initOrder();
+    /*    initOrder();
         initContact(faker);
         initMetadata(faker, generator);
-        initQuestionning(faker, generator);
+        initQuestionning(faker, generator);*/
 
 
 
@@ -99,6 +99,7 @@ public class Dataloader {
     private void initOrder() {
 
         Long nbExistingOrders = orderRepository.count();
+        LOGGER.info("{} orders in database", nbExistingOrders);
 
         if(nbExistingOrders==0) {
             // Creating table order
@@ -122,7 +123,7 @@ public class Dataloader {
 
         LOGGER.info("{} contacts exist in database", nbExistingContacts);
 
-        int nbContacts = 2000000;
+        int nbContacts = 200000;
 
         for (Long i = nbExistingContacts; i < nbContacts; i ++ ) {
             long start = System.currentTimeMillis();
@@ -320,7 +321,7 @@ public class Dataloader {
         String fakeSiren;
         Random qeRan = new Random();
 
-        for (Long i = nbExistingQuestionings; i < 1000000; i ++ ) {
+        for (Long i = nbExistingQuestionings; i < 100000; i ++ ) {
             su = new SurveyUnit();
             qu = new Questioning();
             qe= new QuestioningEvent();

@@ -23,7 +23,7 @@ public class MonitoringRepository {
             " FROM questioning_event JOIN event_order ON event_order.status=questioning_event.type) AS A " +
             " JOIN questioning ON questioning.id=A.questioning_id) AS C " +
             " JOIN partitioning ON partitioning.id=C.id_partitioning " +
-            " WHERE campaign_campaign_id='?' " +
+            " WHERE campaign_campaign_id=? " +
             " ORDER BY survey_unit_id_su, event_order DESC) AS m " +
             " GROUP BY status, batch_num";
 
@@ -31,7 +31,7 @@ public class MonitoringRepository {
         List<MoogRowProgressDto> progress = jdbcTemplate.query(progressQuery, new RowMapper<MoogRowProgressDto>() {
             public MoogRowProgressDto mapRow(ResultSet rs, int rowNum) throws SQLException {
                 MoogRowProgressDto av = new MoogRowProgressDto();
-                av.setBatchNum(Integer.parseInt(rs.getString("batch_num")));
+                av.setBatchNum(Integer.parseInt(rs.getString("batch_num").substring(rs.getString("batch_num").length() - 1)));
                 av.setStatus(rs.getString("status"));
                 av.setTotal(Integer.parseInt(rs.getString("total")));
 
