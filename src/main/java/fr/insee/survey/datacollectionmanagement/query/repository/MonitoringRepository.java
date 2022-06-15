@@ -28,7 +28,17 @@ public class MonitoringRepository {
             " ORDER BY survey_unit_id_su, event_order DESC) AS m " +
             " GROUP BY status, batch_num";
 
-    final String followUpQuery = "";
+    final String followUpQuery = "SELECT COUNT(survey_unit_id_su) as nb, batch_num, freq FROM\n" +
+            "(SELECT COUNT(type) as freq, id_partitioning as batch_num, survey_unit_id_su FROM\n" +
+            "(SELECT type, id_partitioning, questioning_id, campaign_campaign_id, survey_unit_id_su \n" +
+            "FROM\n" +
+            "(SELECT type, id_partitioning, questioning_id, survey_unit_id_su FROM questioning_event  \n" +
+            "JOIN questioning ON  \n" +
+            "questioning_event.questioning_id=questioning.id) AS A\n" +
+            "JOIN partitioning ON partitioning.id=A.id_partitioning) AS C\n" +
+            "WHERE (type='FOLLOWUP' AND campaign_campaign_id=?) \n" +
+            "GROUP BY survey_unit_id_su, id_partitioning) AS G\n" +
+            "GROUP BY batch_num, freq";
 
     public List<MoogRowProgressDto> getProgress(String idCampaign) {
         List<MoogRowProgressDto> progress = jdbcTemplate.query(progressQuery, new RowMapper<MoogRowProgressDto>() {
@@ -55,7 +65,7 @@ public class MonitoringRepository {
 
                 return rel;
             }
-        }, new Object[]{idCampaign, idCampaign});
+        }, new Object[]{idCampaign});
 
         return relance;
 
