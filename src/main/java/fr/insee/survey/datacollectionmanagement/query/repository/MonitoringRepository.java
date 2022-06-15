@@ -17,28 +17,22 @@ public class MonitoringRepository {
    @Autowired
     JdbcTemplate jdbcTemplate;
 
-    final String progressQuery = "SELECT COUNT(survey_unit_id_su) as total, m.type as status, m.id_partitioning as batch_num FROM " +
-            "(SELECT type, event_id, questioning_id, event_order, campaign_campaign_id, id_partitioning, survey_unit_id_su FROM " +
-            "(SELECT type, questioning_id, event_id, event_order, id_partitioning, survey_unit_id_su FROM " +
-            "(SELECT questioning_event.id as event_id,type, questioning_id, event_order, status " +
-            " FROM questioning_event JOIN event_order ON event_order.status=questioning_event.type) AS A " +
-            " JOIN questioning ON questioning.id=A.questioning_id) AS C " +
-            " JOIN partitioning ON partitioning.id=C.id_partitioning " +
-            " WHERE campaign_campaign_id=? " +
-            " ORDER BY survey_unit_id_su, event_order DESC) AS m " +
-            " GROUP BY status, batch_num";
+    final String progressQuery = "SELECT COUNT(survey_unit_id_su) as total,status,batch_num FROM\n" +
+            "(SELECT DISTINCT ON (survey_unit_id_su) survey_unit_id_su,status,event_order,batch_num FROM (SELECT event_order, campaign_campaign_id, C.status, batch_num, survey_unit_id_su FROM (SELECT campaign_campaign_id, type as status, id_partitioning as batch_num, survey_unit_id_su  FROM\n" +
+            "(select survey_unit_id_su, id_partitioning, questioning_id, type from questioning_event JOIN questioning ON questioning_event.questioning_id=questioning.id) As A\n" +
+            "JOIN partitioning ON partitioning.id=A.id_partitioning\n" +
+            "WHERE campaign_campaign_id=?) AS C JOIN event_order ON event_order.status = C.status\n" +
+            "ORDER BY survey_unit_id_su,event_order DESC) AS G) AS M\n" +
+            "GROUP BY status,batch_num";
 
-    final String followUpQuery = "SELECT COUNT(survey_unit_id_su) as nb, batch_num, freq FROM\n" +
-            "(SELECT COUNT(type) as freq, id_partitioning as batch_num, survey_unit_id_su FROM\n" +
-            "(SELECT type, id_partitioning, questioning_id, campaign_campaign_id, survey_unit_id_su \n" +
-            "FROM\n" +
-            "(SELECT type, id_partitioning, questioning_id, survey_unit_id_su FROM questioning_event  \n" +
-            "JOIN questioning ON  \n" +
-            "questioning_event.questioning_id=questioning.id) AS A\n" +
-            "JOIN partitioning ON partitioning.id=A.id_partitioning) AS C\n" +
-            "WHERE (type='FOLLOWUP' AND campaign_campaign_id=?) \n" +
-            "GROUP BY survey_unit_id_su, id_partitioning) AS G\n" +
-            "GROUP BY batch_num, freq";
+    final String followUpQuery = "SELECT COUNT(A.survey_unit_id_su) as nb, id_partitioning as batch_num, freq FROM\n" +
+            " (SELECT questioning.id, id_partitioning, survey_unit_id_su, campaign_campaign_id FROM questioning JOIN partitioning ON questioning.id_partitioning=partitioning.id\n" +
+            " WHERE campaign_campaign_id=?) AS A LEFT JOIN(SELECT COUNT(type) as freq, survey_unit_id_su FROM(SELECT survey_unit_id_su, id_partitioning, questioning_id, type, campaign_campaign_id FROM\n" +
+            " (select survey_unit_id_su, id_partitioning, questioning_id, type from questioning_event JOIN questioning ON questioning_event.questioning_id=questioning.id) As A\n" +
+            " JOIN partitioning ON partitioning.id=A.id_partitioning\n" +
+            " WHERE type='FOLLOWUP' AND campaign_campaign_id=?) AS B\n" +
+            " GROUP BY survey_unit_id_su) AS G ON G.survey_unit_id_su=A.survey_unit_id_su\n" +
+            " GROUP BY batch_num, freq";
 
     public List<MoogRowProgressDto> getProgress(String idCampaign) {
         List<MoogRowProgressDto> progress = jdbcTemplate.query(progressQuery, new RowMapper<MoogRowProgressDto>() {
@@ -65,7 +59,7 @@ public class MonitoringRepository {
 
                 return rel;
             }
-        }, new Object[]{idCampaign});
+        }, new Object[]{idCampaign, idCampaign});
 
         return relance;
 
