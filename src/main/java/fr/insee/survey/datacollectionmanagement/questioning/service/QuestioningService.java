@@ -8,4 +8,6 @@ public interface QuestioningService {
 
     public List<Questioning> fingByIdPartitioning(String idPartitioning);
 
+    List<Questioning> fingByIdPartitioning(String idPartitioning, int limit);
+
 }

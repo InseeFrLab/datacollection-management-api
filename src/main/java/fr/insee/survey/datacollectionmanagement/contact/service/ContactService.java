@@ -15,4 +15,8 @@ public interface ContactService {
 
     public List<Contact> findByFirstName(String firstName);
 
+    public List<Contact> findByEmail(String email);
+
+    public List<Contact> searchListContactParameters(String identifier, String lastName, String firstName, String email);
+
 }

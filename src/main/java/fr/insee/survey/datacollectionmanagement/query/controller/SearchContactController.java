@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
+import fr.insee.survey.datacollectionmanagement.contact.service.ContactService;
+import fr.insee.survey.datacollectionmanagement.query.dto.SearchContactDto;
 import fr.insee.survey.datacollectionmanagement.query.service.SearchContactService;
 
 @RestController
@@ -23,6 +25,9 @@ public class SearchContactController {
 
     @Autowired
     private SearchContactService searchContactService;
+
+    @Autowired
+    private ContactService contactService;
 
     @GetMapping(path = "contacts/search")
     public ResponseEntity<?> search(
@@ -41,12 +46,15 @@ public class SearchContactController {
 
         List<Contact> listContacts =
             searchContactService.searchContactCrossDomain(identifier, lastName, firstName, email, idSu, surveyUnitId, companyName, source, year, period);
+
         Pageable pageable = PageRequest.of(pageNo, pageSize);
         int start = (int) pageable.getOffset();
         int end = (int) ((start + pageable.getPageSize()) > listContacts.size() ? listContacts.size() : (start + pageable.getPageSize()));
 
         if ( !listContacts.isEmpty() && start < end) {
-            Page<Contact> page = new PageImpl<Contact>(listContacts.subList(start, end), pageable, listContacts.size());
+            Page<SearchContactDto> page =
+                new PageImpl<SearchContactDto>(searchContactService.transformListContactDaoToDto(listContacts.subList(start, end)), pageable,
+                    listContacts.size());
             return new ResponseEntity<>(page, HttpStatus.OK);
 
         }

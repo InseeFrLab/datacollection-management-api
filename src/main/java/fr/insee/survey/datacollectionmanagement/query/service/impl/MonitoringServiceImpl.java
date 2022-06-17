@@ -1,16 +1,17 @@
 package fr.insee.survey.datacollectionmanagement.query.service.impl;
 
+import java.util.HashMap;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import fr.insee.survey.datacollectionmanagement.config.JSONCollectionWrapper;
 import fr.insee.survey.datacollectionmanagement.query.dto.MoogFollowUpDto;
 import fr.insee.survey.datacollectionmanagement.query.dto.MoogProgressDto;
 import fr.insee.survey.datacollectionmanagement.query.dto.MoogRowProgressDto;
 import fr.insee.survey.datacollectionmanagement.query.repository.MonitoringRepository;
 import fr.insee.survey.datacollectionmanagement.query.service.MonitoringService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.HashMap;
-import java.util.List;
 
 @Service
 public class MonitoringServiceImpl implements MonitoringService {

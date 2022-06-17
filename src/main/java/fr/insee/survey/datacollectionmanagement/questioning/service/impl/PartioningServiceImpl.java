@@ -15,9 +15,15 @@ public class PartioningServiceImpl implements PartitioningService {
     @Autowired
     private PartitioningRepository partitioningRepository;
 
+    @Override
     public Partitioning findById(String id) {
         return partitioningRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Partitioning not found"));
 
+    }
+
+    @Override
+    public String getCampaignWording(Partitioning part) {
+        return part.getCampaign().getSurvey().getSource().getIdSource() + " " + part.getCampaign().getSurvey().getYear() + " " + part.getCampaign().getPeriod();
     }
 
 }
