@@ -17,7 +17,12 @@ public class QuestioningServiceImpl implements QuestioningService {
 
     @Override
     public List<Questioning> fingByIdPartitioning(String idPartitioning) {
-        return questioningRepository.findByIdPartitioning( idPartitioning);
+        return questioningRepository.findByIdPartitioning(idPartitioning);
+    }
+
+    @Override
+    public List<Questioning> fingByIdPartitioning(String idPartitioning, int limit) {
+        return questioningRepository.findByIdPartitioningLimit(idPartitioning, limit);
     }
 
 }

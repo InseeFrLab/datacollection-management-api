@@ -19,4 +19,6 @@ public interface ContactRepository extends PagingAndSortingRepository<Contact, S
 
     public List<Contact> findByFirstNameIgnoreCase(String firstName);
 
+    public List<Contact> findByEmailIgnoreCase(String email);
+
 }

@@ -1,5 +1,6 @@
 package fr.insee.survey.datacollectionmanagement.query.controller;
 
+
 import fr.insee.survey.datacollectionmanagement.config.JSONCollectionWrapper;
 import fr.insee.survey.datacollectionmanagement.metadata.service.CampaignService;
 import fr.insee.survey.datacollectionmanagement.query.dto.MoogFollowUpDto;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+
 
 @RestController
 @CrossOrigin
@@ -48,7 +50,7 @@ public class MonitoringController {
         return monitoringService.getFollowUp(idCampaign);
     }
 
-    @GetMapping(value = "temp//moog/campaigns/{idCampaign}/monitoring/follow-up", produces = "application/json")
+    @GetMapping(value = "temp/moog/campaigns/{idCampaign}/monitoring/follow-up", produces = "application/json")
     public JSONCollectionWrapper<MoogFollowUpDto> getDataToFollowUpTemp(@PathVariable String idCampaign) {
         LOGGER.info("Request GET for following table for campaign : {}", idCampaign);
         return monitoringService.getFollowUp(idCampaign);

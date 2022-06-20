@@ -12,14 +12,19 @@ import org.springframework.stereotype.Service;
 
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
 import fr.insee.survey.datacollectionmanagement.contact.service.ContactService;
+import fr.insee.survey.datacollectionmanagement.metadata.domain.Campaign;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Partitioning;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Source;
+import fr.insee.survey.datacollectionmanagement.metadata.domain.Survey;
+import fr.insee.survey.datacollectionmanagement.metadata.service.CampaignService;
 import fr.insee.survey.datacollectionmanagement.metadata.service.SourceService;
 import fr.insee.survey.datacollectionmanagement.metadata.service.SurveyService;
+import fr.insee.survey.datacollectionmanagement.query.dto.SearchContactDto;
 import fr.insee.survey.datacollectionmanagement.query.service.SearchContactService;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningAccreditation;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.SurveyUnit;
+import fr.insee.survey.datacollectionmanagement.questioning.service.PartitioningService;
 import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningAccreditationService;
 import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningService;
 import fr.insee.survey.datacollectionmanagement.questioning.service.SurveyUnitService;
@@ -45,6 +50,12 @@ public class SearchContactServiceImpl implements SearchContactService {
     @Autowired
     private QuestioningService questioningService;
 
+    @Autowired
+    private PartitioningService partitioningService;
+
+    @Autowired
+    private CampaignService campaignService;
+
     @Override
     public List<Contact> searchContactCrossDomain(
         String identifier,
@@ -58,114 +69,308 @@ public class SearchContactServiceImpl implements SearchContactService {
         String year,
         String period) {
 
-        List<Contact> listFirstParameterNotNull = new ArrayList<>();
-        List<Contact> listContactSurveyUnit = searchListContactSurveyUnit(idSu, surveyUnitId, companyName);
-        List<Contact> listContactMetadata = searchListContactMetadata(source, year, period);
+        List<Contact> listContact = new ArrayList<>();
+        boolean alwaysEmpty = true;
 
         if ( !StringUtils.isEmpty(identifier)) {
-            listFirstParameterNotNull = Arrays.asList(contactService.findByIdentifier(identifier));
-
-        }
-        else if ( !StringUtils.isEmpty(lastName)) {
-            listFirstParameterNotNull = contactService.findByLastName(lastName);
-        }
-        else if ( !StringUtils.isEmpty(firstName)) {
-            listFirstParameterNotNull = contactService.findByFirstName(firstName);
-        }
-        else if ( !StringUtils.isEmpty(idSu)) {
-            listFirstParameterNotNull = listContactSurveyUnit;
-        }
-        else if ( !StringUtils.isEmpty(surveyUnitId)) {
-            listFirstParameterNotNull = listContactSurveyUnit;
-        }
-        else if ( !StringUtils.isEmpty(companyName)) {
-            listFirstParameterNotNull = listContactSurveyUnit;
+            listContact = Arrays.asList(contactService.findByIdentifier(identifier));
+            alwaysEmpty = false;
         }
 
-        return listFirstParameterNotNull.stream().filter(c -> !StringUtils.isEmpty(lastName) ? c.getLastName().equalsIgnoreCase(lastName) : c != null)
-            .filter(c -> !StringUtils.isEmpty(firstName) ? c.getFirstName().equalsIgnoreCase(firstName) : c != null)
-            .filter(c -> !StringUtils.isEmpty(email) ? c.getEmail().equalsIgnoreCase(email) : c != null)
-            .filter(c -> !listContactSurveyUnit.isEmpty() ? listContactSurveyUnit.contains(c) : c != null)
-            .filter(c -> !listContactMetadata.isEmpty() ? listContactMetadata.contains(c) : c != null)
-            .collect(Collectors.toList());
-    }
+        if ( !StringUtils.isEmpty(lastName)) {
+            if (listContact.isEmpty() && alwaysEmpty) {
+                listContact.addAll(contactService.findByLastName(lastName));
+                alwaysEmpty = false;
+            }
+            else
+                listContact = listContact.stream().filter(c -> c.getLastName().equalsIgnoreCase(lastName)).collect(Collectors.toList());
 
-    /**
-     * Search for the list of qualified contacts who can respond for the survey units selected by the parameters:
-     * @param idSu
-     * @param surveyUnitId
-     * @param companyName
-     * @return List<Contact>
-     */
-    private List<Contact> searchListContactSurveyUnit(String idSu, String surveyUnitId, String companyName) {
-        List<Contact> listContactSurveyUnit = new ArrayList<>();
-        List<SurveyUnit> listSu = new ArrayList<>();
+        }
+
+        if ( !StringUtils.isEmpty(firstName)) {
+            if (listContact.isEmpty() && alwaysEmpty) {
+                listContact.addAll(contactService.findByFirstName(firstName));
+                alwaysEmpty = false;
+            }
+            else
+                listContact = listContact.stream().filter(c -> c.getFirstName().equalsIgnoreCase(firstName)).collect(Collectors.toList());
+        }
+
+        if ( !StringUtils.isEmpty(email)) {
+            if (listContact.isEmpty() && alwaysEmpty) {
+                listContact.addAll(contactService.findByEmail(email));
+                alwaysEmpty = false;
+            }
+            else
+                listContact = listContact.stream().filter(c -> c.getEmail().equalsIgnoreCase(email)).collect(Collectors.toList());
+        }
 
         if ( !StringUtils.isEmpty(idSu)) {
-            listSu.add(surveyUnitService.findbyId(idSu));
-        }
-        else if ( !StringUtils.isEmpty(surveyUnitId)) {
-            listSu.addAll(surveyUnitService.findbySurveyUnitId(surveyUnitId));
-        }
-        else if ( !StringUtils.isEmpty(companyName)) {
-            listSu.addAll(surveyUnitService.findbyCompanyName(companyName));
+            SurveyUnit su = surveyUnitService.findbyId(idSu);
+            if (listContact.isEmpty() && alwaysEmpty) {
+                listContact.addAll(findContactBySurveyUnit(su));
+                alwaysEmpty = false;
+            }
+            else
+                listContact = listContact.stream().filter(c -> findContactBySurveyUnit(su).contains(c)).collect(Collectors.toList());
         }
 
-        for (SurveyUnit surveyUnit : listSu) {
-            listContactSurveyUnit.addAll(findContactBySurveyUnit(surveyUnit));
+        if ( !StringUtils.isEmpty(surveyUnitId)) {
+            List<SurveyUnit> listSu = surveyUnitService.findbySurveyUnitId(surveyUnitId);
+            if (listContact.isEmpty() && alwaysEmpty) {
+                for (SurveyUnit surveyUnit : listSu) {
+                    listContact.addAll(findContactBySurveyUnit(surveyUnit));
+                }
+                alwaysEmpty = false;
+            }
+            else {
+                for (SurveyUnit surveyUnit : listSu) {
+                    listContact = listContact.stream().filter(c -> findContactBySurveyUnit(surveyUnit).contains(c)).collect(Collectors.toList());
+
+                }
+            }
         }
-        return listContactSurveyUnit;
+
+        if ( !StringUtils.isEmpty(companyName)) {
+            List<SurveyUnit> listSu = surveyUnitService.findbyCompanyName(companyName);
+            if (listContact.isEmpty() && alwaysEmpty) {
+                for (SurveyUnit surveyUnit : listSu) {
+                    listContact.addAll(findContactBySurveyUnit(surveyUnit));
+                }
+                alwaysEmpty = false;
+            }
+            else {
+                for (SurveyUnit surveyUnit : listSu) {
+                    listContact = listContact.stream().filter(c -> findContactBySurveyUnit(surveyUnit).contains(c)).collect(Collectors.toList());
+
+                }
+            }
+        }
+
+        boolean kCampaign = false;
+
+        if ( !StringUtils.isEmpty(source) && !StringUtils.isEmpty(year) && !StringUtils.isEmpty(period)) {
+            kCampaign = true;
+            if (listContact.isEmpty() && alwaysEmpty) {
+                List<Partitioning> listPart = new ArrayList<>();
+                campaignService.findbyPeriod(period).stream()
+                    .filter(c -> c.getSurvey().getYear() == Integer.parseInt(year) & c.getSurvey().getSource().getIdSource().equals(source))
+                    .collect(Collectors.toList()).forEach(camp -> listPart.addAll(camp.getPartitionings()));
+                for (Partitioning part : listPart)
+                    listContact.addAll(findContactByPartitioning(part));
+
+                alwaysEmpty = false;
+            }
+            else {
+
+                List<Contact> listContactCopy = List.copyOf(listContact);
+                for (Contact c : listContactCopy) {
+                    boolean hasHabYear = false;
+
+                    List<QuestioningAccreditation> listAccreditations = questioningAccreditationService.findByIdContact(c.getIdentifier());
+                    List<Partitioning> listPart = new ArrayList<>();
+                    campaignService.findbyPeriod(period).stream()
+                        .filter(camp -> camp.getSurvey().getYear() == Integer.parseInt(year) & camp.getSurvey().getSource().getIdSource().equals(source))
+                        .collect(Collectors.toList()).forEach(camp -> listPart.addAll(camp.getPartitionings()));
+
+                    for (QuestioningAccreditation acc : listAccreditations) {
+                        for (Partitioning part : listPart) {
+                            if (acc.getQuestioning().getIdPartitioning().equals(part.getId())) {
+                                hasHabYear = true;
+                                break;
+                            }
+                        }
+                    }
+                    if ( !hasHabYear) {
+                        listContact.remove(c);
+                    }
+
+                }
+
+            }
+        }
+
+        if ( !StringUtils.isEmpty(source) && !kCampaign) {
+            Source s = sourceService.findbyId(source);
+            List<Partitioning> listPart = new ArrayList<>();
+            if (s != null) {
+                s.getSurveys().stream().forEach(so -> so.getCampaigns().stream().forEach(camp -> listPart.addAll(camp.getPartitionings())));
+            }
+            if (listContact.isEmpty() && alwaysEmpty) {
+                for (Partitioning part : listPart)
+                    listContact.addAll(findContactByPartitioning(part));
+
+                alwaysEmpty = false;
+            }
+            else {
+                List<Contact> listContactCopy = List.copyOf(listContact);
+                for (Contact c : listContactCopy) {
+                    List<QuestioningAccreditation> listAccreditations = questioningAccreditationService.findByIdContact(c.getIdentifier());
+                    sourceService.findbyId(source).getSurveys().stream()
+                        .forEach(su -> su.getCampaigns().stream().forEach(camp -> listPart.addAll(camp.getPartitionings())));
+                    boolean hasHabYear = false;
+
+                    for (QuestioningAccreditation acc : listAccreditations) {
+                        for (Partitioning part : listPart) {
+                            if (acc.getQuestioning().getIdPartitioning().equals(part.getId())) {
+                                hasHabYear = true;
+                                break;
+                            }
+                        }
+                    }
+                    if ( !hasHabYear) {
+                        listContact.remove(c);
+                    }
+
+                }
+            }
+        }
+
+        if ( !StringUtils.isEmpty(year) && !kCampaign) {
+            if (listContact.isEmpty() && alwaysEmpty) {
+                List<Survey> listSurveys = surveyService.findbyYear(Integer.parseInt(year));
+                List<Partitioning> listPart = new ArrayList<>();
+                if ( !listSurveys.isEmpty()) {
+                    listSurveys.stream().forEach(so -> so.getCampaigns().stream().forEach(camp -> listPart.addAll(camp.getPartitionings())));
+                }
+                for (Partitioning part : listPart)
+                    listContact.addAll(findContactByPartitioning(part));
+
+                alwaysEmpty = false;
+            }
+            else {
+
+                List<Contact> listContactCopy = List.copyOf(listContact);
+                for (Contact c : listContactCopy) {
+                    List<QuestioningAccreditation> listAccreditations = questioningAccreditationService.findByIdContact(c.getIdentifier());
+                    List<Partitioning> listPart = new ArrayList<>();
+                    surveyService.findbyYear(Integer.parseInt(year)).stream().collect(Collectors.toList())
+                        .forEach(s -> s.getCampaigns().stream().forEach(camp -> listPart.addAll(camp.getPartitionings())));
+                    boolean hasHabYear = false;
+
+                    for (QuestioningAccreditation acc : listAccreditations) {
+                        for (Partitioning part : listPart) {
+                            if (acc.getQuestioning().getIdPartitioning().equals(part.getId())) {
+                                hasHabYear = true;
+                                break;
+                            }
+                        }
+                    }
+                    if ( !hasHabYear) {
+                        listContact.remove(c);
+                    }
+
+                }
+
+            }
+
+        }
+
+        if ( !StringUtils.isEmpty(period) && !kCampaign) {
+            if (listContact.isEmpty() && alwaysEmpty) {
+                List<Campaign> listCampaigns = campaignService.findbyPeriod(period);
+                List<Partitioning> listPart = new ArrayList<>();
+                if ( !listCampaigns.isEmpty()) {
+                    listCampaigns.stream().forEach(camp -> listPart.addAll(camp.getPartitionings()));
+                }
+                for (Partitioning part : listPart)
+                    listContact.addAll(findContactByPartitioning(part));
+
+                alwaysEmpty = false;
+            }
+            else {
+
+                List<Contact> listContactCopy = List.copyOf(listContact);
+                for (Contact c : listContactCopy) {
+                    List<QuestioningAccreditation> listAccreditations = questioningAccreditationService.findByIdContact(c.getIdentifier());
+                    List<Partitioning> listPart = new ArrayList<>();
+                    campaignService.findbyPeriod(period).stream().forEach(camp -> listPart.addAll(camp.getPartitionings()));
+                    boolean hasHabYear = false;
+
+                    for (QuestioningAccreditation acc : listAccreditations) {
+                        for (Partitioning part : listPart) {
+                            if (acc.getQuestioning().getIdPartitioning().equals(part.getId())) {
+                                hasHabYear = true;
+                                break;
+                            }
+                        }
+                    }
+                    if ( !hasHabYear) {
+                        listContact.remove(c);
+                    }
+
+                }
+            }
+
+        }
+        return listContact;
+    }
+
+    private SearchContactDto transformContactDaoToDto(Contact c) {
+
+        SearchContactDto searchContact = new SearchContactDto();
+        List<String> listAccreditations = new ArrayList<>();;
+
+        searchContact.setIdentifier(c.getIdentifier());
+        searchContact.setFirstName(c.getFirstName());
+        searchContact.setLastName(c.getLastName());
+        searchContact.setEmail(c.getEmail());
+
+        List<QuestioningAccreditation> accreditations = questioningAccreditationService.findByIdContact(c.getIdentifier());
+        for (QuestioningAccreditation questioningAccreditation : accreditations) {
+            Questioning questioning = questioningAccreditation.getQuestioning();
+            Partitioning part = partitioningService.findById(questioning.getIdPartitioning());
+            listAccreditations.add(partitioningService.getCampaignWording(part) + " - " + questioningAccreditation.getQuestioning().getSurveyUnit().getIdSu());
+        }
+        searchContact.setAccreditationsList(listAccreditations);
+        return searchContact;
+    }
+
+    public List<SearchContactDto> transformListContactDaoToDto(List<Contact> listContacts) {
+
+        List<SearchContactDto> listResult = new ArrayList<>();
+        for (Contact c : listContacts) {
+            listResult.add(transformContactDaoToDto(c));
+        }
+        return listResult;
+    }
+
+    private List<Contact> findContactByPartitioning(Partitioning part) {
+        List<Questioning> listQuestioning = new ArrayList<>();
+        List<Contact> listContact = new ArrayList<>();
+        listQuestioning.addAll(questioningService.fingByIdPartitioning(part.getId(), 100));
+        listQuestioning.stream().forEach(q -> q.getQuestioningAccreditations().stream().forEach(acc -> {
+            while (listContact.size() < 100)
+                listContact.add(contactService.findByIdentifier(acc.getIdContact()));
+        }));
+        return listContact;
+    }
+    
+    public List<SearchContactDto> transformListStringToDto(List<String> listIdentifiers) {
+
+        List<SearchContactDto> listResult = new ArrayList<>();
+        for (String ident  : listIdentifiers) {
+            
+            listResult.add(transformContactDaoToDto(contactService.findByIdentifier(ident)));
+        }
+        return listResult;
     }
 
     /**
-     * earch for the list of qualified contacts who can respond for one survey unit
+     * Search for the list of qualified contacts who can respond for one survey unit
      * @param su
      * @return List<Contact>
      */
     private List<Contact> findContactBySurveyUnit(SurveyUnit su) {
         List<Contact> listReturn = new ArrayList<>();
-        Set<QuestioningAccreditation> setAccreditations = questioningAccreditationService.findBySurveyUnit(su);
-        for (QuestioningAccreditation qu : setAccreditations) {
-            String ident = qu.getIdContact();
-            listReturn.add(contactService.findByIdentifier(ident));
+        if (su != null) {
+            Set<QuestioningAccreditation> setAccreditations = questioningAccreditationService.findBySurveyUnit(su);
+            for (QuestioningAccreditation qu : setAccreditations) {
+                String ident = qu.getIdContact();
+                listReturn.add(contactService.findByIdentifier(ident));
+            }
         }
         return listReturn;
-    }
-
-    /**
-     * Search for the list of qualified contacts who can respond for the campaigns corresponding to the parameters
-     * @param source
-     * @param year
-     * @param period
-     * @return
-     */
-    private List<Contact> searchListContactMetadata(String idSource, String year, String period) {
-        List<Contact> listContactMetadata = new ArrayList<>();
-        List<Questioning> listQuestioning = new ArrayList<>();
-
-        if ( !StringUtils.isEmpty(idSource)) {
-            Source source = sourceService.findbyId(idSource);
-            if (source != null) {
-                List<Partitioning> listPart = new ArrayList<>();
-                source.getSurveys().stream().forEach(s -> s.getCampaigns().stream().forEach(c -> listPart.addAll(c.getPartitionings())));
-                listPart.stream().forEach(p -> listQuestioning.addAll(questioningService.fingByIdPartitioning(p.getId())));
-                listQuestioning.stream().forEach(q -> q.getQuestioningAccreditations().stream()
-                    .forEach(acc -> listContactMetadata.add(contactService.findByIdentifier(acc.getIdContact()))));
-
-            }
-
-        }
-        else if ( !StringUtils.isEmpty(year)) {
-            // listSu.addAll(surveyUnitService.findbySurveyUnitId(year));
-        }
-        else if ( !StringUtils.isEmpty(period)) {
-            // listSu.addAll(surveyUnitService.findbyCompanyName(period));
-        }
-
-        // for (SurveyUnit surveyUnit : listSu) {
-        // listContactMetadata.addAll(findContactBySurveyUnit(surveyUnit));
-        // }
-        return listContactMetadata;
     }
 
 }

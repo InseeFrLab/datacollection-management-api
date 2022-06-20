@@ -1,14 +1,13 @@
 package fr.insee.survey.datacollectionmanagement.contact.service.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
@@ -35,5 +34,53 @@ public class ContactServiceImpl implements ContactService {
     public List<Contact> findByFirstName(String firstName) {
         return contactRepository.findByFirstNameIgnoreCase(firstName);
     }
+
+    @Override
+    public List<Contact> findByEmail(String email) {
+        return contactRepository.findByEmailIgnoreCase(email);
+    }
+
+    @Override
+    public List<Contact> searchListContactParameters(String identifier, String lastName, String firstName, String email) {
+
+        List<Contact> listContactContact = new ArrayList<>();
+        boolean alwaysEmpty = true;
+
+        if ( !StringUtils.isEmpty(identifier)) {
+            listContactContact = Arrays.asList(findByIdentifier(identifier));
+            alwaysEmpty = false;
+        }
+
+        if ( !StringUtils.isEmpty(lastName)) {
+            if (listContactContact.isEmpty() && alwaysEmpty) {
+                listContactContact.addAll(findByLastName(lastName));
+                alwaysEmpty = false;
+            }
+            else
+                listContactContact = listContactContact.stream().filter(c -> c.getLastName().equalsIgnoreCase(lastName)).collect(Collectors.toList());
+
+        }
+
+        if ( !StringUtils.isEmpty(firstName)) {
+            if (listContactContact.isEmpty() && alwaysEmpty) {
+                listContactContact.addAll(findByFirstName(firstName));
+                alwaysEmpty = false;
+            }
+            else
+                listContactContact = listContactContact.stream().filter(c -> c.getFirstName().equalsIgnoreCase(firstName)).collect(Collectors.toList());
+        }
+
+        if ( !StringUtils.isEmpty(email)) {
+            if (listContactContact.isEmpty() && alwaysEmpty) {
+                listContactContact.addAll(findByEmail(email));
+                alwaysEmpty = false;
+            }
+            else
+                listContactContact = listContactContact.stream().filter(c -> c.getEmail().equalsIgnoreCase(email)).collect(Collectors.toList());
+        }
+
+        return listContactContact;
+    }
+
 
 }

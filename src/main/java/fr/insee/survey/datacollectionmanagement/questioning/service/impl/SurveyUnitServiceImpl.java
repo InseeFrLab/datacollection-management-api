@@ -1,7 +1,6 @@
 package fr.insee.survey.datacollectionmanagement.questioning.service.impl;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,7 +17,7 @@ public class SurveyUnitServiceImpl implements SurveyUnitService {
 
     @Override
     public SurveyUnit findbyId(String idSu) {
-        return surveyUnitRepository.findById(idSu).orElseThrow(() -> new NoSuchElementException("SurveyUnit not found"));
+        return surveyUnitRepository.findById(idSu).orElse(null);
     }
 
     @Override

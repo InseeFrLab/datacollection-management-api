@@ -3,6 +3,7 @@ package fr.insee.survey.datacollectionmanagement.query.service;
 import java.util.List;
 
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
+import fr.insee.survey.datacollectionmanagement.query.dto.SearchContactDto;
 
 public interface SearchContactService {
 
@@ -18,4 +19,8 @@ public interface SearchContactService {
         String year,
         String period);
 
+    List<SearchContactDto> transformListContactDaoToDto(List<Contact> listContacts);
+    
+    List<SearchContactDto> transformListStringToDto(List<String> listIdentifiers);
+    
 }
