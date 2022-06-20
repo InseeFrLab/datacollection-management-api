@@ -87,10 +87,10 @@ public class Dataloader {
         Faker faker = new Faker();
         EasyRandom generator = new EasyRandom();
 
-        initOrder();
+   /*     initOrder();
         initContact(faker);
         initMetadata(faker, generator);
-        initQuestionning(faker, generator);
+        initQuestionning(faker, generator);*/
     }
 
     private void initOrder() {
