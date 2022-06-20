@@ -1,13 +1,12 @@
-package fr.insee.survey.datacollectionmanagement.questioning.service.impl;
-
-import java.util.NoSuchElementException;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+package fr.insee.survey.datacollectionmanagement.metadata.service.impl;
 
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Partitioning;
 import fr.insee.survey.datacollectionmanagement.metadata.repository.PartitioningRepository;
-import fr.insee.survey.datacollectionmanagement.questioning.service.PartitioningService;
+import fr.insee.survey.datacollectionmanagement.metadata.service.PartitioningService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.NoSuchElementException;
 
 @Service
 public class PartioningServiceImpl implements PartitioningService {
@@ -25,5 +24,4 @@ public class PartioningServiceImpl implements PartitioningService {
     public String getCampaignWording(Partitioning part) {
         return part.getCampaign().getSurvey().getSource().getIdSource() + " " + part.getCampaign().getSurvey().getYear() + " " + part.getCampaign().getPeriod();
     }
-
 }
