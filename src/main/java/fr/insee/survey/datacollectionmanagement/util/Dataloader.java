@@ -104,14 +104,15 @@ public class Dataloader {
         Faker faker = new Faker();
         EasyRandom generator = new EasyRandom();
 
+
         initOrder();
-//        initContact(faker);
-//        initMetadata(faker, generator);
-//        initQuestionning(faker, generator);
-        initQuestioningEvents(faker, generator);
+        initContact(faker);
+        initMetadata(faker, generator);
+        initQuestionning(faker, generator);
+
     }
 
-    private void initOrder() {
+    private void initOrder(){
 
         Long nbExistingOrders = orderRepository.count();
         LOGGER.info("{} orders in database", nbExistingOrders);

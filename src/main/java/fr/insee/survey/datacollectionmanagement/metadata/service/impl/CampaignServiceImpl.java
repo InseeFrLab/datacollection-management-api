@@ -1,11 +1,6 @@
 package fr.insee.survey.datacollectionmanagement.metadata.service.impl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -56,5 +51,10 @@ public class CampaignServiceImpl implements CampaignService {
     public List<Campaign> findbyPeriod(String period) {
         // TODO Auto-generated method stub
         return campaignRepository.findByPeriod(period);
+    }
+
+    @Override
+    public Campaign findById(String idCampaign) {
+        return campaignRepository.findById(idCampaign).orElseThrow(() -> new NoSuchElementException("Campaign not found"));
     }
 }
