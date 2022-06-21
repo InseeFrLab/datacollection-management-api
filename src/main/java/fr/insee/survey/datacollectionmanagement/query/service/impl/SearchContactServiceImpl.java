@@ -84,7 +84,6 @@ public class SearchContactServiceImpl implements SearchContactService {
             }
             else
                 listContact = listContact.stream().filter(c -> c.getLastName().equalsIgnoreCase(lastName)).collect(Collectors.toList());
-
         }
 
         if ( !StringUtils.isEmpty(firstName)) {
@@ -338,19 +337,18 @@ public class SearchContactServiceImpl implements SearchContactService {
     private List<Contact> findContactByPartitioning(Partitioning part) {
         List<Questioning> listQuestioning = new ArrayList<>();
         List<Contact> listContact = new ArrayList<>();
-        listQuestioning.addAll(questioningService.fingByIdPartitioning(part.getId(), 100));
+        listQuestioning.addAll(questioningService.fingByIdPartitioning(part.getId()));
         listQuestioning.stream().forEach(q -> q.getQuestioningAccreditations().stream().forEach(acc -> {
-            while (listContact.size() < 100)
-                listContact.add(contactService.findByIdentifier(acc.getIdContact()));
+            listContact.add(contactService.findByIdentifier(acc.getIdContact()));
         }));
         return listContact;
     }
-    
+
     public List<SearchContactDto> transformListStringToDto(List<String> listIdentifiers) {
 
         List<SearchContactDto> listResult = new ArrayList<>();
-        for (String ident  : listIdentifiers) {
-            
+        for (String ident : listIdentifiers) {
+
             listResult.add(transformContactDaoToDto(contactService.findByIdentifier(ident)));
         }
         return listResult;
