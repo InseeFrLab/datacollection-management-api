@@ -12,4 +12,9 @@ public interface QuestioningAccreditationService {
 
     public Set<QuestioningAccreditation> findBySurveyUnit(SurveyUnit su);
     
+    public List<String> findIdContactsByPartitionigAccredications(String idPartitioning);
+    
+    public List<String> findIdPartitioningsByContactAccreditations(String idContact);
+
+    
 }

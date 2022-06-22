@@ -30,4 +30,14 @@ public class QuestioningAccreditationServiceImpl implements QuestioningAccredita
         }
         return setReturn;
     }
+
+    @Override
+    public List<String> findIdContactsByPartitionigAccredications(String idPartitioning) {
+        return questioningAccreditationRepository.findIdContactsByPartitionigAccredications(idPartitioning);
+    }
+
+    @Override
+    public List<String> findIdPartitioningsByContactAccreditations(String idContact) {
+        return questioningAccreditationRepository.findIdPartitioningsByContactAccreditations(idContact);
+    }
 }

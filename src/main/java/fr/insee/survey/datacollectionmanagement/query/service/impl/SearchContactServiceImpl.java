@@ -2,7 +2,7 @@ package fr.insee.survey.datacollectionmanagement.query.service.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,20 +12,13 @@ import org.springframework.stereotype.Service;
 
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
 import fr.insee.survey.datacollectionmanagement.contact.service.ContactService;
-import fr.insee.survey.datacollectionmanagement.metadata.domain.Campaign;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Partitioning;
-import fr.insee.survey.datacollectionmanagement.metadata.domain.Source;
-import fr.insee.survey.datacollectionmanagement.metadata.domain.Survey;
-import fr.insee.survey.datacollectionmanagement.metadata.service.CampaignService;
 import fr.insee.survey.datacollectionmanagement.metadata.service.PartitioningService;
-import fr.insee.survey.datacollectionmanagement.metadata.service.SourceService;
-import fr.insee.survey.datacollectionmanagement.metadata.service.SurveyService;
 import fr.insee.survey.datacollectionmanagement.query.dto.SearchContactDto;
 import fr.insee.survey.datacollectionmanagement.query.service.SearchContactService;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningAccreditation;
 import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningAccreditationService;
-import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningService;
 import fr.insee.survey.datacollectionmanagement.questioning.service.SurveyUnitService;
 
 @Service
@@ -41,19 +34,7 @@ public class SearchContactServiceImpl implements SearchContactService {
     private SurveyUnitService surveyUnitService;
 
     @Autowired
-    private SourceService sourceService;
-
-    @Autowired
-    private SurveyService surveyService;
-
-    @Autowired
-    private QuestioningService questioningService;
-
-    @Autowired
     private PartitioningService partitioningService;
-
-    @Autowired
-    private CampaignService campaignService;
 
     @Override
     public List<Contact> searchContactCrossDomain(
@@ -139,36 +120,19 @@ public class SearchContactServiceImpl implements SearchContactService {
         if ( !StringUtils.isEmpty(source) && !StringUtils.isEmpty(year) && !StringUtils.isEmpty(period)) {
             kCampaign = true;
             if (listContact.isEmpty() && alwaysEmpty) {
-                List<Partitioning> listPart = new ArrayList<>();
-                campaignService.findbyPeriod(period).stream()
-                    .filter(c -> c.getSurvey().getYear() == Integer.parseInt(year) & c.getSurvey().getSource().getIdSource().equals(source))
-                    .collect(Collectors.toList()).forEach(camp -> listPart.addAll(camp.getPartitionings()));
-                for (Partitioning part : listPart)
-                    listContact.addAll(findContactByPartitioning(part));
-
+                List<String> listPartitioningIds = partitioningService.findIdPartitioningsBySourceIdYearPeriod(source, year, period);
+                for (String partId : listPartitioningIds)
+                    listContact.addAll(findContactByPartitioningId(partId));
                 alwaysEmpty = false;
             }
             else {
-
                 List<Contact> listContactCopy = List.copyOf(listContact);
+                List<String> listPartitioningIds = partitioningService.findIdPartitioningsBySourceIdYearPeriod(source, year, period);
                 for (Contact c : listContactCopy) {
-                    boolean hasHabYear = false;
-
-                    List<QuestioningAccreditation> listAccreditations = questioningAccreditationService.findByIdContact(c.getIdentifier());
-                    List<Partitioning> listPart = new ArrayList<>();
-                    campaignService.findbyPeriod(period).stream()
-                        .filter(camp -> camp.getSurvey().getYear() == Integer.parseInt(year) & camp.getSurvey().getSource().getIdSource().equals(source))
-                        .collect(Collectors.toList()).forEach(camp -> listPart.addAll(camp.getPartitionings()));
-
-                    for (QuestioningAccreditation acc : listAccreditations) {
-                        for (Partitioning part : listPart) {
-                            if (acc.getQuestioning().getIdPartitioning().equals(part.getId())) {
-                                hasHabYear = true;
-                                break;
-                            }
-                        }
-                    }
-                    if ( !hasHabYear) {
+                    List<String> listPartitioningIdContact = questioningAccreditationService.findIdPartitioningsByContactAccreditations(c.getIdentifier());
+                    boolean noElementsInCommon = true;
+                    if ( !listPartitioningIdContact.isEmpty()) noElementsInCommon = Collections.disjoint(listPartitioningIdContact, listPartitioningIds);
+                    if (noElementsInCommon) {
                         listContact.remove(c);
                     }
 
@@ -178,115 +142,69 @@ public class SearchContactServiceImpl implements SearchContactService {
         }
 
         if ( !StringUtils.isEmpty(source) && !kCampaign) {
-            Source s = sourceService.findbyId(source);
-            List<Partitioning> listPart = new ArrayList<>();
-            if (s != null) {
-                s.getSurveys().stream().forEach(so -> so.getCampaigns().stream().forEach(camp -> listPart.addAll(camp.getPartitionings())));
-            }
             if (listContact.isEmpty() && alwaysEmpty) {
-                for (Partitioning part : listPart)
-                    listContact.addAll(findContactByPartitioning(part));
-
+                List<String> listPartitioningIds = partitioningService.findIdPartitioningsBySourceId(source);
+                for (String partId : listPartitioningIds)
+                    listContact.addAll(findContactByPartitioningId(partId));
                 alwaysEmpty = false;
             }
+
             else {
                 List<Contact> listContactCopy = List.copyOf(listContact);
+                List<String> listPartitioningIds = partitioningService.findIdPartitioningsBySourceId(source);
                 for (Contact c : listContactCopy) {
-                    List<QuestioningAccreditation> listAccreditations = questioningAccreditationService.findByIdContact(c.getIdentifier());
-                    sourceService.findbyId(source).getSurveys().stream()
-                        .forEach(su -> su.getCampaigns().stream().forEach(camp -> listPart.addAll(camp.getPartitionings())));
-                    boolean hasHabYear = false;
-
-                    for (QuestioningAccreditation acc : listAccreditations) {
-                        for (Partitioning part : listPart) {
-                            if (acc.getQuestioning().getIdPartitioning().equals(part.getId())) {
-                                hasHabYear = true;
-                                break;
-                            }
-                        }
-                    }
-                    if ( !hasHabYear) {
+                    List<String> listPartitioningIdContact = questioningAccreditationService.findIdPartitioningsByContactAccreditations(c.getIdentifier());
+                    boolean noElementsInCommon = true;
+                    if ( !listPartitioningIdContact.isEmpty()) noElementsInCommon = Collections.disjoint(listPartitioningIdContact, listPartitioningIds);
+                    if (noElementsInCommon) {
                         listContact.remove(c);
                     }
-
                 }
             }
         }
 
         if ( !StringUtils.isEmpty(year) && !kCampaign) {
             if (listContact.isEmpty() && alwaysEmpty) {
-                List<Survey> listSurveys = surveyService.findbyYear(Integer.parseInt(year));
-                List<Partitioning> listPart = new ArrayList<>();
-                if ( !listSurveys.isEmpty()) {
-                    listSurveys.stream().forEach(so -> so.getCampaigns().stream().forEach(camp -> listPart.addAll(camp.getPartitionings())));
-                }
-                for (Partitioning part : listPart)
-                    listContact.addAll(findContactByPartitioning(part));
-
+                List<String> listPartitioningIds = partitioningService.findIdPartitioningsByYear(year);
+                for (String partId : listPartitioningIds)
+                    listContact.addAll(findContactByPartitioningId(partId));
                 alwaysEmpty = false;
             }
+
             else {
-
                 List<Contact> listContactCopy = List.copyOf(listContact);
+                List<String> listPartitioningIds = partitioningService.findIdPartitioningsByYear(year);
                 for (Contact c : listContactCopy) {
-                    List<QuestioningAccreditation> listAccreditations = questioningAccreditationService.findByIdContact(c.getIdentifier());
-                    List<Partitioning> listPart = new ArrayList<>();
-                    surveyService.findbyYear(Integer.parseInt(year)).stream().collect(Collectors.toList())
-                        .forEach(s -> s.getCampaigns().stream().forEach(camp -> listPart.addAll(camp.getPartitionings())));
-                    boolean hasHabYear = false;
-
-                    for (QuestioningAccreditation acc : listAccreditations) {
-                        for (Partitioning part : listPart) {
-                            if (acc.getQuestioning().getIdPartitioning().equals(part.getId())) {
-                                hasHabYear = true;
-                                break;
-                            }
-                        }
-                    }
-                    if ( !hasHabYear) {
+                    List<String> listPartitioningIdContact = questioningAccreditationService.findIdPartitioningsByContactAccreditations(c.getIdentifier());
+                    boolean noElementsInCommon = true;
+                    if ( !listPartitioningIdContact.isEmpty()) noElementsInCommon = Collections.disjoint(listPartitioningIdContact, listPartitioningIds);
+                    if (noElementsInCommon) {
                         listContact.remove(c);
                     }
-
                 }
-
             }
-
         }
 
         if ( !StringUtils.isEmpty(period) && !kCampaign) {
             if (listContact.isEmpty() && alwaysEmpty) {
-                List<Campaign> listCampaigns = campaignService.findbyPeriod(period);
-                List<Partitioning> listPart = new ArrayList<>();
-                if ( !listCampaigns.isEmpty()) {
-                    listCampaigns.stream().forEach(camp -> listPart.addAll(camp.getPartitionings()));
-                }
-                for (Partitioning part : listPart)
-                    listContact.addAll(findContactByPartitioning(part));
-
+                List<String> listPartitioningIds = partitioningService.findIdPartitioningsByPeriod(period);
+                for (String partId : listPartitioningIds)
+                    listContact.addAll(findContactByPartitioningId(partId));
                 alwaysEmpty = false;
             }
+
             else {
-
                 List<Contact> listContactCopy = List.copyOf(listContact);
+                List<String> listPartitioningIds = partitioningService.findIdPartitioningsByPeriod(period);
                 for (Contact c : listContactCopy) {
-                    List<QuestioningAccreditation> listAccreditations = questioningAccreditationService.findByIdContact(c.getIdentifier());
-                    List<Partitioning> listPart = new ArrayList<>();
-                    campaignService.findbyPeriod(period).stream().forEach(camp -> listPart.addAll(camp.getPartitionings()));
-                    boolean hasHabYear = false;
-
-                    for (QuestioningAccreditation acc : listAccreditations) {
-                        for (Partitioning part : listPart) {
-                            if (acc.getQuestioning().getIdPartitioning().equals(part.getId())) {
-                                hasHabYear = true;
-                                break;
-                            }
-                        }
-                    }
-                    if ( !hasHabYear) {
+                    List<String> listPartitioningIdContact = questioningAccreditationService.findIdPartitioningsByContactAccreditations(c.getIdentifier());
+                    boolean noElementsInCommon = true;
+                    if ( !listPartitioningIdContact.isEmpty()) noElementsInCommon = Collections.disjoint(listPartitioningIdContact, listPartitioningIds);
+                    if (noElementsInCommon) {
                         listContact.remove(c);
                     }
-
                 }
+
             }
 
         }
@@ -322,13 +240,10 @@ public class SearchContactServiceImpl implements SearchContactService {
         return listResult;
     }
 
-    private List<Contact> findContactByPartitioning(Partitioning part) {
-        List<Questioning> listQuestioning = new ArrayList<>();
+    private List<Contact> findContactByPartitioningId(String partitiongId) {
+        List<String> listIdentifiers = questioningAccreditationService.findIdContactsByPartitionigAccredications(partitiongId);
         List<Contact> listContact = new ArrayList<>();
-        listQuestioning.addAll(questioningService.fingByIdPartitioning(part.getId()));
-        listQuestioning.stream().forEach(q -> q.getQuestioningAccreditations().stream().forEach(acc -> {
-            listContact.add(contactService.findByIdentifier(acc.getIdContact()));
-        }));
+        listIdentifiers.stream().forEach(id -> listContact.add(contactService.findByIdentifier(id)));
         return listContact;
     }
 

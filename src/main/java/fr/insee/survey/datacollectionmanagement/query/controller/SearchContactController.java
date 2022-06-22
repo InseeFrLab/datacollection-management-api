@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
-import fr.insee.survey.datacollectionmanagement.contact.service.ContactService;
 import fr.insee.survey.datacollectionmanagement.query.dto.SearchContactDto;
 import fr.insee.survey.datacollectionmanagement.query.service.SearchContactService;
 
@@ -25,9 +24,6 @@ public class SearchContactController {
 
     @Autowired
     private SearchContactService searchContactService;
-
-    @Autowired
-    private ContactService contactService;
 
     @GetMapping(path = "contacts/search")
     public ResponseEntity<?> search(

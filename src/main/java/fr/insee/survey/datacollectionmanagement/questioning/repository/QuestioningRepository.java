@@ -11,6 +11,4 @@ public interface QuestioningRepository extends JpaRepository<Questioning, Long> 
 
     public List<Questioning> findByIdPartitioning(String idPartitioning);
 
-    @Query(nativeQuery = true, value = "select * from questioning q  where q.id_partitioning =?1 limit ?2")
-    public List<Questioning> findByIdPartitioningLimit(String idPartitioning, int limit);
 }
