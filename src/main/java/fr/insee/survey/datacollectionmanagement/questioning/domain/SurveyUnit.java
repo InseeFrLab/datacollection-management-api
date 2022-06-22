@@ -15,7 +15,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(indexes = {
-    @Index(name = "companyName_index", columnList = "companyName")
+    @Index(name = "companyName_index", columnList = "companyName"),
+    @Index(name = "surveyUnitId_index", columnList = "surveyUnitId")
   })
 public class SurveyUnit {
 

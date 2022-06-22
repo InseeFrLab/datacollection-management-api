@@ -30,5 +30,4 @@ public class QuestioningAccreditationServiceImpl implements QuestioningAccredita
         }
         return setReturn;
     }
-
 }

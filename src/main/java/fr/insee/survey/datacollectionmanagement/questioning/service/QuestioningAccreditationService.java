@@ -11,5 +11,5 @@ public interface QuestioningAccreditationService {
     public List<QuestioningAccreditation> findByIdContact(String id);
 
     public Set<QuestioningAccreditation> findBySurveyUnit(SurveyUnit su);
-
+    
 }

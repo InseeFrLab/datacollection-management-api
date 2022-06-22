@@ -1,12 +1,13 @@
 package fr.insee.survey.datacollectionmanagement.metadata.service.impl;
 
-import fr.insee.survey.datacollectionmanagement.metadata.domain.Partitioning;
-import fr.insee.survey.datacollectionmanagement.metadata.repository.PartitioningRepository;
-import fr.insee.survey.datacollectionmanagement.metadata.service.PartitioningService;
+import java.util.NoSuchElementException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.NoSuchElementException;
+import fr.insee.survey.datacollectionmanagement.metadata.domain.Partitioning;
+import fr.insee.survey.datacollectionmanagement.metadata.repository.PartitioningRepository;
+import fr.insee.survey.datacollectionmanagement.metadata.service.PartitioningService;
 
 @Service
 public class PartioningServiceImpl implements PartitioningService {

@@ -29,4 +29,20 @@ public class SurveyUnitServiceImpl implements SurveyUnitService {
     public List<SurveyUnit> findbyCompanyName(String companyName) {
         return surveyUnitRepository.findByCompanyNameIgnoreCase(companyName);
     }
+
+    @Override
+    public List<String> findIdContactbySurveyUnitId(String surveyUnitId) {
+        return surveyUnitRepository.findIdContactsBySurveyUnitId(surveyUnitId);
+    }
+
+    @Override
+    public List<String> findIdContactsByIdSu(String idSu) {
+        return surveyUnitRepository.findIdContactsByIdSu(idSu);
+    }
+
+    @Override
+    public List<String> findIdContactsbyCompanyName(String companyName) {
+        return surveyUnitRepository.findIdContactsByCompanyName(companyName);
+
+    }
 }
