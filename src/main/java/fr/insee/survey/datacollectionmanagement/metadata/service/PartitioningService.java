@@ -8,13 +8,6 @@ public interface PartitioningService {
 
     Partitioning findById(String id);
 
-    /**
-     * Gives the wording of the campain with idSource year and period
-     * @param part
-     * @return
-     */
-    String getCampaignWording(Partitioning part);
-
     List<String> findIdPartitioningsBySourceIdYearPeriod(String sourceId, String year, String period);
 
     List<String> findIdPartitioningsBySourceId(String sourceId);

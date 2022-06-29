@@ -23,11 +23,6 @@ public class PartioningServiceImpl implements PartitioningService {
     }
 
     @Override
-    public String getCampaignWording(Partitioning part) {
-        return part.getCampaign().getSurvey().getSource().getIdSource() + " " + part.getCampaign().getSurvey().getYear() + " " + part.getCampaign().getPeriod();
-    }
-
-    @Override
     public List<String> findIdPartitioningsBySourceIdYearPeriod(String sourceId, String year, String period) {
         return partitioningRepository.findIdPartitioningBySourceIdYearPeriod(sourceId, year, period);
     }

@@ -14,6 +14,7 @@ import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
 import fr.insee.survey.datacollectionmanagement.contact.service.ContactService;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Partitioning;
 import fr.insee.survey.datacollectionmanagement.metadata.service.PartitioningService;
+import fr.insee.survey.datacollectionmanagement.query.dto.AccreditationDetail;
 import fr.insee.survey.datacollectionmanagement.query.dto.SearchContactDto;
 import fr.insee.survey.datacollectionmanagement.query.service.SearchContactService;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
@@ -214,7 +215,7 @@ public class SearchContactServiceImpl implements SearchContactService {
     private SearchContactDto transformContactDaoToDto(Contact c) {
 
         SearchContactDto searchContact = new SearchContactDto();
-        List<String> listAccreditations = new ArrayList<>();;
+        List<AccreditationDetail> listAccreditations = new ArrayList<>();;
 
         searchContact.setIdentifier(c.getIdentifier());
         searchContact.setFirstName(c.getFirstName());
@@ -225,7 +226,9 @@ public class SearchContactServiceImpl implements SearchContactService {
         for (QuestioningAccreditation questioningAccreditation : accreditations) {
             Questioning questioning = questioningAccreditation.getQuestioning();
             Partitioning part = partitioningService.findById(questioning.getIdPartitioning());
-            listAccreditations.add(partitioningService.getCampaignWording(part) + " - " + questioningAccreditation.getQuestioning().getSurveyUnit().getIdSu());
+            
+            listAccreditations.add(new AccreditationDetail(part.getCampaign().getSurvey().getSource().getIdSource(),part.getCampaign().getSurvey().getYear(), part.getCampaign().getPeriod(),questioningAccreditation.getQuestioning().getSurveyUnit().getIdSu()));
+                
         }
         searchContact.setAccreditationsList(listAccreditations);
         return searchContact;

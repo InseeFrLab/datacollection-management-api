@@ -14,6 +14,8 @@ public class SearchContactDto {
     private String lastName;
     private String email;
 
-    private List<String> accreditationsList;
+    private List<AccreditationDetail> accreditationsList;
+    
+    
 
 }
