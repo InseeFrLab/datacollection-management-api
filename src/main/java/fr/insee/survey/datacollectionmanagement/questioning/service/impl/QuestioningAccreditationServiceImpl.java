@@ -40,4 +40,24 @@ public class QuestioningAccreditationServiceImpl implements QuestioningAccredita
     public List<String> findIdPartitioningsByContactAccreditations(String idContact) {
         return questioningAccreditationRepository.findIdPartitioningsByContactAccreditations(idContact);
     }
+
+    @Override
+    public List<String> findIdContactsByIdSource(String idSource) {
+        return questioningAccreditationRepository.findIdContactsByIdSource(idSource);
+    }
+
+    @Override
+    public List<String> findIdContactsByYear(Integer year) {
+        return questioningAccreditationRepository.findIdContactsByYear(year);
+    }
+
+    @Override
+    public List<String> findIdContactsByPeriod(String period) {
+        return questioningAccreditationRepository.findIdContactsByPeriod(period);
+    }
+
+    @Override
+    public List<String> findIdContactsBySourceYearPeriod(String source, Integer year, String period) {
+        return questioningAccreditationRepository.findIdContactsBySourceYearPeriod(source, year, period);
+    }
 }

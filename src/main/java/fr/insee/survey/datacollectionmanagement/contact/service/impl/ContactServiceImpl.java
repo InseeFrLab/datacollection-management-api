@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
@@ -82,5 +84,46 @@ public class ContactServiceImpl implements ContactService {
         return listContactContact;
     }
 
+    @Override
+    public Page<Contact> searchListContactAccreditationsCopy(
+        String identifier,
+        String lastName,
+        String firstName,
+        String email,
+        String idSu,
+        String surveyUnitId,
+        String companyName,
+        String source,
+        String year,
+        String period,
+        Pageable pageable) {
+        if (StringUtils.isEmpty(year))
+            return contactRepository.findContactMultiCriteriaAccreditationsCopy(identifier, lastName, firstName, email, idSu, surveyUnitId, companyName, source,
+                period, pageable);
+        else
+            return contactRepository.findContactMultiCriteriaAccreditationsCopyYear(identifier, lastName, firstName, email, idSu, surveyUnitId, companyName, source,
+                Integer.parseInt(year), period, pageable);
+    }
+
+    @Override
+    public Page<Contact> searchListContactSql(
+        String identifier,
+        String lastName,
+        String firstName,
+        String email,
+        String idSu,
+        String surveyUnitId,
+        String companyName,
+        String source,
+        String year,
+        String period,
+        Pageable pageable) {
+        if (StringUtils.isEmpty(year))
+            return contactRepository.findContactMultiCriteria(identifier, lastName, firstName, email, idSu, surveyUnitId, companyName, source, period,
+                pageable);
+        else
+            return contactRepository.findContactMultiCriteriaYear(identifier, lastName, firstName, email, idSu, surveyUnitId, companyName, source,
+                Integer.parseInt(year), period, pageable);
+    }
 
 }

@@ -18,7 +18,7 @@ import lombok.Setter;
 @Setter
 @Table(indexes = {
     @Index(name = "idPartitioning_index", columnList = "idPartitioning")
-  })
+})
 public class Questioning {
 
     @Id
@@ -28,12 +28,10 @@ public class Questioning {
     private String modelName;
     private String idPartitioning;
 
-
     @OneToMany
     private Set<QuestioningAccreditation> questioningAccreditations;
-    
+
     @OneToOne
     private SurveyUnit surveyUnit;
-
 
 }

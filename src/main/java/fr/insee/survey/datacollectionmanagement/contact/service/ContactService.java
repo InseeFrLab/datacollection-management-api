@@ -2,6 +2,8 @@ package fr.insee.survey.datacollectionmanagement.contact.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
@@ -18,5 +20,31 @@ public interface ContactService {
     public List<Contact> findByEmail(String email);
 
     public List<Contact> searchListContactParameters(String identifier, String lastName, String firstName, String email);
+    
+    public Page<Contact> searchListContactAccreditationsCopy(
+        String identifier,
+        String lastName,
+        String firstName,
+        String email,
+        String idSu,
+        String surveyUnitId,
+        String companyName,
+        String source,
+        String year,
+        String period,
+        Pageable pageable);
+
+    public Page<Contact> searchListContactSql(
+        String identifier,
+        String lastName,
+        String firstName,
+        String email,
+        String idSu,
+        String surveyUnitId,
+        String companyName,
+        String source,
+        String year,
+        String period,
+        Pageable pageable);
 
 }
