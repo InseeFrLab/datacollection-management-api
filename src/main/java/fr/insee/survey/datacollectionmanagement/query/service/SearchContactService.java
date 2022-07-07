@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
 import fr.insee.survey.datacollectionmanagement.query.dto.SearchContactDto;
+import fr.insee.survey.datacollectionmanagement.view.domain.View;
 
 public interface SearchContactService {
 
@@ -35,22 +36,9 @@ public interface SearchContactService {
         String source,
         String year,
         String period);
-
-    /**
-     * Search contact in the 2 separated domains: contacts, questioning (with a copy of metadata in the questioning domain)
-     * @param identifier
-     * @param lastName
-     * @param firstName
-     * @param email
-     * @param idSu
-     * @param surveyUnitId
-     * @param companyName
-     * @param source
-     * @param year
-     * @param period
-     * @return
-     */
-    List<Contact> searchContactV2CrossDomain(
+    
+    
+    List<View> searchContactV2CrossDomain(
         String identifier,
         String lastName,
         String firstName,
@@ -60,7 +48,8 @@ public interface SearchContactService {
         String companyName,
         String source,
         String year,
-        String period);
+        String period,
+        Pageable pageable);
 
     /**
      * Search for contacts in 1 domain (copy of accreditations and metadata into contacts)
@@ -91,6 +80,32 @@ public interface SearchContactService {
         Pageable pageable);
 
     /**
+     * Search contact in the 2 separated domains: contacts, questioning (with a copy of metadata in the questioning domain)
+     * @param identifier
+     * @param lastName
+     * @param firstName
+     * @param email
+     * @param idSu
+     * @param surveyUnitId
+     * @param companyName
+     * @param source
+     * @param year
+     * @param period
+     * @return
+     */
+    List<Contact> searchContactV3bisCrossDomain(
+        String identifier,
+        String lastName,
+        String firstName,
+        String email,
+        String idSu,
+        String surveyUnitId,
+        String companyName,
+        String source,
+        String year,
+        String period);
+
+    /**
      * No separated domains (SQL query to search contact)
      * @param identifier
      * @param lastName
@@ -119,8 +134,13 @@ public interface SearchContactService {
 
     List<SearchContactDto> transformListContactDaoToDto(List<Contact> listContacts);
 
-    List<SearchContactDto> transformPageContactDaoToDto(Page<Contact> listContacts);
-
     List<SearchContactDto> transformListStringToDto(List<String> listIdentifiers);
+
+    List<SearchContactDto> transformPageContactDaoToDtoV3(Page<Contact> listContacts);
+
+    List<SearchContactDto> transformListViewDaoToDto(List<View> subList);
+
+
+    List<SearchContactDto> transformPageContactDaoToDto(Page<Contact> listContacts);
 
 }

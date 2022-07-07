@@ -55,12 +55,21 @@ public class CampaignServiceImpl implements CampaignService {
 
     @Override
     public List<Campaign> findbyPeriod(String period) {
-        // TODO Auto-generated method stub
         return campaignRepository.findByPeriod(period);
     }
 
     @Override
     public Campaign findById(String idCampaign) {
         return campaignRepository.findById(idCampaign).orElseThrow(() -> new NoSuchElementException("Campaign not found"));
+    }
+
+    @Override
+    public List<Campaign> findbySourceYearPeriod(String source, Integer year, String period) {
+        return campaignRepository.findBySourceYearPeriod(source, year, period);
+    }
+    
+    @Override
+    public List<Campaign> findbySourcePeriod(String source, String period) {
+        return campaignRepository.findBySourcePeriod(source, period);
     }
 }

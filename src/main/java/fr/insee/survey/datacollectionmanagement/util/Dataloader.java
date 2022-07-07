@@ -56,6 +56,8 @@ import fr.insee.survey.datacollectionmanagement.questioning.repository.Questioni
 import fr.insee.survey.datacollectionmanagement.questioning.repository.QuestioningEventRepository;
 import fr.insee.survey.datacollectionmanagement.questioning.repository.QuestioningRepository;
 import fr.insee.survey.datacollectionmanagement.questioning.repository.SurveyUnitRepository;
+import fr.insee.survey.datacollectionmanagement.view.domain.View;
+import fr.insee.survey.datacollectionmanagement.view.repository.ViewRepository;
 
 @Component
 public class Dataloader {
@@ -106,6 +108,9 @@ public class Dataloader {
 
     @Autowired
     private AccreditationsCopyRepository accreditationsCopyRepository;
+    
+    @Autowired
+    private ViewRepository viewRepository;
 
     @PostConstruct
     public void init() {
@@ -119,6 +124,7 @@ public class Dataloader {
         initQuestionning(faker, generator);
         initMetadatacopy();
         initAccreditationsCopy();
+        initView();
 
     }
 
@@ -531,6 +537,20 @@ public class Dataloader {
                 acc.setYear(p.getCampaign().getSurvey().getYear());
                 acc.setPeriod(p.getCampaign().getPeriod());
                 accreditationsCopyRepository.save(acc);
+            });
+        }
+    }
+    
+    private void initView() {
+        if (viewRepository.count() == 0) {
+            List<QuestioningAccreditation> listAccreditations = questioningAccreditationRepository.findAll();
+            listAccreditations.stream().forEach(a -> {
+                Partitioning p = partitioningRepository.findById(a.getQuestioning().getIdPartitioning()).orElse(null);
+                View view = new View();
+                view.setIdentifier(contactRepository.findById(a.getIdContact()).orElse(null).getIdentifier());
+                view.setCampaignId(p.getCampaign().getCampaignId());
+                view.setIdSu(a.getQuestioning().getSurveyUnit().getIdSu());
+                viewRepository.save(view);
             });
         }
     }
