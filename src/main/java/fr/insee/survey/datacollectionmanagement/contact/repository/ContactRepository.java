@@ -12,38 +12,6 @@ import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
 
 public interface ContactRepository extends PagingAndSortingRepository<Contact, String> {
 
-    static final String QUERY_MULTI_CRITERIA =
-        "select                                                                                                                                 "
-            + "        c.*                                                                                                                      "
-            + "from                                                                                                                             "
-            + "        contact c                                                                                                                "
-            + "join questioning_accreditation qa                                                                                                "
-            + "        on                                                                                                                       "
-            + "        c.identifier = qa.id_contact                                                                                             "
-            + "join questioning q on                                                                                                            "
-            + "        q.id = qa.questioning_id                                                                                                 "
-            + "join survey_unit su                                                                                                              "
-            + "on                                                                                                                               "
-            + "        su.id_su = q.survey_unit_id_su                                                                                           "
-            + "join partitioning p on                                                                                                           "
-            + "        p.id = q.id_partitioning                                                                                                 "
-            + "join campaign c2 on                                                                                                              "
-            + "        p.campaign_campaign_id = c2.campaign_id                                                                                  "
-            + "join survey y on                                                                                                                 "
-            + "        y.id = c2.survey_id                                                                                                      "
-            + "join \"source\" s2 on                                                                                                            "
-            + "        s2.id_source = y.source_id_source                                                                                        "
-            + "where                                                                                                                            "
-            + "        (:identifier is null or UPPER(c.identifier) = UPPER(cast(:identifier as text)))                                          "
-            + "        and (:firstName is null or UPPER(c.first_name) = UPPER(cast( :firstName as text)))                                       "
-            + "        and (:lastName is null or UPPER(c.last_name) = UPPER(cast(:lastName as text)))                                           "
-            + "        and (:email is null or UPPER(c.email) = UPPER(cast( :email as text)))                                                    "
-            + "        and (:idSu is null or UPPER(su.id_su) = UPPER(cast( :idSu as text)))                                                     "
-            + "        and (:surveyUnitId is null or UPPER(su.survey_unit_id) = UPPER(cast( :surveyUnitId as text)))                            "
-            + "        and (:companyName is null or UPPER(su.company_name) = UPPER(cast( :companyName as text)))                                "
-            + "        and (:source is null or UPPER(s2.id_source) = UPPER(cast( :source as text)))                                             "
-            + "        and (:period is null or UPPER(c2.\"period\") = UPPER(cast( :period as text)))                                            ";
-
     static final String QUERY_ACCREDITATIONS_COPY =
         "select                                                                                                                                 "
             + "        c.*                                                                                                                      "
@@ -77,32 +45,6 @@ public interface ContactRepository extends PagingAndSortingRepository<Contact, S
 
     public List<Contact> findByEmailIgnoreCase(String email);
 
-    @Query(nativeQuery = true, value = QUERY_MULTI_CRITERIA)
-    public Page<Contact> findContactMultiCriteria(
-        @Param("identifier") String identifier,
-        @Param("lastName") String lastName,
-        @Param("firstName") String firstName,
-        @Param("email") String email,
-        @Param("idSu") String idSu,
-        @Param("surveyUnitId") String surveyUnitId,
-        @Param("companyName") String companyName,
-        @Param("source") String source,
-        @Param("period") String period,
-        Pageable pageable);
-
-    @Query(nativeQuery = true, value = QUERY_MULTI_CRITERIA + CLAUSE_YEAR)
-    public Page<Contact> findContactMultiCriteriaYear(
-        @Param("identifier") String identifier,
-        @Param("lastName") String lastName,
-        @Param("firstName") String firstName,
-        @Param("email") String email,
-        @Param("idSu") String idSu,
-        @Param("surveyUnitId") String surveyUnitId,
-        @Param("companyName") String companyName,
-        @Param("source") String source,
-        @Param("year") Integer year,
-        @Param("period") String period,
-        Pageable pageable);
 
     @Query(nativeQuery = true, value = QUERY_ACCREDITATIONS_COPY)
     public Page<Contact> findContactMultiCriteriaAccreditationsCopy(

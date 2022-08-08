@@ -79,58 +79,6 @@ public interface SearchContactService {
         String period,
         Pageable pageable);
 
-    /**
-     * Search contact in the 2 separated domains: contacts, questioning (with a copy of metadata in the questioning domain)
-     * @param identifier
-     * @param lastName
-     * @param firstName
-     * @param email
-     * @param idSu
-     * @param surveyUnitId
-     * @param companyName
-     * @param source
-     * @param year
-     * @param period
-     * @return
-     */
-    List<Contact> searchContactV3bisCrossDomain(
-        String identifier,
-        String lastName,
-        String firstName,
-        String email,
-        String idSu,
-        String surveyUnitId,
-        String companyName,
-        String source,
-        String year,
-        String period);
-
-    /**
-     * No separated domains (SQL query to search contact)
-     * @param identifier
-     * @param lastName
-     * @param firstName
-     * @param email
-     * @param idSu
-     * @param surveyUnitId
-     * @param companyName
-     * @param source
-     * @param year
-     * @param period
-     * @return
-     */
-    Page<Contact> searchContactV4CrossDomain(
-        String identifier,
-        String lastName,
-        String firstName,
-        String email,
-        String idSu,
-        String surveyUnitId,
-        String companyName,
-        String source,
-        String year,
-        String period,
-        Pageable pageable);
 
     List<SearchContactDto> transformListContactDaoToDto(List<Contact> listContacts);
 
@@ -139,7 +87,6 @@ public interface SearchContactService {
     List<SearchContactDto> transformPageContactDaoToDtoV3(Page<Contact> listContacts);
 
     List<SearchContactDto> transformListViewDaoToDto(List<View> subList);
-
 
     List<SearchContactDto> transformPageContactDaoToDto(Page<Contact> listContacts);
 
