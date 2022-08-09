@@ -13,4 +13,6 @@ public interface AccreditationsCopyService {
     
     List<AccreditationsCopy> findAccreditationCopy(String identifier, String idSu, String source, int year, String period);
 
+    List<AccreditationsCopy> findByContactIdentifierContainingOrIdSuContaining(String identifier, String idSu);
+
 }

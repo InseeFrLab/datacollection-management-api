@@ -119,13 +119,13 @@ public class Dataloader {
         Faker faker = new Faker();
         EasyRandom generator = new EasyRandom();
 
-        initOrder();
-        initContact(faker);
-        initMetadata(faker, generator);
-         initQuestionning(faker, generator);
-         initMetadatacopy();
-         initAccreditationsCopy();
-         initView();
+//        initOrder();
+//        initContact(faker);
+//        initMetadata(faker, generator);
+//        initQuestionning(faker, generator);
+//        initMetadatacopy();
+//        initAccreditationsCopy();
+//        initView();
 
     }
 
@@ -354,8 +354,7 @@ public class Dataloader {
         String fakeSiren;
         Random qeRan = new Random();
 
-        LOGGER.info("{} survey units exist in database", surveyUnitRepository.
-            count());
+        LOGGER.info("{} survey units exist in database", surveyUnitRepository.count());
 
         for (Long i = surveyUnitRepository.count(); i < 1000000; i ++ ) {
             SurveyUnit su = new SurveyUnit();

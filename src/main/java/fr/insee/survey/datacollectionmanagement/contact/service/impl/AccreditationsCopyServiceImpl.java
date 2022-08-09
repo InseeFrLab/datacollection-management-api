@@ -25,4 +25,9 @@ public class AccreditationsCopyServiceImpl implements AccreditationsCopyService 
         return accreditationsCopyRepository.findByContactIdentifierAndIdSuAndSourceIdAndYearAndPeriod(identifier, idSu, source, year, period);
     }
 
+    @Override
+    public List<AccreditationsCopy> findByContactIdentifierContainingOrIdSuContaining(String identifier, String idSu) {
+        return accreditationsCopyRepository.findByContactIdentifierContainingOrIdSuContaining(identifier, idSu);
+    }
+
 }

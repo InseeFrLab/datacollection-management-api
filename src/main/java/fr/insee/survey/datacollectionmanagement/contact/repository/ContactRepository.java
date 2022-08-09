@@ -17,7 +17,7 @@ public interface ContactRepository extends PagingAndSortingRepository<Contact, S
             + "        c.*                                                                                                                      "
             + "from                                                                                                                             "
             + "        contact c                                                                                                                "
-            + "join accreditations_copy y                                                                                                       "
+            + "left join accreditations_copy y                                                                                                  "
             + "on                                                                                                                               "
             + "        c.identifier = y.contact_identifier                                                                                      "
             + "where                                                                                                                            "

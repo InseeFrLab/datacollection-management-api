@@ -16,4 +16,7 @@ public interface AccreditationsCopyRepository extends JpaRepository<Accreditatio
         String sourceId,
         int year,
         String period);
+    
+    List<AccreditationsCopy> findByContactIdentifierContainingOrIdSuContaining(String identifier, String idSu);
+
 }

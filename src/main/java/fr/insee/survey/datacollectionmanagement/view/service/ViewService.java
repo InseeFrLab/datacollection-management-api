@@ -17,4 +17,8 @@ public interface ViewService {
     
     List<View> findViewByIdentifierIdSuCampaignId(String identifier, String idSu, String campaignId);
 
+    List<View> findByIdentifierContainingAndIdSuNotNull(String identifier);
+
+    List<View> findViewByIdSuContaining(String field);
+
 }
