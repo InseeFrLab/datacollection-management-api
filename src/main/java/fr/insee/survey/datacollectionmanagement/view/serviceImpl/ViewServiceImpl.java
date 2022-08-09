@@ -30,4 +30,9 @@ public class ViewServiceImpl implements ViewService {
         return viewRepository.findByIdSu(idSu);
     }
 
+    @Override
+    public List<View> findViewByIdentifierIdSuCampaignId(String identifier, String idSu, String campaignId) {
+        return viewRepository.findViewByIdentifierAndIdSuAndCampaignId(identifier, idSu, campaignId);
+    }
+
 }

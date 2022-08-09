@@ -8,4 +8,12 @@ import fr.insee.survey.datacollectionmanagement.contact.domain.AccreditationsCop
 
 public interface AccreditationsCopyRepository extends JpaRepository<AccreditationsCopy, Long> {
 
-    List<AccreditationsCopy> findByContactIdentifier(String identifier);}
+    List<AccreditationsCopy> findByContactIdentifier(String identifier);
+
+    List<AccreditationsCopy> findByContactIdentifierAndIdSuAndSourceIdAndYearAndPeriod(
+        String identifier,
+        String idSu,
+        String sourceId,
+        int year,
+        String period);
+}

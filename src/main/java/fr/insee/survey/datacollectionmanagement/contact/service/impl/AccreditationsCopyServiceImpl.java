@@ -16,8 +16,13 @@ public class AccreditationsCopyServiceImpl implements AccreditationsCopyService 
     private AccreditationsCopyRepository accreditationsCopyRepository;
 
     @Override
-    public List<AccreditationsCopy> findAddredationsCopyOfContact(String identifier) {
+    public List<AccreditationsCopy> findAccreditationCopyOfContact(String identifier) {
         return accreditationsCopyRepository.findByContactIdentifier(identifier);
+    }
+
+    @Override
+    public List<AccreditationsCopy> findAccreditationCopy(String identifier, String idSu, String source, int year, String period) {
+        return accreditationsCopyRepository.findByContactIdentifierAndIdSuAndSourceIdAndYearAndPeriod(identifier, idSu, source, year, period);
     }
 
 }

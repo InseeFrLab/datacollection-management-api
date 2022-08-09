@@ -17,5 +17,7 @@ public interface ViewRepository extends PagingAndSortingRepository<View, Long> {
     List<View> findByCampaignId(String campaignId);
     
     List<View> findByIdSu(String idSu);
+    
+    List<View> findViewByIdentifierAndIdSuAndCampaignId(String identifier, String idSu, String campaignId);
 
 }

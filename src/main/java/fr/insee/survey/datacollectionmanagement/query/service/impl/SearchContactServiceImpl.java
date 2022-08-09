@@ -429,7 +429,7 @@ public class SearchContactServiceImpl implements SearchContactService {
         searchContact.setLastName(c.getLastName());
         searchContact.setEmail(c.getEmail());
 
-        List<AccreditationsCopy> accreditations = accreditationsCopyService.findAddredationsCopyOfContact(c.getIdentifier());
+        List<AccreditationsCopy> accreditations = accreditationsCopyService.findAccreditationCopyOfContact(c.getIdentifier());
 
         accreditations.stream()
             .forEach(acc -> listAccreditations.add(new AccreditationDetail(acc.getSourceId(), acc.getYear(), acc.getPeriod(), acc.getSurveyUnitId())));
