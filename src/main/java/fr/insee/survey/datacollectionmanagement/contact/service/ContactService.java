@@ -34,17 +34,4 @@ public interface ContactService {
         String period,
         Pageable pageable);
 
-    public Page<Contact> searchListContactSql(
-        String identifier,
-        String lastName,
-        String firstName,
-        String email,
-        String idSu,
-        String surveyUnitId,
-        String companyName,
-        String source,
-        String year,
-        String period,
-        Pageable pageable);
-
 }

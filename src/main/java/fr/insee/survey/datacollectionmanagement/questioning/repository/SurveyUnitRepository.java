@@ -59,4 +59,7 @@ public interface SurveyUnitRepository extends JpaRepository<SurveyUnit, String> 
 
     @Query(nativeQuery=true, value=QUERY_COMPANY_NAME)
     public List<String> findIdContactsByCompanyName(String companyName);
+    
+    @Query(nativeQuery = true, value = "SELECT *  FROM survey_unit ORDER BY random() LIMIT 1")
+    public SurveyUnit findRandomSurveyUnit();
 }

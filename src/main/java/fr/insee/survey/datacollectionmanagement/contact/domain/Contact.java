@@ -26,6 +26,8 @@ public class Contact {
 
     @Id
     private String identifier;
+    private String campaignId;
+
 
     private String lastName;
     private String firstName;

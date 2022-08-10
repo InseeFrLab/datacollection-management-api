@@ -105,25 +105,6 @@ public class ContactServiceImpl implements ContactService {
                 Integer.parseInt(year), period, pageable);
     }
 
-    @Override
-    public Page<Contact> searchListContactSql(
-        String identifier,
-        String lastName,
-        String firstName,
-        String email,
-        String idSu,
-        String surveyUnitId,
-        String companyName,
-        String source,
-        String year,
-        String period,
-        Pageable pageable) {
-        if (StringUtils.isEmpty(year))
-            return contactRepository.findContactMultiCriteria(identifier, lastName, firstName, email, idSu, surveyUnitId, companyName, source, period,
-                pageable);
-        else
-            return contactRepository.findContactMultiCriteriaYear(identifier, lastName, firstName, email, idSu, surveyUnitId, companyName, source,
-                Integer.parseInt(year), period, pageable);
-    }
+
 
 }

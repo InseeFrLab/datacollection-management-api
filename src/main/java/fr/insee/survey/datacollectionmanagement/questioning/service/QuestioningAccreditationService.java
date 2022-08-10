@@ -8,7 +8,7 @@ import fr.insee.survey.datacollectionmanagement.questioning.domain.SurveyUnit;
 
 public interface QuestioningAccreditationService {
 
-    public List<QuestioningAccreditation> findByIdContact(String id);
+    public List<QuestioningAccreditation> findByContactIdentifier(String id);
 
     public Set<QuestioningAccreditation> findBySurveyUnit(SurveyUnit su);
 

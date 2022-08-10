@@ -34,7 +34,7 @@ public class MySurveysController {
     public List<MySurveyDto> findById(@PathVariable("id") String id) {
 
         List<MySurveyDto> listSurveys = new ArrayList<>();
-        List<QuestioningAccreditation> accreditations = questioningAccreditationService.findByIdContact(id);
+        List<QuestioningAccreditation> accreditations = questioningAccreditationService.findByContactIdentifier(id);
 
         for (QuestioningAccreditation questioningAccreditation : accreditations) {
             MySurveyDto surveyDto = new MySurveyDto();

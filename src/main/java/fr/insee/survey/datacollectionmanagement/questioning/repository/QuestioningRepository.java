@@ -3,7 +3,6 @@ package fr.insee.survey.datacollectionmanagement.questioning.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
 import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
 

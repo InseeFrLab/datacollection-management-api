@@ -12,7 +12,12 @@ import fr.insee.survey.datacollectionmanagement.metadata.dto.CampaignMoogDto;
 public interface CampaignService {
     Collection<CampaignMoogDto> getCampaigns();
 
+    Campaign findById(String idCampaign);
+
     List<Campaign> findbyPeriod(String period);
 
-    Campaign findById(String idCampaign);
+    List<Campaign> findbySourceYearPeriod(String source, Integer year, String period);
+
+    List<Campaign> findbySourcePeriod(String source, String period);
+
 }
