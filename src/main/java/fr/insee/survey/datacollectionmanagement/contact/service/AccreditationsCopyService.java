@@ -9,7 +9,7 @@ import fr.insee.survey.datacollectionmanagement.contact.domain.AccreditationsCop
 @Service
 public interface AccreditationsCopyService {
 
-    List<AccreditationsCopy> findAccreditationCopyOfContact(String idContact);
+    List<AccreditationsCopy> findAccreditationCopyOfContact(String identifier);
     
     List<AccreditationsCopy> findAccreditationCopy(String identifier, String idSu, String source, int year, String period);
 

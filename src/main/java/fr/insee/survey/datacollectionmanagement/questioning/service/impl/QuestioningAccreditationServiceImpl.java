@@ -19,7 +19,7 @@ public class QuestioningAccreditationServiceImpl implements QuestioningAccredita
     @Autowired
     private QuestioningAccreditationRepository questioningAccreditationRepository;
 
-    public List<QuestioningAccreditation> findByIdContact(String id) {
+    public List<QuestioningAccreditation> findByContactIdentifier(String id) {
         return questioningAccreditationRepository.findByIdContact(id);
     }
 

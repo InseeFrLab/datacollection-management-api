@@ -144,9 +144,9 @@ public class SearchContactServiceImpl implements SearchContactService {
                 List<Contact> listContactCopy = List.copyOf(listContact);
                 List<String> listPartitioningIds = partitioningService.findIdPartitioningsBySourceIdYearPeriod(source, year, period);
                 for (Contact c : listContactCopy) {
-                    List<String> listPartitioningIdContact = questioningAccreditationService.findIdPartitioningsByContactAccreditations(c.getIdentifier());
+                    List<String> listPartitioningContactId = questioningAccreditationService.findIdPartitioningsByContactAccreditations(c.getIdentifier());
                     boolean noElementsInCommon = true;
-                    if ( !listPartitioningIdContact.isEmpty()) noElementsInCommon = Collections.disjoint(listPartitioningIdContact, listPartitioningIds);
+                    if ( !listPartitioningContactId.isEmpty()) noElementsInCommon = Collections.disjoint(listPartitioningContactId, listPartitioningIds);
                     if (noElementsInCommon) {
                         listContact.remove(c);
                     }
@@ -168,9 +168,9 @@ public class SearchContactServiceImpl implements SearchContactService {
                 List<Contact> listContactCopy = List.copyOf(listContact);
                 List<String> listPartitioningIds = partitioningService.findIdPartitioningsBySourceId(source);
                 for (Contact c : listContactCopy) {
-                    List<String> listPartitioningIdContact = questioningAccreditationService.findIdPartitioningsByContactAccreditations(c.getIdentifier());
+                    List<String> listPartitioningContactId = questioningAccreditationService.findIdPartitioningsByContactAccreditations(c.getIdentifier());
                     boolean noElementsInCommon = true;
-                    if ( !listPartitioningIdContact.isEmpty()) noElementsInCommon = Collections.disjoint(listPartitioningIdContact, listPartitioningIds);
+                    if ( !listPartitioningContactId.isEmpty()) noElementsInCommon = Collections.disjoint(listPartitioningContactId, listPartitioningIds);
                     if (noElementsInCommon) {
                         listContact.remove(c);
                     }
@@ -190,9 +190,9 @@ public class SearchContactServiceImpl implements SearchContactService {
                 List<Contact> listContactCopy = List.copyOf(listContact);
                 List<String> listPartitioningIds = partitioningService.findIdPartitioningsByYear(year);
                 for (Contact c : listContactCopy) {
-                    List<String> listPartitioningIdContact = questioningAccreditationService.findIdPartitioningsByContactAccreditations(c.getIdentifier());
+                    List<String> listPartitioningContactId = questioningAccreditationService.findIdPartitioningsByContactAccreditations(c.getIdentifier());
                     boolean noElementsInCommon = true;
-                    if ( !listPartitioningIdContact.isEmpty()) noElementsInCommon = Collections.disjoint(listPartitioningIdContact, listPartitioningIds);
+                    if ( !listPartitioningContactId.isEmpty()) noElementsInCommon = Collections.disjoint(listPartitioningContactId, listPartitioningIds);
                     if (noElementsInCommon) {
                         listContact.remove(c);
                     }
@@ -212,9 +212,9 @@ public class SearchContactServiceImpl implements SearchContactService {
                 List<Contact> listContactCopy = List.copyOf(listContact);
                 List<String> listPartitioningIds = partitioningService.findIdPartitioningsByPeriod(period);
                 for (Contact c : listContactCopy) {
-                    List<String> listPartitioningIdContact = questioningAccreditationService.findIdPartitioningsByContactAccreditations(c.getIdentifier());
+                    List<String> listPartitioningContactId = questioningAccreditationService.findIdPartitioningsByContactAccreditations(c.getIdentifier());
                     boolean noElementsInCommon = true;
-                    if ( !listPartitioningIdContact.isEmpty()) noElementsInCommon = Collections.disjoint(listPartitioningIdContact, listPartitioningIds);
+                    if ( !listPartitioningContactId.isEmpty()) noElementsInCommon = Collections.disjoint(listPartitioningContactId, listPartitioningIds);
                     if (noElementsInCommon) {
                         listContact.remove(c);
                     }
@@ -405,7 +405,7 @@ public class SearchContactServiceImpl implements SearchContactService {
         searchContact.setLastName(c.getLastName());
         searchContact.setEmail(c.getEmail());
 
-        List<QuestioningAccreditation> accreditations = questioningAccreditationService.findByIdContact(c.getIdentifier());
+        List<QuestioningAccreditation> accreditations = questioningAccreditationService.findByContactIdentifier(c.getIdentifier());
         for (QuestioningAccreditation questioningAccreditation : accreditations) {
             Questioning questioning = questioningAccreditation.getQuestioning();
             Partitioning part = partitioningService.findById(questioning.getIdPartitioning());
@@ -478,7 +478,7 @@ public class SearchContactServiceImpl implements SearchContactService {
             searchContact.setLastName(c.getLastName());
             searchContact.setEmail(c.getEmail());
 
-            List<QuestioningAccreditation> accreditations = questioningAccreditationService.findByIdContact(c.getIdentifier());
+            List<QuestioningAccreditation> accreditations = questioningAccreditationService.findByContactIdentifier(c.getIdentifier());
             for (QuestioningAccreditation questioningAccreditation : accreditations) {
                 Questioning questioning = questioningAccreditation.getQuestioning();
                 Partitioning part = partitioningService.findById(questioning.getIdPartitioning());
