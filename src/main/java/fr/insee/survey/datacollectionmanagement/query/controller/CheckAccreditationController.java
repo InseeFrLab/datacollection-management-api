@@ -23,9 +23,9 @@ public class CheckAccreditationController {
 
     @GetMapping(path = "checkAccreditationV2")
     public ResponseEntity<?> checkAccreditationV2(
-        @RequestParam(required = false) String identifier,
-        @RequestParam(required = false) String idSu,
-        @RequestParam(required = false) String campaignId) {
+        @RequestParam(required = true) String identifier,
+        @RequestParam(required = true) String idSu,
+        @RequestParam(required = true) String campaignId) {
 
         boolean res = checkAccreditationService.checkAccreditationV2(identifier, idSu, campaignId);
 //        LOGGER.info("Check accreditation V2: identifier = {},  idSu= {}, campaignId= {} - res = {}", identifier, idSu, campaignId, res);
@@ -36,9 +36,9 @@ public class CheckAccreditationController {
 
     @GetMapping(path = "checkAccreditationV3")
     public ResponseEntity<?> checkAccreditationV3(
-        @RequestParam(required = false) String identifier,
-        @RequestParam(required = false) String idSu,
-        @RequestParam(required = false) String campaignId) {
+        @RequestParam(required = true) String identifier,
+        @RequestParam(required = true) String idSu,
+        @RequestParam(required = true) String campaignId) {
 
         boolean res = checkAccreditationService.checkAccreditationV3(identifier, idSu, campaignId);
 //        LOGGER.info("Check accreditation V3: identifier = {},  idSu= {}, campaignId= {} - res = {}", identifier, idSu, campaignId, res);

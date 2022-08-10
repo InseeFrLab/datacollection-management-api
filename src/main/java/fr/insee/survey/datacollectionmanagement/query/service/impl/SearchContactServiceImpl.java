@@ -81,8 +81,7 @@ public class SearchContactServiceImpl implements SearchContactService {
                 listContact.addAll(contactService.findByLastName(lastName));
                 alwaysEmpty = false;
             }
-            else
-                listContact = listContact.stream().filter(c -> lastName.equalsIgnoreCase(c.getLastName())).collect(Collectors.toList());
+            else if ( !alwaysEmpty) listContact = listContact.stream().filter(c -> lastName.equalsIgnoreCase(c.getLastName())).collect(Collectors.toList());
         }
 
         if ( !StringUtils.isEmpty(firstName)) {
@@ -90,8 +89,7 @@ public class SearchContactServiceImpl implements SearchContactService {
                 listContact.addAll(contactService.findByFirstName(firstName));
                 alwaysEmpty = false;
             }
-            else
-                listContact = listContact.stream().filter(c -> firstName.equalsIgnoreCase(c.getFirstName())).collect(Collectors.toList());
+            else if ( !alwaysEmpty) listContact = listContact.stream().filter(c -> firstName.equalsIgnoreCase(c.getFirstName())).collect(Collectors.toList());
         }
 
         if ( !StringUtils.isEmpty(email)) {
@@ -99,8 +97,7 @@ public class SearchContactServiceImpl implements SearchContactService {
                 listContact.addAll(contactService.findByEmail(email));
                 alwaysEmpty = false;
             }
-            else
-                listContact = listContact.stream().filter(c -> email.equalsIgnoreCase(c.getEmail())).collect(Collectors.toList());
+            else if ( !alwaysEmpty) listContact = listContact.stream().filter(c -> email.equalsIgnoreCase(c.getEmail())).collect(Collectors.toList());
         }
 
         if ( !StringUtils.isEmpty(idSu)) {
@@ -108,8 +105,7 @@ public class SearchContactServiceImpl implements SearchContactService {
                 listContact.addAll(findContactsByIdSu(idSu));
                 alwaysEmpty = false;
             }
-            else
-                listContact = listContact.stream().filter(c -> findContactsByIdSu(idSu).contains(c)).collect(Collectors.toList());
+            else if ( !alwaysEmpty) listContact = listContact.stream().filter(c -> findContactsByIdSu(idSu).contains(c)).collect(Collectors.toList());
         }
 
         if ( !StringUtils.isEmpty(surveyUnitId)) {
@@ -117,7 +113,7 @@ public class SearchContactServiceImpl implements SearchContactService {
                 listContact.addAll(findContactsBySurveyUnitId(surveyUnitId));
                 alwaysEmpty = false;
             }
-            else {
+            else if ( !alwaysEmpty) {
                 listContact = listContact.stream().filter(c -> findContactsBySurveyUnitId(surveyUnitId).contains(c)).collect(Collectors.toList());
 
             }
@@ -128,7 +124,7 @@ public class SearchContactServiceImpl implements SearchContactService {
                 listContact.addAll(findContactsByCompanyName(companyName));
                 alwaysEmpty = false;
             }
-            else {
+            else if ( !alwaysEmpty) {
                 listContact = listContact.stream().filter(c -> findContactsByCompanyName(companyName).contains(c)).collect(Collectors.toList());
 
             }
@@ -144,7 +140,7 @@ public class SearchContactServiceImpl implements SearchContactService {
                     listContact.addAll(findContactByPartitioningId(partId));
                 alwaysEmpty = false;
             }
-            else {
+            else if ( !alwaysEmpty) {
                 List<Contact> listContactCopy = List.copyOf(listContact);
                 List<String> listPartitioningIds = partitioningService.findIdPartitioningsBySourceIdYearPeriod(source, year, period);
                 for (Contact c : listContactCopy) {
@@ -168,7 +164,7 @@ public class SearchContactServiceImpl implements SearchContactService {
                 alwaysEmpty = false;
             }
 
-            else {
+            else if ( !alwaysEmpty) {
                 List<Contact> listContactCopy = List.copyOf(listContact);
                 List<String> listPartitioningIds = partitioningService.findIdPartitioningsBySourceId(source);
                 for (Contact c : listContactCopy) {
@@ -190,7 +186,7 @@ public class SearchContactServiceImpl implements SearchContactService {
                 alwaysEmpty = false;
             }
 
-            else {
+            else if ( !alwaysEmpty) {
                 List<Contact> listContactCopy = List.copyOf(listContact);
                 List<String> listPartitioningIds = partitioningService.findIdPartitioningsByYear(year);
                 for (Contact c : listContactCopy) {
@@ -212,7 +208,7 @@ public class SearchContactServiceImpl implements SearchContactService {
                 alwaysEmpty = false;
             }
 
-            else {
+            else if ( !alwaysEmpty) {
                 List<Contact> listContactCopy = List.copyOf(listContact);
                 List<String> listPartitioningIds = partitioningService.findIdPartitioningsByPeriod(period);
                 for (Contact c : listContactCopy) {
@@ -257,7 +253,7 @@ public class SearchContactServiceImpl implements SearchContactService {
                 listView = viewService.findViewByIdSu(idSu);
                 alwaysEmpty = false;
             }
-            else {
+            else if ( !alwaysEmpty) {
                 listView = listView.stream().filter(v -> viewService.findViewByIdSu(idSu).contains(v)).collect(Collectors.toList());
             }
         }
@@ -271,7 +267,7 @@ public class SearchContactServiceImpl implements SearchContactService {
 
                 alwaysEmpty = false;
             }
-            else {
+            else if ( !alwaysEmpty) {
                 List<Campaign> listCampains = campaignService.findbySourceYearPeriod(source, Integer.parseInt(year), period);
                 List<View> listViewC = new ArrayList<>();
                 for (Campaign c : listCampains) {
@@ -290,7 +286,7 @@ public class SearchContactServiceImpl implements SearchContactService {
 
                 alwaysEmpty = false;
             }
-            else {
+            else if ( !alwaysEmpty) {
                 List<Campaign> listCampains = campaignService.findbySourcePeriod(source, period);
                 List<View> listViewC = new ArrayList<>();
                 for (Campaign c : listCampains) {
@@ -309,7 +305,8 @@ public class SearchContactServiceImpl implements SearchContactService {
                 }
                 alwaysEmpty = false;
             }
-            else
+            else if ( !alwaysEmpty)
+
                 listView =
                     listView.stream().filter(v -> lastName.equalsIgnoreCase(contactService.findByIdentifier(v.getIdentifier()).getLastName()))
                         .collect(Collectors.toList());
@@ -323,7 +320,8 @@ public class SearchContactServiceImpl implements SearchContactService {
                 }
                 alwaysEmpty = false;
             }
-            else
+            else if ( !alwaysEmpty)
+
                 listView =
                     listView.stream().filter(v -> firstName.equalsIgnoreCase(contactService.findByIdentifier(v.getIdentifier()).getFirstName()))
                         .collect(Collectors.toList());
@@ -337,7 +335,8 @@ public class SearchContactServiceImpl implements SearchContactService {
                 }
                 alwaysEmpty = false;
             }
-            else
+            else if ( !alwaysEmpty)
+
                 listView =
                     listView.stream().filter(v -> email.equalsIgnoreCase(contactService.findByIdentifier(v.getIdentifier()).getEmail()))
                         .collect(Collectors.toList());
@@ -351,7 +350,7 @@ public class SearchContactServiceImpl implements SearchContactService {
                 }
                 alwaysEmpty = false;
             }
-            else {
+            else if ( !alwaysEmpty) {
                 List<SurveyUnit> listSurveyUnits = surveyUnitService.findbySurveyUnitId(surveyUnitId);
                 for (SurveyUnit s : listSurveyUnits) {
                     listView = listView.stream().filter(v -> surveyUnitId.equalsIgnoreCase(s.getSurveyUnitId())).collect(Collectors.toList());
@@ -368,7 +367,7 @@ public class SearchContactServiceImpl implements SearchContactService {
                 }
                 alwaysEmpty = false;
             }
-            else {
+            else if ( !alwaysEmpty) {
                 List<SurveyUnit> listSurveyUnits = surveyUnitService.findbySurveyUnitId(surveyUnitId);
                 for (SurveyUnit s : listSurveyUnits) {
                     listView = listView.stream().filter(v -> companyName.equalsIgnoreCase(s.getCompanyName())).collect(Collectors.toList());
