@@ -10,8 +10,12 @@ import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
 
 @Service
 public interface ContactService {
+    
+    public Page<Contact> findAll(Pageable pageable);
 
     public Contact findByIdentifier(String identifier);
+    
+    public Contact updateContact(Contact contact);
 
     public List<Contact> findByLastName(String lastName);
 

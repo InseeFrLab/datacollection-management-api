@@ -4,13 +4,14 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
 
-public interface ContactRepository extends PagingAndSortingRepository<Contact, String> {
+public interface ContactRepository extends PagingAndSortingRepository<Contact, String>,JpaRepository<Contact, String>  {
 
     static final String QUERY_ACCREDITATIONS_COPY =
         "select                                                                                                                                 "
@@ -32,6 +33,8 @@ public interface ContactRepository extends PagingAndSortingRepository<Contact, S
             + "        and (:period is null or UPPER(y.\"period\") = UPPER(cast( :period as text)))                                             ";
 
     static final String CLAUSE_YEAR = " and (:year is null or y.\"year\" = :year)                   ";
+    
+    Page<Contact> findAll(Pageable pageable);
 
     @Query(nativeQuery = true, value = "SELECT *  FROM contact ORDER BY random() LIMIT 1")
     public Contact findRandomContact();

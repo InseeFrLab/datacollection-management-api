@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
@@ -21,11 +22,24 @@ public class ContactServiceImpl implements ContactService {
 
     @Autowired
     private ContactRepository contactRepository;
+    
+
+    @Override
+    public Page<Contact> findAll(Pageable pageable) {
+        return contactRepository.findAll(pageable);
+    }
 
     @Override
     public Contact findByIdentifier(String identifier) {
         return contactRepository.findById(identifier).orElseThrow(() -> new NoSuchElementException("Contact not found"));
     }
+    
+    @Override
+    public Contact updateContact(Contact contact) {
+        return contactRepository.save(contact);
+    }
+
+
 
     @Override
     public List<Contact> findByLastName(String lastName) {
@@ -104,6 +118,7 @@ public class ContactServiceImpl implements ContactService {
             return contactRepository.findContactMultiCriteriaAccreditationsCopyYear(identifier, lastName, firstName, email, idSu, surveyUnitId, companyName, source,
                 Integer.parseInt(year), period, pageable);
     }
+
 
 
 
