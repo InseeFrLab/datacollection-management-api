@@ -38,6 +38,11 @@ public class ContactServiceImpl implements ContactService {
     public Contact updateContact(Contact contact) {
         return contactRepository.save(contact);
     }
+    
+    @Override
+    public void deleteContact(String identifier) {
+        contactRepository.deleteById(identifier);
+    }
 
 
 

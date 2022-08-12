@@ -16,6 +16,8 @@ public interface ContactService {
     public Contact findByIdentifier(String identifier);
     
     public Contact updateContact(Contact contact);
+    
+    public void deleteContact(String identifier);
 
     public List<Contact> findByLastName(String lastName);
 
