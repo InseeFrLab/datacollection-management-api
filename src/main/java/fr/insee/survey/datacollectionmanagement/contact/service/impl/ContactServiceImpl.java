@@ -2,18 +2,23 @@ package fr.insee.survey.datacollectionmanagement.contact.service.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
+import fr.insee.survey.datacollectionmanagement.contact.domain.ContactEvent;
+import fr.insee.survey.datacollectionmanagement.contact.domain.ContactEvent.ContactEventType;
+import fr.insee.survey.datacollectionmanagement.contact.repository.AddressRepository;
+import fr.insee.survey.datacollectionmanagement.contact.repository.ContactEventRepository;
 import fr.insee.survey.datacollectionmanagement.contact.repository.ContactRepository;
 import fr.insee.survey.datacollectionmanagement.contact.service.ContactService;
 
@@ -22,7 +27,12 @@ public class ContactServiceImpl implements ContactService {
 
     @Autowired
     private ContactRepository contactRepository;
-    
+
+    @Autowired
+    private AddressRepository addressRepository;
+
+    @Autowired
+    private ContactEventRepository contactEventRepository;
 
     @Override
     public Page<Contact> findAll(Pageable pageable) {
@@ -33,18 +43,35 @@ public class ContactServiceImpl implements ContactService {
     public Contact findByIdentifier(String identifier) {
         return contactRepository.findById(identifier).orElseThrow(() -> new NoSuchElementException("Contact not found"));
     }
-    
+
     @Override
     public Contact updateContact(Contact contact) {
-        return contactRepository.save(contact);
+        Contact c = findByIdentifier(contact.getIdentifier());
+        if (c != null && !c.equals(contact)) {
+            addressRepository.save(contact.getAddress());
+            contactRepository.save(contact);
+            Set<ContactEvent> setContactEventsContact = contactEventRepository.findByContact(contact);
+            List<ContactEvent> listUpdateContact =
+                setContactEventsContact.stream().filter(ce -> ce.getType().equals(ContactEventType.update)).collect(Collectors.toList());
+            ContactEvent contactEventUpdate = null;
+            if (!listUpdateContact.isEmpty())
+                contactEventUpdate = listUpdateContact.get(0);
+            else {
+                contactEventUpdate = new ContactEvent();
+                contactEventUpdate.setContact(contact);
+                contactEventUpdate.setType(ContactEventType.update);
+            }
+            contactEventUpdate.setEventDate(new Date());
+            contactEventRepository.save(contactEventUpdate);
+            c = contact;
+        }
+        return c;
     }
-    
+
     @Override
     public void deleteContact(String identifier) {
         contactRepository.deleteById(identifier);
     }
-
-
 
     @Override
     public List<Contact> findByLastName(String lastName) {
@@ -120,11 +147,8 @@ public class ContactServiceImpl implements ContactService {
             return contactRepository.findContactMultiCriteriaAccreditationsCopy(identifier, lastName, firstName, email, idSu, surveyUnitId, companyName, source,
                 period, pageable);
         else
-            return contactRepository.findContactMultiCriteriaAccreditationsCopyYear(identifier, lastName, firstName, email, idSu, surveyUnitId, companyName, source,
-                Integer.parseInt(year), period, pageable);
+            return contactRepository.findContactMultiCriteriaAccreditationsCopyYear(identifier, lastName, firstName, email, idSu, surveyUnitId, companyName,
+                source, Integer.parseInt(year), period, pageable);
     }
-
-
-
 
 }

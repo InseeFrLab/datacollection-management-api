@@ -1,5 +1,7 @@
 package fr.insee.survey.datacollectionmanagement.contact.controller;
 
+import java.util.NoSuchElementException;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,18 +38,25 @@ public class ContactController {
     public Page<Contact> findContacts(
         @RequestParam(defaultValue = "0") Integer page,
         @RequestParam(defaultValue = "20") Integer size,
-        @RequestParam(required = false) String sort) {
+        @RequestParam(defaultValue = "identifier") String sort) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
         return contactService.findAll(pageable);
     }
 
     @GetMapping(value = "contacts/{id}")
     public ResponseEntity<?> findContact(@PathVariable("id") String id) {
-        Contact contact = contactService.findByIdentifier(id);
-        if (contact.getIdentifier() != null)
+        Contact contact = null;
+        try {
+            contact = contactService.findByIdentifier(StringUtils.upperCase(id));
             return new ResponseEntity<>(contact, HttpStatus.OK);
-        else
+        }
+        catch (NoSuchElementException e) {
             return new ResponseEntity<>(contact, HttpStatus.NOT_FOUND);
+        }
+        catch (Exception e) {
+            return new ResponseEntity<String>("Error", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
     @PutMapping(value = "contacts/{id}")
@@ -57,22 +66,19 @@ public class ContactController {
         }
         return new ResponseEntity<>(contactService.updateContact(contact), HttpStatus.OK);
     }
-    
+
     @DeleteMapping(value = "contacts/{id}")
     public ResponseEntity<?> deleteContact(@PathVariable("id") String id) {
         try {
             contactService.deleteContact(id);
-            return new ResponseEntity<>("Contact deleted",HttpStatus.OK);
+            return new ResponseEntity<>("Contact deleted", HttpStatus.OK);
         }
         catch (EmptyResultDataAccessException e) {
-            return new ResponseEntity<>("Contact not found",HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Contact not found", HttpStatus.NOT_FOUND);
         }
         catch (Exception e) {
             return new ResponseEntity<String>("Error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
-    
-
 
 }
