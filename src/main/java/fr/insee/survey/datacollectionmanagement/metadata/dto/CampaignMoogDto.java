@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 public class CampaignMoogDto implements Serializable {
 
+    private static final long serialVersionUID = 6628857938862106451L;
     private String id;
     private String label;
     private Long collectionStartDate;

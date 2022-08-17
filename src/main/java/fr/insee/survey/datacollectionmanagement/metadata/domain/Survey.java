@@ -9,6 +9,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -38,9 +41,11 @@ public class Survey {
     private String communication;
     
     @OneToMany
+    @JsonBackReference
     private Set<Campaign> campaigns;
     
     @OneToOne
+    @JsonManagedReference
     private Source source;
     
     

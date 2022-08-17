@@ -1,6 +1,8 @@
 package fr.insee.survey.datacollectionmanagement.metadata.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Source;
@@ -15,6 +17,16 @@ public class SourceServiceImpl implements SourceService {
 
     public Source findbyId(String source) {
         return sourceRepository.findById(source).orElse(null);
+    }
+
+    @Override
+    public Page<Source> findAll(Pageable pageable) {
+        return sourceRepository.findAll(pageable);
+    }
+
+    @Override
+    public Source updateSource(Source source) {
+        return sourceRepository.save(source);
     }
 
 }
