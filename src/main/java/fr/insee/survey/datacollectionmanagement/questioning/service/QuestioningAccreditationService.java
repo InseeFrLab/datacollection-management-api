@@ -3,6 +3,9 @@ package fr.insee.survey.datacollectionmanagement.questioning.service;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningAccreditation;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.SurveyUnit;
 
@@ -23,5 +26,11 @@ public interface QuestioningAccreditationService {
     public List<String> findIdContactsByPeriod(String period);
 
     public List<String> findIdContactsBySourceYearPeriod(String idSource, Integer year, String period);
+
+    public Page<QuestioningAccreditation> findAll(Pageable pageable);
+
+    public QuestioningAccreditation findById(Long id);
+
+    public QuestioningAccreditation updateQuestioningAccreditation(QuestioningAccreditation questioningAccreditation);
 
 }
