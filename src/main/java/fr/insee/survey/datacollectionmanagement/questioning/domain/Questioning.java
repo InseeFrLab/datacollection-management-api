@@ -3,6 +3,7 @@ package fr.insee.survey.datacollectionmanagement.questioning.domain;
 import java.util.Set;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Index;
@@ -30,6 +31,9 @@ public class Questioning {
 
     @OneToMany
     private Set<QuestioningAccreditation> questioningAccreditations;
+
+    @OneToMany(fetch = FetchType.EAGER)
+    private Set<QuestioningEvent> questioningEvents;
 
     @OneToOne
     private SurveyUnit surveyUnit;

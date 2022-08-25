@@ -7,6 +7,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
+import fr.insee.survey.datacollectionmanagement.metadata.util.TypeQuestioningEvent;
 import lombok.Data;
 
 @Entity

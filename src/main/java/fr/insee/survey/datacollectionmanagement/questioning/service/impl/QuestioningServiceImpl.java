@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
 import fr.insee.survey.datacollectionmanagement.questioning.repository.QuestioningRepository;
+import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningEventService;
 import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningService;
 
 @Service
@@ -14,6 +15,9 @@ public class QuestioningServiceImpl implements QuestioningService {
 
     @Autowired
     private QuestioningRepository questioningRepository;
+
+    @Autowired
+    private QuestioningEventService questioningEventService;
 
     @Override
     public List<Questioning> fingByIdPartitioning(String idPartitioning) {

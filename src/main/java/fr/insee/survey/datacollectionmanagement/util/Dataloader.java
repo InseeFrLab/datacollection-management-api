@@ -44,13 +44,13 @@ import fr.insee.survey.datacollectionmanagement.metadata.repository.Partitioning
 import fr.insee.survey.datacollectionmanagement.metadata.repository.SourceRepository;
 import fr.insee.survey.datacollectionmanagement.metadata.repository.SupportRepository;
 import fr.insee.survey.datacollectionmanagement.metadata.repository.SurveyRepository;
+import fr.insee.survey.datacollectionmanagement.metadata.util.TypeQuestioningEvent;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.EventOrder;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.MetadataCopy;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningAccreditation;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningEvent;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.SurveyUnit;
-import fr.insee.survey.datacollectionmanagement.questioning.domain.TypeQuestioningEvent;
 import fr.insee.survey.datacollectionmanagement.questioning.repository.EventOrderRepository;
 import fr.insee.survey.datacollectionmanagement.questioning.repository.MetadataCopyRepository;
 import fr.insee.survey.datacollectionmanagement.questioning.repository.QuestioningAccreditationRepository;
@@ -119,13 +119,14 @@ public class Dataloader {
         Faker faker = new Faker();
         EasyRandom generator = new EasyRandom();
 
-//        initOrder();
-//        initContact(faker);
-//        initMetadata(faker, generator);
-//        initQuestionning(faker, generator);
-//        initMetadatacopy();
-//        initAccreditationsCopy();
-//        initView();
+        // initOrder();
+        // initContact(faker);
+        // initMetadata(faker, generator);
+        // initQuestionning(faker, generator);
+        // initMetadatacopy();
+        // initAccreditationsCopy();
+        // initView();
+        initQuestioningEvent();
 
     }
 
@@ -146,6 +147,19 @@ public class Dataloader {
             orderRepository.saveAndFlush(new EventOrder(Long.parseLong("2"), TypeQuestioningEvent.PND.toString(), 2));
             orderRepository.saveAndFlush(new EventOrder(Long.parseLong("1"), TypeQuestioningEvent.INITLA.toString(), 1));
         }
+    }
+
+    private void initQuestioningEvent() {
+        questioningRepository.findAll().stream().forEach(q -> {
+            if (q.getQuestioningEvents().isEmpty()) {
+                List<QuestioningEvent> listQuestioningEvent = questioningEventRepository.findByQuestioningId(q.getId());
+                q.setQuestioningEvents(Set.copyOf(listQuestioningEvent));
+                questioningRepository.save(q);  
+            }
+
+
+        });
+
     }
 
     private void initContact(Faker faker) {

@@ -15,6 +15,8 @@ public class MySurveyDto {
     private Timestamp monitoringDate;
     private String monitoringStatus;
     private String accessUrl;
+    private Timestamp questioningDate;
+    private String questioningStatus;
 
 
 }
