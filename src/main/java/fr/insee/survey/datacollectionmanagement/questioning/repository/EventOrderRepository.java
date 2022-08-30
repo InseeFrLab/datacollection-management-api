@@ -6,4 +6,6 @@ import fr.insee.survey.datacollectionmanagement.questioning.domain.EventOrder;
 
 
 public interface EventOrderRepository extends JpaRepository<EventOrder, Long> {
+
+    EventOrder findByStatus(String status);
 }

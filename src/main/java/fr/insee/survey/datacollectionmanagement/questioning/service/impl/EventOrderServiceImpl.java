@@ -21,4 +21,9 @@ public class EventOrderServiceImpl implements EventOrderService {
         return eventOrderRepository.saveAndFlush(order);
     }
 
+    @Override
+    public EventOrder findByStatus(String status) {
+        return eventOrderRepository.findByStatus(status);
+    }
+
 }

@@ -15,7 +15,6 @@ import fr.insee.survey.datacollectionmanagement.metadata.domain.Partitioning;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Survey;
 import fr.insee.survey.datacollectionmanagement.metadata.service.PartitioningService;
 import fr.insee.survey.datacollectionmanagement.metadata.util.PartitioningStatusEnum;
-import fr.insee.survey.datacollectionmanagement.metadata.util.TypeQuestioningEvent;
 import fr.insee.survey.datacollectionmanagement.query.dto.MySurveyDto;
 import fr.insee.survey.datacollectionmanagement.query.service.MySurveysService;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
@@ -23,6 +22,7 @@ import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningAc
 import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningEvent;
 import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningAccreditationService;
 import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningEventService;
+import fr.insee.survey.datacollectionmanagement.questioning.util.TypeQuestioningEvent;
 
 @Service
 public class MySurveysServiceImpl implements MySurveysService {

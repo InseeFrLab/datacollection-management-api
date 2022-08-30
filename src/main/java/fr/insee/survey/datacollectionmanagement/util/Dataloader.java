@@ -44,7 +44,6 @@ import fr.insee.survey.datacollectionmanagement.metadata.repository.Partitioning
 import fr.insee.survey.datacollectionmanagement.metadata.repository.SourceRepository;
 import fr.insee.survey.datacollectionmanagement.metadata.repository.SupportRepository;
 import fr.insee.survey.datacollectionmanagement.metadata.repository.SurveyRepository;
-import fr.insee.survey.datacollectionmanagement.metadata.util.TypeQuestioningEvent;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.EventOrder;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.MetadataCopy;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
@@ -57,6 +56,7 @@ import fr.insee.survey.datacollectionmanagement.questioning.repository.Questioni
 import fr.insee.survey.datacollectionmanagement.questioning.repository.QuestioningEventRepository;
 import fr.insee.survey.datacollectionmanagement.questioning.repository.QuestioningRepository;
 import fr.insee.survey.datacollectionmanagement.questioning.repository.SurveyUnitRepository;
+import fr.insee.survey.datacollectionmanagement.questioning.util.TypeQuestioningEvent;
 import fr.insee.survey.datacollectionmanagement.view.domain.View;
 import fr.insee.survey.datacollectionmanagement.view.repository.ViewRepository;
 
@@ -119,14 +119,14 @@ public class Dataloader {
         Faker faker = new Faker();
         EasyRandom generator = new EasyRandom();
 
-        // initOrder();
+         initOrder();
         // initContact(faker);
         // initMetadata(faker, generator);
         // initQuestionning(faker, generator);
         // initMetadatacopy();
         // initAccreditationsCopy();
         // initView();
-        initQuestioningEvent();
+        // initQuestioningEvent();
 
     }
 
@@ -138,13 +138,14 @@ public class Dataloader {
         if (nbExistingOrders == 0) {
             // Creating table order
             LOGGER.info("loading eventorder data");
-            orderRepository.saveAndFlush(new EventOrder(Long.parseLong("8"), TypeQuestioningEvent.REFUSAL.toString(), 8));
-            orderRepository.saveAndFlush(new EventOrder(Long.parseLong("7"), TypeQuestioningEvent.VALINT.toString(), 7));
-            orderRepository.saveAndFlush(new EventOrder(Long.parseLong("6"), TypeQuestioningEvent.VALPAP.toString(), 6));
-            orderRepository.saveAndFlush(new EventOrder(Long.parseLong("5"), TypeQuestioningEvent.HC.toString(), 5));
-            orderRepository.saveAndFlush(new EventOrder(Long.parseLong("4"), TypeQuestioningEvent.PARTIELINT.toString(), 4));
-            orderRepository.saveAndFlush(new EventOrder(Long.parseLong("3"), TypeQuestioningEvent.WASTE.toString(), 3));
-            orderRepository.saveAndFlush(new EventOrder(Long.parseLong("2"), TypeQuestioningEvent.PND.toString(), 2));
+            orderRepository.saveAndFlush(new EventOrder(Long.parseLong("9"), TypeQuestioningEvent.REFUSAL.toString(), 9));
+            orderRepository.saveAndFlush(new EventOrder(Long.parseLong("8"), TypeQuestioningEvent.VALINT.toString(), 8));
+            orderRepository.saveAndFlush(new EventOrder(Long.parseLong("7"), TypeQuestioningEvent.VALPAP.toString(), 7));
+            orderRepository.saveAndFlush(new EventOrder(Long.parseLong("6"), TypeQuestioningEvent.HC.toString(), 6));
+            orderRepository.saveAndFlush(new EventOrder(Long.parseLong("5"), TypeQuestioningEvent.PARTIELINT.toString(), 5));
+            orderRepository.saveAndFlush(new EventOrder(Long.parseLong("4"), TypeQuestioningEvent.WASTE.toString(), 4));
+            orderRepository.saveAndFlush(new EventOrder(Long.parseLong("3"), TypeQuestioningEvent.FOLLOWUP.toString(), 3));
+            orderRepository.saveAndFlush(new EventOrder(Long.parseLong("2"), TypeQuestioningEvent.PND.toString(), 2));           
             orderRepository.saveAndFlush(new EventOrder(Long.parseLong("1"), TypeQuestioningEvent.INITLA.toString(), 1));
         }
     }
@@ -154,9 +155,8 @@ public class Dataloader {
             if (q.getQuestioningEvents().isEmpty()) {
                 List<QuestioningEvent> listQuestioningEvent = questioningEventRepository.findByQuestioningId(q.getId());
                 q.setQuestioningEvents(Set.copyOf(listQuestioningEvent));
-                questioningRepository.save(q);  
+                questioningRepository.save(q);
             }
-
 
         });
 
