@@ -3,14 +3,19 @@ package fr.insee.survey.datacollectionmanagement.contact.domain;
 import java.util.Date;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
-@Data
+@Getter
+@Setter
 public class ContactEvent {
 
     public enum ContactEventType {
@@ -24,6 +29,7 @@ public class ContactEvent {
     private Date eventDate;
 
     @ManyToOne
+    @JsonBackReference
     private Contact contact;
     private ContactEventType type;
 

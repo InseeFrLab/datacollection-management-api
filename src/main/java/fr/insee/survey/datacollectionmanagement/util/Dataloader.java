@@ -29,8 +29,11 @@ import fr.insee.survey.datacollectionmanagement.contact.domain.AccreditationsCop
 import fr.insee.survey.datacollectionmanagement.contact.domain.Address;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact.Gender;
+import fr.insee.survey.datacollectionmanagement.contact.domain.ContactEvent;
+import fr.insee.survey.datacollectionmanagement.contact.domain.ContactEvent.ContactEventType;
 import fr.insee.survey.datacollectionmanagement.contact.repository.AccreditationsCopyRepository;
 import fr.insee.survey.datacollectionmanagement.contact.repository.AddressRepository;
+import fr.insee.survey.datacollectionmanagement.contact.repository.ContactEventRepository;
 import fr.insee.survey.datacollectionmanagement.contact.repository.ContactRepository;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Campaign;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Owner;
@@ -70,6 +73,9 @@ public class Dataloader {
 
     @Autowired
     private AddressRepository addressRepository;
+    
+    @Autowired
+    private ContactEventRepository contactEventRepository;
 
     @Autowired
     private OwnerRepository ownerRepository;
@@ -120,7 +126,7 @@ public class Dataloader {
         EasyRandom generator = new EasyRandom();
 
 //        initOrder();
-//        initContact(faker);
+        initContact(faker);
 //        initMetadata(faker, generator);
 //        initQuestionning(faker, generator);
 //        initMetadatacopy();
@@ -200,7 +206,25 @@ public class Dataloader {
 
                 LOGGER.info("It took {}ms to execute saveAll() for 10000 contacts.", (end - start));
             }
+            
 
+
+        }
+        
+        Long nbContactEvents = contactEventRepository.count();
+
+        
+        for (Long j = nbContactEvents; j < 300; j ++ ) {
+            Contact contact = contactRepository.findRandomContact();
+            ContactEvent contactEvent = new ContactEvent();
+            contactEvent.setType(ContactEventType.create);
+            contactEvent.setEventDate(new Date());
+            contactEvent.setContact(contact);
+            contactEventRepository.save(contactEvent);
+            Set<ContactEvent> setContactEvents =  new HashSet<>();
+            setContactEvents.add(contactEvent);
+            contact.setContactEvents(setContactEvents);
+            contactRepository.save(contact);
         }
         // addressRepository.saveAll(listAddresses);
         // contactRepository.saveAll(listContact);

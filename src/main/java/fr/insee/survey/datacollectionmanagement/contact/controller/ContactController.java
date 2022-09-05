@@ -44,14 +44,15 @@ public class ContactController {
     }
 
     @GetMapping(value = "contacts/{id}")
-    public ResponseEntity<?> findContact(@PathVariable("id") String id) {
+    public ResponseEntity<?> getContact(@PathVariable("id") String id) {
         Contact contact = null;
         try {
             contact = contactService.findByIdentifier(StringUtils.upperCase(id));
+            
             return new ResponseEntity<>(contact, HttpStatus.OK);
         }
         catch (NoSuchElementException e) {
-            return new ResponseEntity<>(contact, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Not Found", HttpStatus.NOT_FOUND);
         }
         catch (Exception e) {
             return new ResponseEntity<String>("Error", HttpStatus.INTERNAL_SERVER_ERROR);

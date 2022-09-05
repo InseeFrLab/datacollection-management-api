@@ -48,21 +48,31 @@ public class ContactServiceImpl implements ContactService {
     public Contact updateContact(Contact contact) {
         Contact c = findByIdentifier(contact.getIdentifier());
         if (c != null && !c.equals(contact)) {
-            addressRepository.save(contact.getAddress());
-            contactRepository.save(contact);
+            if (contact.getAddress() != null)
+                addressRepository.save(contact.getAddress());
+            else {
+                Contact contactInit = contactRepository.findById(contact.getIdentifier()).orElse(null);
+                contact.setAddress(contactInit.getAddress());
+            }
+
             Set<ContactEvent> setContactEventsContact = contactEventRepository.findByContact(contact);
             List<ContactEvent> listUpdateContact =
                 setContactEventsContact.stream().filter(ce -> ce.getType().equals(ContactEventType.update)).collect(Collectors.toList());
             ContactEvent contactEventUpdate = null;
-            if (!listUpdateContact.isEmpty())
+            if (!listUpdateContact.isEmpty()) {
                 contactEventUpdate = listUpdateContact.get(0);
+                setContactEventsContact.remove(contactEventUpdate);}
             else {
                 contactEventUpdate = new ContactEvent();
                 contactEventUpdate.setContact(contact);
                 contactEventUpdate.setType(ContactEventType.update);
             }
             contactEventUpdate.setEventDate(new Date());
+            setContactEventsContact.add(contactEventUpdate);
+            contact.setContactEvents(setContactEventsContact);
             contactEventRepository.save(contactEventUpdate);
+            addressRepository.save(contact.getAddress());
+            contactRepository.save(contact);
             c = contact;
         }
         return c;
