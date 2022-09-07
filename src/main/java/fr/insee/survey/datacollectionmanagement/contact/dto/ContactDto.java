@@ -1,28 +1,20 @@
 package fr.insee.survey.datacollectionmanagement.contact.dto;
 
-import java.util.Set;
+import org.springframework.hateoas.RepresentationModel;
 
-import fr.insee.survey.datacollectionmanagement.contact.domain.Address;
-import fr.insee.survey.datacollectionmanagement.contact.domain.Contact.Gender;
-import fr.insee.survey.datacollectionmanagement.contact.domain.ContactEvent;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class ContactDto {
-    
-    private String identifier;
-    private String campaignId;
+public class ContactDto extends RepresentationModel<ContactDto> {
 
+    private String identifier;
+    private String civility;
     private String lastName;
     private String firstName;
-    private String email;
     private String function;
+    private String email;
     private String phone;
-    private String comment;
-    private Address address;
-    private Set<ContactEvent> contactEvents;
-    private Gender gender;
 
 }

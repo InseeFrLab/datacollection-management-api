@@ -3,6 +3,7 @@ package fr.insee.survey.datacollectionmanagement.contact.service.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -40,46 +41,49 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public Contact findByIdentifier(String identifier) {
-        return contactRepository.findById(identifier).orElseThrow(() -> new NoSuchElementException("Contact not found"));
+    public Contact findByIdentifier(String identifier) throws NoSuchElementException {
+        return contactRepository.findById(identifier).orElseThrow();
     }
 
     @Override
-    public Contact updateContact(Contact contact) {
-        Contact c = findByIdentifier(contact.getIdentifier());
-        if (c != null && !c.equals(contact)) {
-            if (contact.getAddress() != null)
-                addressRepository.save(contact.getAddress());
-            else {
-                Contact contactInit = contactRepository.findById(contact.getIdentifier()).orElse(null);
-                contact.setAddress(contactInit.getAddress());
-            }
-
-            Set<ContactEvent> setContactEventsContact = contactEventRepository.findByContact(contact);
-            List<ContactEvent> listUpdateContact =
-                setContactEventsContact.stream().filter(ce -> ce.getType().equals(ContactEventType.update)).collect(Collectors.toList());
-            ContactEvent contactEventUpdate = null;
-            if (!listUpdateContact.isEmpty()) {
-                contactEventUpdate = listUpdateContact.get(0);
-                setContactEventsContact.remove(contactEventUpdate);}
-            else {
-                contactEventUpdate = new ContactEvent();
-                contactEventUpdate.setContact(contact);
-                contactEventUpdate.setType(ContactEventType.update);
-            }
-            contactEventUpdate.setEventDate(new Date());
-            setContactEventsContact.add(contactEventUpdate);
-            contact.setContactEvents(setContactEventsContact);
-            contactEventRepository.save(contactEventUpdate);
-            addressRepository.save(contact.getAddress());
-            contactRepository.save(contact);
-            c = contact;
+    public Contact updateExistingContact(Contact contact) {
+        Set<ContactEvent> setContactEventsContact = contactEventRepository.findByContact(contact);
+        List<ContactEvent> listUpdateContact =
+            setContactEventsContact.stream().filter(ce -> ce.getType().equals(ContactEventType.update)).collect(Collectors.toList());
+        ContactEvent contactEventUpdate = null;
+        if ( !listUpdateContact.isEmpty()) {
+            contactEventUpdate = listUpdateContact.get(0);
+            setContactEventsContact.remove(contactEventUpdate);
         }
-        return c;
+        else {
+            contactEventUpdate = new ContactEvent();
+            contactEventUpdate.setContact(contact);
+            contactEventUpdate.setType(ContactEventType.update);
+        }
+        contactEventUpdate.setEventDate(new Date());
+        setContactEventsContact.add(contactEventUpdate);
+        contact.setContactEvents(setContactEventsContact);
+        contactEventRepository.save(contactEventUpdate);
+        return contactRepository.save(contact);
     }
 
     @Override
-    public void deleteContact(String identifier) {
+    public Contact createContact(Contact contact) {
+        ContactEvent contactEventCreate = new ContactEvent();
+        contactEventCreate.setContact(contact);
+        contactEventCreate.setType(ContactEventType.create);
+        contactEventCreate.setEventDate(new Date());
+        Set<ContactEvent> setContactEventsContact = new HashSet<>();
+        setContactEventsContact.add(contactEventCreate);
+        contact.setContactEvents(setContactEventsContact);
+        return contactRepository.save(contact);
+    }
+
+    @Override
+    public void deleteContact(String identifier) throws NoSuchElementException {
+        Contact contact = findByIdentifier(identifier);
+        if (contact.getAddress() != null) addressRepository.delete(contact.getAddress());
+        contact.getContactEvents().stream().forEach(ce -> contactEventRepository.delete(ce));
         contactRepository.deleteById(identifier);
     }
 

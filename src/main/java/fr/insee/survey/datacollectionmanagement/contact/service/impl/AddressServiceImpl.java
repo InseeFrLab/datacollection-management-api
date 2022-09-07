@@ -30,4 +30,10 @@ public class AddressServiceImpl implements AddressService {
         return addressRepository.save(address);
     }
 
+    @Override
+    public void deleteAddressById(Long id) {
+        addressRepository.deleteById(id);
+        
+    }
+
 }

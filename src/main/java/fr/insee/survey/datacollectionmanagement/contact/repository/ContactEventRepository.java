@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
 import fr.insee.survey.datacollectionmanagement.contact.domain.ContactEvent;
 
-public interface ContactEventRepository extends JpaRepository<ContactEvent, String> {
+public interface ContactEventRepository extends JpaRepository<ContactEvent, Long> {
     
     Set<ContactEvent> findByContact(Contact contact);
 }

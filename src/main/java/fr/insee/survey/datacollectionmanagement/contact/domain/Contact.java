@@ -13,8 +13,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -33,7 +31,6 @@ public class Contact {
 
     @Id
     private String identifier;
-    private String campaignId;
 
     private String lastName;
     private String firstName;
@@ -43,11 +40,9 @@ public class Contact {
     private String comment;
 
     @OneToOne
-    @JsonIgnore
     private Address address;
 
-    @OneToMany(fetch = FetchType.LAZY, targetEntity=ContactEvent.class, cascade = CascadeType.ALL, mappedBy="contact" )
-    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY, targetEntity = ContactEvent.class, cascade = CascadeType.ALL, mappedBy = "contact")
     private Set<ContactEvent> contactEvents;
 
     @Enumerated(EnumType.STRING)

@@ -14,5 +14,7 @@ public interface AddressService {
     public Page<Address> findAll(Pageable pageable);
 
     public Address updateAddress(Address address);
+    
+    public void deleteAddressById(Long id);
 
 }
