@@ -1,6 +1,7 @@
 package fr.insee.survey.datacollectionmanagement.contact.controller;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -144,7 +145,7 @@ public class ContactEventController {
 
     private ContactEventDto convertToDto(ContactEvent contactEvent) {
         ContactEventDto ceDto = modelMapper.map(contactEvent, ContactEventDto.class);
-        WebMvcLinkBuilder selfLinkBuider = linkTo(AddressController.class).slash(contactEvent.getId());
+        WebMvcLinkBuilder selfLinkBuider = linkTo(methodOn(this.getClass()).getContactEvent(contactEvent.getId()));
         ceDto.add(selfLinkBuider.withSelfRel());
         ceDto.add(selfLinkBuider.withRel("contactEvent"));
         return ceDto;

@@ -42,7 +42,7 @@ public class Contact {
     @OneToOne
     private Address address;
 
-    @OneToMany(fetch = FetchType.LAZY, targetEntity = ContactEvent.class, cascade = CascadeType.ALL, mappedBy = "contact")
+    @OneToMany
     private Set<ContactEvent> contactEvents;
 
     @Enumerated(EnumType.STRING)

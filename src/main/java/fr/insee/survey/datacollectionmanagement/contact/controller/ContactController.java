@@ -150,7 +150,7 @@ public class ContactController {
         ContactDto contactDto = modelMapper.map(contact, ContactDto.class);
         String civility = contact.getGender().equals(Gender.Male) ? "Mr" : "Mme";
         contactDto.setCivility(civility);
-        WebMvcLinkBuilder selfLinkBuider = linkTo(ContactController.class).slash(contact.getIdentifier());
+        WebMvcLinkBuilder selfLinkBuider = linkTo(methodOn(this.getClass()).getContact(contact.getIdentifier()));
         contactDto.add(selfLinkBuider.withSelfRel());
         contactDto.add(selfLinkBuider.withRel("contact"));
         Link linkAddress = linkTo(methodOn(AddressController.class).getContactAddress(contact.getIdentifier())).withRel("address");
