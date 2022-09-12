@@ -11,7 +11,6 @@ RUN mvn package -DskipTests=true
 
 FROM openjdk:11-jre-slim
 
-COPY --from=build /pwd/target/*.jar /usr/src/app/main.jar
+COPY --from=build /pwd/target/*.war /usr/local/tomcat/webapps/ROOT.war
 
-WORKDIR /usr/src/app
-CMD java $JAVA_OPTS -jar main.jar
+CMD ["catalina.sh", "run"]
