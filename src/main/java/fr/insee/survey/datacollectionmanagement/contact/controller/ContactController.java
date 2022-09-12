@@ -61,7 +61,7 @@ public class ContactController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ContactPage.class))))
     })
-    public ResponseEntity<?> findContacts(
+    public ResponseEntity<?> getContacts(
         @RequestParam(defaultValue = "0") Integer page,
         @RequestParam(defaultValue = "20") Integer size,
         @RequestParam(defaultValue = "identifier") String sort) {

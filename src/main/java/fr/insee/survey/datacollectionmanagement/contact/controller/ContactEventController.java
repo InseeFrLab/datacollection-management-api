@@ -58,7 +58,7 @@ public class ContactEventController {
 
     @Operation(summary = "Search for contactEvents, paginated")
     @GetMapping(value = "contactEvents", produces = "application/hal+json")
-    public Page<ContactEventDto> findContactEvents(
+    public Page<ContactEventDto> getContactEvents(
         @RequestParam(defaultValue = "0") Integer page,
         @RequestParam(defaultValue = "20") Integer size,
         @RequestParam(defaultValue = "id") String sort) {

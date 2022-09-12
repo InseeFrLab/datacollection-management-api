@@ -63,7 +63,7 @@ public class AddressController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = AddressPage.class))))
     })
-    public ResponseEntity<?> findAddresss(
+    public ResponseEntity<?> getAddresss(
         @RequestParam(defaultValue = "0") Integer page,
         @RequestParam(defaultValue = "20") Integer size,
         @RequestParam(defaultValue = "id") String sort) {
