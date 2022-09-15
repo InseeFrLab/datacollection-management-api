@@ -16,5 +16,6 @@ public class ContactDto extends RepresentationModel<ContactDto> {
     private String function;
     private String email;
     private String phone;
+    private AddressDto address;
 
 }

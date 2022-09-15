@@ -28,22 +28,15 @@ public interface ContactService {
     public Contact findByIdentifier(String identifier) throws NoSuchElementException;
 
     /**
-     * Update an existing contact. Add an 'update' ContactEvent associated to the contact
+     * Update an existing contact and its address, or creates a new one
      * @param contact
      * @return contact updated
      */
-    public Contact updateExistingContact(Contact contact);
+    public Contact updateOrCreateContact(Contact contact);
+
 
     /**
-     * Create a new Contact. Add a 'create' ContactEvent associated to the contact
-     * @param contact
-     * @throws NoSuchElementException - if the contact doesn't exist
-     * @return contact created
-     */
-    public Contact createContact(Contact contact);
-
-    /**
-     * Delete a contact. Delete also the Address ant the ContactEvents associates to the contact.
+     * Delete a contact. Delete also the contact address.
      * @throws NoSuchElementException - if the contact doesn't exist
      * @param identifier
      */

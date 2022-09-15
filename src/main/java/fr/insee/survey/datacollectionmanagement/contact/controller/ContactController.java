@@ -33,9 +33,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import fr.insee.survey.datacollectionmanagement.contact.domain.Address;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact.Gender;
+import fr.insee.survey.datacollectionmanagement.contact.dto.AddressDto;
 import fr.insee.survey.datacollectionmanagement.contact.dto.ContactDto;
+import fr.insee.survey.datacollectionmanagement.contact.service.AddressService;
 import fr.insee.survey.datacollectionmanagement.contact.service.ContactService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -52,6 +55,9 @@ public class ContactController {
 
     @Autowired
     private ContactService contactService;
+
+    @Autowired
+    private AddressService addressService;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -108,26 +114,27 @@ public class ContactController {
         Contact contact;
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set(HttpHeaders.LOCATION,
-            ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(contactDto.getIdentifier()).toUriString());
+            ServletUriComponentsBuilder.fromCurrentRequest().buildAndExpand(contactDto.getIdentifier()).toUriString());
 
         try {
             contact = convertToEntity(contactDto);
+
         }
         catch (ParseException e) {
             return new ResponseEntity<>("Impossible to parse contact", HttpStatus.BAD_REQUEST);
         }
         catch (NoSuchElementException e) {
-            LOGGER.info("Creating contact with the identifier {}, ", contactDto.getIdentifier());
+            LOGGER.info("Creating contact with the identifier {}", contactDto.getIdentifier());
             contact = convertToEntityNewContact(contactDto);
-            Contact contactUpdate = contactService.createContact(contact);
+            Contact contactUpdate = updateContactAndAddress(contactDto, contact);
             return ResponseEntity.status(HttpStatus.CREATED).headers(responseHeaders).body(convertToDto(contactUpdate));
 
         }
-        Contact contactUpdate = contactService.updateExistingContact(contact);
+        Contact contactUpdate = updateContactAndAddress(contactDto, contact);
         return ResponseEntity.ok().headers(responseHeaders).body(convertToDto(contactUpdate));
     }
 
-    @Operation(summary = "Delete a contact (including its address and its assiociated ContactEvents)")
+    @Operation(summary = "Delete a contact and its address")
     @DeleteMapping(value = "contacts/{id}")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204", description = "No Content"), @ApiResponse(responseCode = "404", description = "Not found"),
@@ -138,7 +145,7 @@ public class ContactController {
             contactService.deleteContact(id);
             return new ResponseEntity<>("Contact deleted", HttpStatus.NO_CONTENT);
         }
-        catch (EmptyResultDataAccessException e) {
+        catch (NoSuchElementException e) {
             return new ResponseEntity<>("Contact not found", HttpStatus.NOT_FOUND);
         }
         catch (Exception e) {
@@ -161,6 +168,17 @@ public class ContactController {
         return contactDto;
     }
 
+    private Contact updateContactAndAddress(ContactDto contactDto, Contact contact) {
+        Address address;
+        if (contactDto.getAddress() != null) {
+            address = addressService.convertToEntity(contactDto.getAddress());
+            addressService.updateAddress(address);
+            contact.setAddress(address);
+        }
+        Contact contactUpdate = contactService.updateOrCreateContact(contact);
+        return contactUpdate;
+    }
+
     private Contact convertToEntity(ContactDto contactDto) throws ParseException {
         Contact contact = modelMapper.map(contactDto, Contact.class);
         contact.setGender(contactDto.getCivility().equals("Mr") ? Gender.Male : Gender.Female);
@@ -176,7 +194,6 @@ public class ContactController {
     private Contact convertToEntityNewContact(ContactDto contactDto) {
         Contact contact = modelMapper.map(contactDto, Contact.class);
         contact.setGender(contactDto.getCivility().equals("Mr") ? Gender.Male : Gender.Female);
-
         return contact;
     }
 

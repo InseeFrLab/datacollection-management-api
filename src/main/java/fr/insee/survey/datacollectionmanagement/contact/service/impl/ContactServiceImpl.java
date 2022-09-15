@@ -2,11 +2,8 @@ package fr.insee.survey.datacollectionmanagement.contact.service.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -16,10 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
-import fr.insee.survey.datacollectionmanagement.contact.domain.ContactEvent;
-import fr.insee.survey.datacollectionmanagement.contact.domain.ContactEvent.ContactEventType;
 import fr.insee.survey.datacollectionmanagement.contact.repository.AddressRepository;
-import fr.insee.survey.datacollectionmanagement.contact.repository.ContactEventRepository;
 import fr.insee.survey.datacollectionmanagement.contact.repository.ContactRepository;
 import fr.insee.survey.datacollectionmanagement.contact.service.ContactService;
 
@@ -32,9 +26,6 @@ public class ContactServiceImpl implements ContactService {
     @Autowired
     private AddressRepository addressRepository;
 
-    @Autowired
-    private ContactEventRepository contactEventRepository;
-
     @Override
     public Page<Contact> findAll(Pageable pageable) {
         return contactRepository.findAll(pageable);
@@ -46,45 +37,15 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public Contact updateExistingContact(Contact contact) {
-        Set<ContactEvent> setContactEventsContact = contactEventRepository.findByContact(contact);
-        List<ContactEvent> listUpdateContact =
-            setContactEventsContact.stream().filter(ce -> ce.getType().equals(ContactEventType.update)).collect(Collectors.toList());
-        ContactEvent contactEventUpdate = null;
-        if ( !listUpdateContact.isEmpty()) {
-            contactEventUpdate = listUpdateContact.get(0);
-            setContactEventsContact.remove(contactEventUpdate);
-        }
-        else {
-            contactEventUpdate = new ContactEvent();
-            contactEventUpdate.setContact(contact);
-            contactEventUpdate.setType(ContactEventType.update);
-        }
-        contactEventUpdate.setEventDate(new Date());
-        setContactEventsContact.add(contactEventUpdate);
-        contact.setContactEvents(setContactEventsContact);
-        contactEventRepository.save(contactEventUpdate);
-        return contactRepository.save(contact);
-    }
-
-    @Override
-    public Contact createContact(Contact contact) {
-        ContactEvent contactEventCreate = new ContactEvent();
-        contactEventCreate.setContact(contact);
-        contactEventCreate.setType(ContactEventType.create);
-        contactEventCreate.setEventDate(new Date());
-        Set<ContactEvent> setContactEventsContact = new HashSet<>();
-        setContactEventsContact.add(contactEventCreate);
-        contact.setContactEvents(setContactEventsContact);
+    public Contact updateOrCreateContact(Contact contact) {
         return contactRepository.save(contact);
     }
 
     @Override
     public void deleteContact(String identifier) throws NoSuchElementException {
         Contact contact = findByIdentifier(identifier);
-        if (contact.getAddress() != null) addressRepository.delete(contact.getAddress());
-        contact.getContactEvents().stream().forEach(ce -> contactEventRepository.delete(ce));
         contactRepository.deleteById(identifier);
+        if (contact.getAddress() != null) addressRepository.delete(contact.getAddress());
     }
 
     @Override

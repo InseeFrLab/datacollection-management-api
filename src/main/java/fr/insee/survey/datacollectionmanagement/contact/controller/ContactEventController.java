@@ -5,27 +5,28 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -41,7 +42,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
-@RestController
+@RestController(value = "contactEvents")
 @CrossOrigin
 public class ContactEventController {
 
@@ -55,17 +56,6 @@ public class ContactEventController {
 
     @Autowired
     private ModelMapper modelMapper;
-
-    @Operation(summary = "Search for contactEvents, paginated")
-    @GetMapping(value = "contactEvents", produces = "application/hal+json")
-    public Page<ContactEventDto> getContactEvents(
-        @RequestParam(defaultValue = "0") Integer page,
-        @RequestParam(defaultValue = "20") Integer size,
-        @RequestParam(defaultValue = "id") String sort) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
-        List<ContactEventDto> listDto = contactEventService.findAll(pageable).stream().map(ce -> convertToDto(ce)).collect(Collectors.toList());
-        return new PageImpl<>(listDto, pageable, listDto.size());
-    }
 
     @Operation(summary = "Search for contactEvents by the contact identifier")
     @GetMapping(value = "contacts/{id}/contactEvents", produces = "application/hal+json")
@@ -90,69 +80,76 @@ public class ContactEventController {
 
     }
 
-    @Operation(summary = "Search for a contactEvent by its id")
-    @GetMapping(value = "contactEvents/{id}", produces = "application/hal+json")
+    @Operation(summary = "Create a contactEvent")
+    @PostMapping(value = "contactEvents")
     @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "OK",
-            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ContactEventDto.class)))),
-        @ApiResponse(responseCode = "404", description = "Not found"), @ApiResponse(responseCode = "500", description = "Internal servor error")
-    })
-    public ResponseEntity<?> getContactEvent(@PathVariable("id") Long id) {
-        try {
-            ContactEventDto contactEventDto = convertToDto(contactEventService.findById(id));
-            return new ResponseEntity<>(contactEventDto, HttpStatus.OK);
-        }
-        catch (NoSuchElementException e) {
-            return new ResponseEntity<>("Not Found", HttpStatus.NOT_FOUND);
-        }
-        catch (Exception e) {
-            return new ResponseEntity<String>("Error", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-    }
-
-    @Operation(summary = "Update or create a contactEvent")
-    @PutMapping(value = "contactEvents/{id}")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ContactEventDto.class)))),
         @ApiResponse(
             responseCode = "201",
             description = "Created",
             content = @Content(array = @ArraySchema(schema = @Schema(implementation = ContactEventDto.class)))),
         @ApiResponse(responseCode = "400", description = "Bad request")
     })
-    public ResponseEntity<?> putContactEvent(@PathVariable("id") Long id, @RequestBody ContactEventDto contactEventDto) {
-        if ( !contactEventDto.getId().equals(id)) {
-            return new ResponseEntity<>("id and contactEvent identifier don't match", HttpStatus.BAD_REQUEST);
-        }
-        ContactEvent contactEvent;
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set(HttpHeaders.LOCATION,
-            ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(contactEventDto.getId()).toUriString());
+    public ResponseEntity<?> postContactEvent(@RequestBody ContactEventDto contactEventDto) {
         try {
-            contactEventService.findById(id);
+            Contact contact = contactService.findByIdentifier(contactEventDto.getIdentifier());
+            ContactEvent contactEvent = convertToEntity(contactEventDto);
+            ContactEvent newContactEvent = contactEventService.updateContactEvent(contactEvent);
+            Set<ContactEvent> setContactEvents = contact.getContactEvents();
+            setContactEvents.add(newContactEvent);
+            contact.setContactEvents(setContactEvents);
+            contactService.updateOrCreateContact(contact);
+            HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.set(HttpHeaders.LOCATION, ServletUriComponentsBuilder.fromCurrentRequest().toUriString());;
+            return ResponseEntity.status(HttpStatus.CREATED).headers(responseHeaders).body(convertToDto(newContactEvent));
         }
         catch (NoSuchElementException e) {
-            LOGGER.info("Creating contactEvent with the identifier {}, ", contactEventDto.getId());
-            contactEvent = convertToEntity(contactEventDto);
-            ContactEvent contactEventUpdate = contactEventService.updateContactEvent(contactEvent);
-            return ResponseEntity.status(HttpStatus.CREATED).headers(responseHeaders).body(convertToDto(contactEventUpdate));
+            return new ResponseEntity<>("Not Found", HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(contactEventService.updateContactEvent(convertToEntity(contactEventDto)), HttpStatus.OK);
+
     }
+
+    @Operation(summary = "Delete a contact event")
+    @DeleteMapping(value = "contactEvents/{id}", produces = "application/hal+json")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "No Content"), @ApiResponse(responseCode = "404", description = "Not found"),
+        @ApiResponse(responseCode = "400", description = "Bad Request")
+    })
+    public ResponseEntity<?> deleteContactEvent(@PathVariable("id") Long id) {
+        try {
+            contactEventService.deleteContactEvent(id);
+            return new ResponseEntity<>("ContactEvent deleted", HttpStatus.NO_CONTENT);
+        }
+        catch (NoSuchElementException e) {
+            return new ResponseEntity<>("ContactEvent not found", HttpStatus.NOT_FOUND);
+        }
+        catch (Exception e) {
+            return new ResponseEntity<String>("Error", HttpStatus.BAD_REQUEST);
+        }
+        }
 
     private ContactEventDto convertToDto(ContactEvent contactEvent) {
         ContactEventDto ceDto = modelMapper.map(contactEvent, ContactEventDto.class);
-        WebMvcLinkBuilder selfLinkBuider = linkTo(methodOn(this.getClass()).getContactEvent(contactEvent.getId()));
+        JSONParser parser = new JSONParser();
+        if (contactEvent.getPayload() != null) {
+            try {
+                JSONObject jsonObject = (JSONObject) parser.parse(contactEvent.getPayload());
+                ceDto.setPayload(jsonObject);
+            }
+            catch (ParseException e) {
+                LOGGER.error("Error reading json", e);
+            }
+        }
+
+        WebMvcLinkBuilder selfLinkBuider = linkTo(methodOn(this.getClass()).getContactContactEvent(contactEvent.getContact().getIdentifier()));
         ceDto.add(selfLinkBuider.withSelfRel());
         ceDto.add(selfLinkBuider.withRel("contactEvent"));
+        ceDto.setIdentifier(contactEvent.getContact().getIdentifier());
         return ceDto;
     }
 
     private ContactEvent convertToEntity(ContactEventDto contactEventDto) {
         ContactEvent contactEvent = modelMapper.map(contactEventDto, ContactEvent.class);
+        if (contactEventDto.getPayload() != null) contactEvent.setPayload(contactEventDto.getPayload().toJSONString());
         return contactEvent;
     }
 
