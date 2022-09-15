@@ -43,9 +43,7 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     public void deleteContact(String identifier) throws NoSuchElementException {
-        Contact contact = findByIdentifier(identifier);
         contactRepository.deleteById(identifier);
-        if (contact.getAddress() != null) addressRepository.delete(contact.getAddress());
     }
 
     @Override

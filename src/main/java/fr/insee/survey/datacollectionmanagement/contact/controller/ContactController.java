@@ -13,7 +13,6 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -36,9 +35,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Address;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact.Gender;
-import fr.insee.survey.datacollectionmanagement.contact.dto.AddressDto;
 import fr.insee.survey.datacollectionmanagement.contact.dto.ContactDto;
 import fr.insee.survey.datacollectionmanagement.contact.service.AddressService;
+import fr.insee.survey.datacollectionmanagement.contact.service.ContactEventService;
 import fr.insee.survey.datacollectionmanagement.contact.service.ContactService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -61,6 +60,9 @@ public class ContactController {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private ContactEventService contactEventService;
 
     @Operation(summary = "Search for contacts, paginated")
     @GetMapping(value = "contacts", produces = "application/hal+json")
@@ -113,8 +115,7 @@ public class ContactController {
         }
         Contact contact;
         HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set(HttpHeaders.LOCATION,
-            ServletUriComponentsBuilder.fromCurrentRequest().buildAndExpand(contactDto.getIdentifier()).toUriString());
+        responseHeaders.set(HttpHeaders.LOCATION, ServletUriComponentsBuilder.fromCurrentRequest().buildAndExpand(contactDto.getIdentifier()).toUriString());
 
         try {
             contact = convertToEntity(contactDto);
@@ -134,7 +135,7 @@ public class ContactController {
         return ResponseEntity.ok().headers(responseHeaders).body(convertToDto(contactUpdate));
     }
 
-    @Operation(summary = "Delete a contact and its address")
+    @Operation(summary = "Delete a contact, its address and its contactEvents")
     @DeleteMapping(value = "contacts/{id}")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204", description = "No Content"), @ApiResponse(responseCode = "404", description = "Not found"),
@@ -142,7 +143,10 @@ public class ContactController {
     })
     public ResponseEntity<?> deleteContact(@PathVariable("id") String id) {
         try {
+            Contact contact = contactService.findByIdentifier(id);
+            if (contact.getContactEvents() != null) contact.getContactEvents().stream().forEach(ce -> contactEventService.deleteContactEvent(ce.getId()));
             contactService.deleteContact(id);
+            if (contact.getAddress() != null) addressService.deleteAddressById(contact.getAddress().getId());   
             return new ResponseEntity<>("Contact deleted", HttpStatus.NO_CONTENT);
         }
         catch (NoSuchElementException e) {
