@@ -16,7 +16,6 @@
 	<properties>
 		<java.version>17</java.version>
 		<springdoc-version>1.6.8</springdoc-version>
-		<packaging.mode>jar</packaging.mode>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -95,6 +94,18 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
+		</dependency>
+		<!-- Actuator Metrics -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
+		<!-- Prometheus Metrics -->
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
+			<version>1.9.3</version>
 		</dependency>
 
 	</dependencies>
