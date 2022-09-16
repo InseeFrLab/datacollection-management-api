@@ -11,10 +11,22 @@ import org.springframework.data.repository.query.Param;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
 
 public interface ContactRepository extends PagingAndSortingRepository<Contact, String> {
+    
+    static final String QUERY_CONTACTS_TABLE_ONLY =
+        "select                                                                                                                                 "
+            + "        c.*                                                                                                                      "
+            + "from                                                                                                                             "
+            + "        contact c                                                                                                                "
+            + "where                                                                                                                            "
+            + "        (:identifier is null or UPPER(c.identifier) = UPPER(cast(:identifier as text)))                                          "
+            + "        and (:firstName is null or UPPER(c.first_name) = UPPER(cast( :firstName as text)))                                       "
+            + "        and (:lastName is null or UPPER(c.last_name) = UPPER(cast(:lastName as text)))                                           "
+            + "        and (:email is null or UPPER(c.email) = UPPER(cast( :email as text)))                                                    ";
+
 
     static final String QUERY_ACCREDITATIONS_COPY =
         "select                                                                                                                                 "
-            + "        c.*                                                                                                                      "
+            + "        distinct(c.*)                                                                                                            "
             + "from                                                                                                                             "
             + "        contact c                                                                                                                "
             + "left join accreditations_copy y                                                                                                  "
@@ -30,6 +42,8 @@ public interface ContactRepository extends PagingAndSortingRepository<Contact, S
             + "        and (:companyName is null or UPPER(y.company_name) = UPPER(cast( :companyName as text)))                                 "
             + "        and (:source is null or UPPER(y.source_id) = UPPER(cast( :source as text)))                                              "
             + "        and (:period is null or UPPER(y.\"period\") = UPPER(cast( :period as text)))                                             ";
+    
+
 
     static final String CLAUSE_YEAR = " and (:year is null or y.\"year\" = :year)                   ";
 
@@ -45,6 +59,13 @@ public interface ContactRepository extends PagingAndSortingRepository<Contact, S
 
     public List<Contact> findByEmailIgnoreCase(String email);
 
+    @Query(nativeQuery = true, value = QUERY_CONTACTS_TABLE_ONLY)
+    public Page<Contact> findContactTableOnly(
+        @Param("identifier") String identifier,
+        @Param("lastName") String lastName,
+        @Param("firstName") String firstName,
+        @Param("email") String email,
+        Pageable pageable);
 
     @Query(nativeQuery = true, value = QUERY_ACCREDITATIONS_COPY)
     public Page<Contact> findContactMultiCriteriaAccreditationsCopy(

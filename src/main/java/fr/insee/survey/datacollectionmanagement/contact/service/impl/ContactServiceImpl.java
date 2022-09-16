@@ -97,14 +97,20 @@ public class ContactServiceImpl implements ContactService {
         String year,
         String period,
         Pageable pageable) {
-        if (StringUtils.isEmpty(year))
-            return contactRepository.findContactMultiCriteriaAccreditationsCopy(identifier, lastName, firstName, email, idSu, surveyUnitId, companyName, source,
-                period, pageable);
-        else
-            return contactRepository.findContactMultiCriteriaAccreditationsCopyYear(identifier, lastName, firstName, email, idSu, surveyUnitId, companyName, source,
-                Integer.parseInt(year), period, pageable);
+        if (StringUtils.isEmpty(idSu)
+            && StringUtils.isEmpty(surveyUnitId) && StringUtils.isEmpty(companyName) && StringUtils.isEmpty(source) && StringUtils.isEmpty(year)
+            && StringUtils.isEmpty(period)) {
+            return contactRepository.findContactTableOnly(identifier, lastName, firstName, email, pageable);
+        }
+        else {
+            if (StringUtils.isEmpty(year))
+                return contactRepository.findContactMultiCriteriaAccreditationsCopy(identifier, lastName, firstName, email, idSu, surveyUnitId, companyName,
+                    source, period, pageable);
+            else
+                return contactRepository.findContactMultiCriteriaAccreditationsCopyYear(identifier, lastName, firstName, email, idSu, surveyUnitId, companyName,
+                    source, Integer.parseInt(year), period, pageable);
+        }
+
     }
-
-
 
 }
