@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import fr.insee.survey.datacollectionmanagement.constants.Constants;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Address;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
 import fr.insee.survey.datacollectionmanagement.contact.dto.AddressDto;
@@ -44,15 +45,15 @@ public class AddressController {
     @Autowired
     private ContactService contactService;
 
-    @Operation(summary = "Search for a contact address by the contact identifier")
-    @GetMapping(value = "contacts/{identifier}/address", produces = "application/hal+json")
+    @Operation(summary = "Search for a contact address by the contact id")
+    @GetMapping(value = Constants.API_CONTACTS_ID_ADDRESS, produces = "application/hal+json")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = AddressDto.class)))),
         @ApiResponse(responseCode = "404", description = "Not found"), @ApiResponse(responseCode = "500", description = "Internal servor error")
     })
-    public ResponseEntity<?> getContactAddress(@PathVariable("identifier") String identifier) {
+    public ResponseEntity<?> getContactAddress(@PathVariable("id") String id) {
         try {
-            Contact contact = contactService.findByIdentifier(identifier);
+            Contact contact = contactService.findByIdentifier(id);
             if (contact.getAddress() != null)
                 return new ResponseEntity<>(addressService.convertToDto(contact.getAddress()), HttpStatus.OK);
             else {
@@ -68,8 +69,8 @@ public class AddressController {
 
     }
 
-    @Operation(summary = "Update or create an address by the contact identifier")
-    @PutMapping(value = "contacts/{identifier}/address")
+    @Operation(summary = "Update or create an address by the contact id")
+    @PutMapping(value = Constants.API_CONTACTS_ID_ADDRESS)
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = AddressDto.class)))),
         @ApiResponse(
@@ -78,9 +79,9 @@ public class AddressController {
             content = @Content(array = @ArraySchema(schema = @Schema(implementation = ContactDto.class)))),
         @ApiResponse(responseCode = "404", description = "Not found")
     })
-    public ResponseEntity<?> putAddress(@PathVariable("identifier") String identifier, @RequestBody AddressDto addressDto) {
+    public ResponseEntity<?> putAddress(@PathVariable("id") String id, @RequestBody AddressDto addressDto) {
         try {
-            Contact contact = contactService.findByIdentifier(identifier);
+            Contact contact = contactService.findByIdentifier(id);
 
             Address address = addressService.convertToEntity(addressDto);
             HttpHeaders responseHeaders = new HttpHeaders();
@@ -92,7 +93,7 @@ public class AddressController {
                 return ResponseEntity.status(HttpStatus.OK).headers(responseHeaders).body(addressService.convertToDto(addressUpdate));
             }
             else {
-                LOGGER.info("Creating address for the contact {} ", identifier);
+                LOGGER.info("Creating address for the contact {} ", id);
                 Address addressUpdate = addressService.updateAddress(address);
                 contact.setAddress(addressUpdate);
                 contactService.updateOrCreateContact(contact);

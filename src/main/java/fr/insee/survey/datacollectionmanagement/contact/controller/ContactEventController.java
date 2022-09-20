@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import fr.insee.survey.datacollectionmanagement.constants.Constants;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
 import fr.insee.survey.datacollectionmanagement.contact.domain.ContactEvent;
 import fr.insee.survey.datacollectionmanagement.contact.dto.ContactEventDto;
@@ -58,7 +59,7 @@ public class ContactEventController {
     private ModelMapper modelMapper;
 
     @Operation(summary = "Search for contactEvents by the contact identifier")
-    @GetMapping(value = "contacts/{id}/contactEvents", produces = "application/hal+json")
+    @GetMapping(value = Constants.API_CONTACTS_ID_CONTACTEVENTS, produces = "application/hal+json")
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "200",
@@ -81,7 +82,7 @@ public class ContactEventController {
     }
 
     @Operation(summary = "Create a contactEvent")
-    @PostMapping(value = "contactEvents")
+    @PostMapping(value = Constants.API_CONTACTEVENTS)
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "201",
@@ -109,7 +110,7 @@ public class ContactEventController {
     }
 
     @Operation(summary = "Delete a contact event")
-    @DeleteMapping(value = "contactEvents/{id}", produces = "application/hal+json")
+    @DeleteMapping(value = Constants.API_CONTACTEVENTS_ID, produces = "application/hal+json")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204", description = "No Content"), @ApiResponse(responseCode = "404", description = "Not found"),
         @ApiResponse(responseCode = "400", description = "Bad Request")
@@ -125,7 +126,7 @@ public class ContactEventController {
         catch (Exception e) {
             return new ResponseEntity<String>("Error", HttpStatus.BAD_REQUEST);
         }
-        }
+    }
 
     private ContactEventDto convertToDto(ContactEvent contactEvent) {
         ContactEventDto ceDto = modelMapper.map(contactEvent, ContactEventDto.class);

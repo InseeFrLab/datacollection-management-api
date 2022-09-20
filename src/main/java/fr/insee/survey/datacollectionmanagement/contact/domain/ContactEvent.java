@@ -36,7 +36,7 @@ public class ContactEvent {
     private Contact contact;
     private ContactEventType type;
     @Type(type = "jsonb")
-    @Column(columnDefinition = "jsonb")
+    @Column(columnDefinition = "VARCHAR2(1000) CONSTRAINT IS_VALID_JSON CHECK (payload IS JSON)")
     private String payload;
 
 }

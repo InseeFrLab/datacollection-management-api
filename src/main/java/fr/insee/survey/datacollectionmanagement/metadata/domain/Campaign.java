@@ -2,6 +2,7 @@ package fr.insee.survey.datacollectionmanagement.metadata.domain;
 
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Index;
@@ -19,16 +20,17 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(indexes = {
-    @Index(name = "year_index", columnList = "year"),
+    @Index(name = "year_index", columnList = "year_value"),
     @Index(name = "surveyid_index", columnList = "survey_id")
   })
 public class Campaign {
 
     @Id
     private String campaignId;
-
+    @Column(name="YEAR_VALUE")
     private int year;
     private String campaignWording;
+    @Column(name="PERIOD_VALUE")
     private String period;
 
     @OneToMany

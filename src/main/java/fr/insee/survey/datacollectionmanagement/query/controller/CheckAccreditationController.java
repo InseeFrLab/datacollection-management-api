@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import fr.insee.survey.datacollectionmanagement.constants.Constants;
 import fr.insee.survey.datacollectionmanagement.query.service.CheckAccreditationService;
 
 @RestController
@@ -21,7 +22,7 @@ public class CheckAccreditationController {
     @Autowired
     private CheckAccreditationService checkAccreditationService;
 
-    @GetMapping(path = "checkAccreditationV2")
+    @GetMapping(path = Constants.API_CHECK_ACCREDITATIONS_V2)
     public ResponseEntity<?> checkAccreditationV2(
         @RequestParam(required = true) String identifier,
         @RequestParam(required = true) String idSu,
@@ -34,7 +35,7 @@ public class CheckAccreditationController {
 
     }
 
-    @GetMapping(path = "checkAccreditationV3")
+    @GetMapping(path = Constants.API_CHECK_ACCREDITATIONS_V3)
     public ResponseEntity<?> checkAccreditationV3(
         @RequestParam(required = true) String identifier,
         @RequestParam(required = true) String idSu,

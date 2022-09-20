@@ -1,5 +1,6 @@
 package fr.insee.survey.datacollectionmanagement.questioning.domain;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -12,7 +13,7 @@ import lombok.Data;
 @Data
 @Table(indexes = {
     @Index(name = "mc_idPartitioning_index", columnList = "idPartitioning"), @Index(name = "mc_idSource_index", columnList = "idSource"),
-    @Index(name = "mc_year_index", columnList = "year"), @Index(name = "mc_period_index", columnList = "period"),
+    @Index(name = "mc_year_index", columnList = "year_value"), @Index(name = "mc_period_index", columnList = "period_value"),
 
 })
 public class MetadataCopy {
@@ -22,7 +23,9 @@ public class MetadataCopy {
     private Long id;
     private String idPartitioning;
     private String idSource;
+    @Column(name="YEAR_VALUE")
     private Integer year;
+    @Column(name="PERIOD_VALUE")
     private String period;
 
 }

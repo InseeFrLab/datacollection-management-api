@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import fr.insee.survey.datacollectionmanagement.constants.Constants;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Address;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact.Gender;
@@ -79,7 +80,7 @@ public class ContactController {
     }
 
     @Operation(summary = "Search for a contact by its identifier")
-    @GetMapping(value = "contacts/{id}", produces = "application/hal+json")
+    @GetMapping(value = Constants.API_CONTACTS_ID, produces = "application/hal+json")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ContactDto.class)))),
         @ApiResponse(responseCode = "404", description = "Not found"), @ApiResponse(responseCode = "400", description = "Bad Request")
@@ -100,7 +101,7 @@ public class ContactController {
     }
 
     @Operation(summary = "Update or create a contact")
-    @PutMapping(value = "contacts/{id}")
+    @PutMapping(value = Constants.API_CONTACTS_ID)
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ContactDto.class)))),
         @ApiResponse(
@@ -136,7 +137,7 @@ public class ContactController {
     }
 
     @Operation(summary = "Delete a contact, its address and its contactEvents")
-    @DeleteMapping(value = "contacts/{id}")
+    @DeleteMapping(value = Constants.API_CONTACTS_ID)
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204", description = "No Content"), @ApiResponse(responseCode = "404", description = "Not found"),
         @ApiResponse(responseCode = "400", description = "Bad Request")
@@ -146,7 +147,7 @@ public class ContactController {
             Contact contact = contactService.findByIdentifier(id);
             if (contact.getContactEvents() != null) contact.getContactEvents().stream().forEach(ce -> contactEventService.deleteContactEvent(ce.getId()));
             contactService.deleteContact(id);
-            if (contact.getAddress() != null) addressService.deleteAddressById(contact.getAddress().getId());   
+            if (contact.getAddress() != null) addressService.deleteAddressById(contact.getAddress().getId());
             return new ResponseEntity<>("Contact deleted", HttpStatus.NO_CONTENT);
         }
         catch (NoSuchElementException e) {
@@ -179,8 +180,8 @@ public class ContactController {
             addressService.updateAddress(address);
             contact.setAddress(address);
         }
-        Contact contactUpdate = contactService.updateOrCreateContact(contact);
-        return contactUpdate;
+        contactService.updateOrCreateContact(contact);
+        return contact;
     }
 
     private Contact convertToEntity(ContactDto contactDto) throws ParseException {
