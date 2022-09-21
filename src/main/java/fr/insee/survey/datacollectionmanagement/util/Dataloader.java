@@ -19,6 +19,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jeasy.random.EasyRandom;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import com.github.javafaker.Animal;
@@ -64,6 +65,7 @@ import fr.insee.survey.datacollectionmanagement.view.domain.View;
 import fr.insee.survey.datacollectionmanagement.view.repository.ViewRepository;
 
 @Component
+@Profile("poc")
 public class Dataloader {
 
     private static final Logger LOGGER = LogManager.getLogger(Dataloader.class);

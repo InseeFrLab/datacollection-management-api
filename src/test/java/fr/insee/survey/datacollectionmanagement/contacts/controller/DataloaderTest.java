@@ -176,12 +176,13 @@ public class DataloaderTest {
         address.setCity("city" + i);
         addressRepository.save(address);
         Contact contact = new Contact();
-        contact.setIdentifier("CONT" + i % 10 + Integer.toString(i));
+        contact.setIdentifier("CONT" + Integer.toString(i));
         contact.setFirstName("firstName" + i);
         contact.setLastName("lastName" + i);
         contact.setEmail(contact.getFirstName() + contact.getLastName() + "@test.com");
         if (i % 2 == 0) contact.setGender(Contact.Gender.Female);
         if (i % 2 != 0) contact.setGender(Contact.Gender.Male);
+        contact.setAddress(address);
         ContactEvent contactEvent = new ContactEvent();
         contactRepository.save(contact);
         contactEvent.setType(ContactEventType.create);
