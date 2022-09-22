@@ -33,12 +33,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import fr.insee.survey.datacollectionmanagement.constants.Constants;
-import fr.insee.survey.datacollectionmanagement.contact.domain.Address;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact.Gender;
 import fr.insee.survey.datacollectionmanagement.contact.dto.ContactDto;
 import fr.insee.survey.datacollectionmanagement.contact.service.AddressService;
-import fr.insee.survey.datacollectionmanagement.contact.service.ContactEventService;
+import fr.insee.survey.datacollectionmanagement.contact.service.AdvancedContactService;
 import fr.insee.survey.datacollectionmanagement.contact.service.ContactService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -54,6 +53,9 @@ public class ContactController {
     static final Logger LOGGER = LoggerFactory.getLogger(ContactController.class);
 
     @Autowired
+    private AdvancedContactService advancedContactService;
+
+    @Autowired
     private ContactService contactService;
 
     @Autowired
@@ -61,9 +63,6 @@ public class ContactController {
 
     @Autowired
     private ModelMapper modelMapper;
-
-    @Autowired
-    private ContactEventService contactEventService;
 
     @Operation(summary = "Search for contacts, paginated")
     @GetMapping(value = "contacts", produces = "application/hal+json")
@@ -110,7 +109,7 @@ public class ContactController {
             content = @Content(array = @ArraySchema(schema = @Schema(implementation = ContactDto.class)))),
         @ApiResponse(responseCode = "400", description = "Bad request")
     })
-    public ResponseEntity<?> updateContact(@PathVariable("id") String id, @RequestBody ContactDto contactDto) {
+    public ResponseEntity<?> putContact(@PathVariable("id") String id, @RequestBody ContactDto contactDto) {
         if (StringUtils.isBlank(contactDto.getIdentifier()) || !contactDto.getIdentifier().equalsIgnoreCase(id)) {
             return new ResponseEntity<>("id and contact identifier don't match", HttpStatus.BAD_REQUEST);
         }
@@ -128,11 +127,13 @@ public class ContactController {
         catch (NoSuchElementException e) {
             LOGGER.info("Creating contact with the identifier {}", contactDto.getIdentifier());
             contact = convertToEntityNewContact(contactDto);
-            Contact contactUpdate = updateContactAndAddress(contactDto, contact);
-            return ResponseEntity.status(HttpStatus.CREATED).headers(responseHeaders).body(convertToDto(contactUpdate));
+            if (contactDto.getAddress() != null) contact.setAddress(addressService.convertToEntity(contactDto.getAddress()));
+            Contact contactCreate = advancedContactService.createContactAddressEvent(contact);
+            return ResponseEntity.status(HttpStatus.CREATED).headers(responseHeaders).body(convertToDto(contactCreate));
 
         }
-        Contact contactUpdate = updateContactAndAddress(contactDto, contact);
+        if (contactDto.getAddress() != null) contact.setAddress(addressService.convertToEntity(contactDto.getAddress()));
+        Contact contactUpdate = advancedContactService.updateContactAddressEvent(contact);
         return ResponseEntity.ok().headers(responseHeaders).body(convertToDto(contactUpdate));
     }
 
@@ -145,9 +146,7 @@ public class ContactController {
     public ResponseEntity<?> deleteContact(@PathVariable("id") String id) {
         try {
             Contact contact = contactService.findByIdentifier(id);
-            if (contact.getContactEvents() != null) contact.getContactEvents().stream().forEach(ce -> contactEventService.deleteContactEvent(ce.getId()));
-            contactService.deleteContact(id);
-            if (contact.getAddress() != null) addressService.deleteAddressById(contact.getAddress().getId());
+            advancedContactService.deleteContactAddressEvent(contact);
             return new ResponseEntity<>("Contact deleted", HttpStatus.NO_CONTENT);
         }
         catch (NoSuchElementException e) {
@@ -171,17 +170,6 @@ public class ContactController {
         contactDto.add(linkContactEvents);
 
         return contactDto;
-    }
-
-    private Contact updateContactAndAddress(ContactDto contactDto, Contact contact) {
-        Address address;
-        if (contactDto.getAddress() != null) {
-            address = addressService.convertToEntity(contactDto.getAddress());
-            addressService.updateAddress(address);
-            contact.setAddress(address);
-        }
-        contactService.updateOrCreateContact(contact);
-        return contact;
     }
 
     private Contact convertToEntity(ContactDto contactDto) throws ParseException {

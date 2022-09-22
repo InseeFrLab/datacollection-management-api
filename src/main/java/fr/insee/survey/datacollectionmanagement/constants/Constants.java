@@ -9,9 +9,9 @@ public class Constants {
     public static final String API_CONTACTS_ID = "/contacts/{id}";
     public static final String API_CONTACTS = "/contacts";
     public static final String API_CONTACTS_ID_ADDRESS = "/contacts/{id}/address";
-    public static final String API_CONTACTS_ID_CONTACTEVENTS = "/contacts/{id}/contactEvents";
-    public static final String API_CONTACTEVENTS = "/contactEvents";
-    public static final String API_CONTACTEVENTS_ID = "/contactEvents/{id}";
+    public static final String API_CONTACTS_ID_CONTACTEVENTS = "/contacts/{id}/contact-events";
+    public static final String API_CONTACTEVENTS = "/contact-events";
+    public static final String API_CONTACTEVENTS_ID = "/contact-events/{id}";
     
     // API CONTACTS METADATA
 

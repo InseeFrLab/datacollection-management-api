@@ -32,7 +32,7 @@ public interface ContactService {
      * @param contact
      * @return contact updated
      */
-    public Contact updateOrCreateContact(Contact contact);
+    public Contact saveContact(Contact contact);
 
 
     /**

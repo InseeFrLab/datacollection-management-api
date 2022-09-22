@@ -2,11 +2,11 @@ package fr.insee.survey.datacollectionmanagement.contact.dto;
 
 import java.util.Date;
 
+import org.json.simple.JSONObject;
 import org.springframework.hateoas.RepresentationModel;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.json.simple.JSONObject;
 
 @Getter
 @Setter

@@ -44,6 +44,7 @@ public class AddressController {
 
     @Autowired
     private ContactService contactService;
+    
 
     @Operation(summary = "Search for a contact address by the contact id")
     @GetMapping(value = Constants.API_CONTACTS_ID_ADDRESS, produces = "application/hal+json")
@@ -89,14 +90,14 @@ public class AddressController {
 
             if (contact.getAddress() != null) {
                 address.setId(contact.getAddress().getId());
-                Address addressUpdate = addressService.updateAddress(address);
+                Address addressUpdate = addressService.saveAddress(address);
                 return ResponseEntity.status(HttpStatus.OK).headers(responseHeaders).body(addressService.convertToDto(addressUpdate));
             }
             else {
                 LOGGER.info("Creating address for the contact {} ", id);
-                Address addressUpdate = addressService.updateAddress(address);
+                Address addressUpdate = addressService.saveAddress(address);
                 contact.setAddress(addressUpdate);
-                contactService.updateOrCreateContact(contact);
+                contactService.saveContact(contact);
                 return ResponseEntity.status(HttpStatus.CREATED).headers(responseHeaders).body(addressService.convertToDto(addressUpdate));
             }
         }

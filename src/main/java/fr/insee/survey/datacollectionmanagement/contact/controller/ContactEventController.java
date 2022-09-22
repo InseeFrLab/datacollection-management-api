@@ -94,11 +94,11 @@ public class ContactEventController {
         try {
             Contact contact = contactService.findByIdentifier(contactEventDto.getIdentifier());
             ContactEvent contactEvent = convertToEntity(contactEventDto);
-            ContactEvent newContactEvent = contactEventService.updateContactEvent(contactEvent);
+            ContactEvent newContactEvent = contactEventService.saveContactEvent(contactEvent);
             Set<ContactEvent> setContactEvents = contact.getContactEvents();
             setContactEvents.add(newContactEvent);
             contact.setContactEvents(setContactEvents);
-            contactService.updateOrCreateContact(contact);
+            contactService.saveContact(contact);
             HttpHeaders responseHeaders = new HttpHeaders();
             responseHeaders.set(HttpHeaders.LOCATION, ServletUriComponentsBuilder.fromCurrentRequest().toUriString());;
             return ResponseEntity.status(HttpStatus.CREATED).headers(responseHeaders).body(convertToDto(newContactEvent));

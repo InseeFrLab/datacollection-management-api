@@ -39,10 +39,10 @@ public class Contact {
     private String phone;
     private String comment;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Address address;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<ContactEvent> contactEvents;
 
     @Enumerated(EnumType.STRING)

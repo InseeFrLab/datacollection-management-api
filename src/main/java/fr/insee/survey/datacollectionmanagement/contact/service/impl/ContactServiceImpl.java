@@ -13,7 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
-import fr.insee.survey.datacollectionmanagement.contact.repository.AddressRepository;
 import fr.insee.survey.datacollectionmanagement.contact.repository.ContactRepository;
 import fr.insee.survey.datacollectionmanagement.contact.service.ContactService;
 
@@ -22,9 +21,6 @@ public class ContactServiceImpl implements ContactService {
 
     @Autowired
     private ContactRepository contactRepository;
-
-    @Autowired
-    private AddressRepository addressRepository;
 
     @Override
     public Page<Contact> findAll(Pageable pageable) {
@@ -37,7 +33,7 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public Contact updateOrCreateContact(Contact contact) {
+    public Contact saveContact(Contact contact) {
         return contactRepository.save(contact);
     }
 
