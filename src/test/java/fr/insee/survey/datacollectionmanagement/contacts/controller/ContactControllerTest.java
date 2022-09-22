@@ -2,6 +2,7 @@ package fr.insee.survey.datacollectionmanagement.contacts.controller;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -9,6 +10,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.json.JSONException;
@@ -23,9 +26,14 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import fr.insee.survey.datacollectionmanagement.constants.Constants;
+import fr.insee.survey.datacollectionmanagement.contact.domain.Address;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact.Gender;
+import fr.insee.survey.datacollectionmanagement.contact.domain.ContactEvent;
+import fr.insee.survey.datacollectionmanagement.contact.domain.ContactEvent.ContactEventType;
 import fr.insee.survey.datacollectionmanagement.contact.repository.ContactRepository;
+import fr.insee.survey.datacollectionmanagement.contact.service.AddressService;
+import fr.insee.survey.datacollectionmanagement.contact.service.ContactEventService;
 import fr.insee.survey.datacollectionmanagement.contact.service.ContactService;
 
 @AutoConfigureMockMvc
@@ -38,6 +46,12 @@ public class ContactControllerTest {
 
     @Autowired
     private ContactService contactService;
+
+    @Autowired
+    private AddressService addressService;
+
+    @Autowired
+    private ContactEventService contactEventService;
 
     @Autowired
     private ContactRepository contactRepository;
@@ -67,7 +81,7 @@ public class ContactControllerTest {
     }
 
     @Test
-    public void putContactsCreateUpdateDelete() throws Exception {
+    public void putContactCreateUpdateDelete() throws Exception {
         String identifier = "TESTPUT";
 
         // create contact - status created
@@ -79,6 +93,10 @@ public class ContactControllerTest {
         assertEquals(contact.getLastName(), contactFound.getLastName());
         assertEquals(contact.getFirstName(), contactFound.getFirstName());
         assertEquals(contact.getEmail(), contactFound.getEmail());
+        List<ContactEvent> list = new ArrayList<>(contactEventService.findContactEventsByContact(contactFound));
+        // List<ContactEvent> list = new ArrayList<>(contactFound.getContactEvents());
+        assertEquals(list.size(), 1);
+        assertEquals(list.get(0).getType(), ContactEventType.create);
 
         // update contact - status ok
         contact.setLastName("lastNameUpdate");
@@ -87,17 +105,50 @@ public class ContactControllerTest {
             .andExpect(content().json(jsonContactUpdate.toString(), false));
         Contact contactFoundAfterUpdate = contactService.findByIdentifier(identifier);
         assertEquals("lastNameUpdate", contactFoundAfterUpdate.getLastName());
-        assertEquals(contact.getFirstName(), contactFound.getFirstName());
-        assertEquals(contact.getEmail(), contactFound.getEmail());
+        assertEquals(contact.getFirstName(), contactFoundAfterUpdate.getFirstName());
+        assertEquals(contact.getEmail(), contactFoundAfterUpdate.getEmail());
+        List<ContactEvent> listUpdate = new ArrayList<>(contactEventService.findContactEventsByContact(contactFoundAfterUpdate));
+        assertEquals(listUpdate.size(), 2);
+        assertEquals(listUpdate.get(1).getType(), ContactEventType.update);
 
         // delete contact
         mockMvc.perform(delete("/contacts/" + identifier).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent());
         assertThrows(NoSuchElementException.class, () -> {
             contactService.findByIdentifier(identifier);
         });
+        assertTrue(contactEventService.findContactEventsByContact(contactFoundAfterUpdate).isEmpty());
 
         // delete contact not found
         mockMvc.perform(delete("/contacts/" + identifier).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound());
+
+    }
+
+    @Test
+    public void putContactAddressCreateUpdateDelete() throws Exception {
+        String identifier = "TESTADDRESS";
+
+        // create contact - status created
+        Contact contact = initContactAddress(identifier);
+        String jsonContact = createJsonContactAddress(contact);
+        mockMvc.perform(put("/contacts/" + identifier).content(jsonContact).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isCreated())
+            .andExpect(content().json(jsonContact.toString(), false));
+        Contact countactFound = contactService.findByIdentifier(identifier);
+        assertEquals(contact.getAddress().getCity(), countactFound.getAddress().getCity());
+
+        // update contact - status ok
+        String newCityName = "cityUpdate";
+        contact.getAddress().setCity(newCityName);
+        String jsonContactUpdate = createJsonContactAddress(contact);
+        mockMvc.perform(put("/contacts/" + identifier).content(jsonContactUpdate).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+            .andExpect(content().json(jsonContactUpdate.toString(), false));
+        Contact countactFoundAfterUpdate = contactService.findByIdentifier(identifier);
+        assertEquals(contact.getAddress().getCity(), countactFoundAfterUpdate.getAddress().getCity());
+
+        // delete contact
+        mockMvc.perform(delete("/contacts/" + identifier).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent());
+        assertThrows(NoSuchElementException.class, () -> {
+            contactService.findByIdentifier(identifier);
+        });
 
     }
 
@@ -123,6 +174,22 @@ public class ContactControllerTest {
         return contactMock;
     }
 
+    private Contact initContactAddress(String identifier) {
+        Contact contact = initContact(identifier);
+        Address address = initAddress(identifier);
+        contact.setAddress(address);
+        return contact;
+    }
+
+    private Address initAddress(String identifier) {
+        Address address = new Address();
+        address.setCity("city " + identifier);
+        address.setCountryName("country " + identifier);
+        address.setStreetName("steet " + identifier);
+        address.setStreetNumber(identifier);
+        return address;
+    }
+
     private String createJson(Contact contact) throws JSONException {
         JSONObject jo = new JSONObject();
         jo.put("identifier", contact.getIdentifier());
@@ -131,6 +198,26 @@ public class ContactControllerTest {
         jo.put("email", contact.getEmail());
         jo.put("civility", contact.getGender().equals(Gender.Male) ? "Mr" : "Mme");
         return jo.toString();
+    }
+
+    private String createJsonContactAddress(Contact contact) throws JSONException {
+        JSONObject jo = new JSONObject();
+        jo.put("identifier", contact.getIdentifier());
+        jo.put("lastName", contact.getLastName());
+        jo.put("firstName", contact.getFirstName());
+        jo.put("email", contact.getEmail());
+        jo.put("civility", contact.getGender().equals(Gender.Male) ? "Mr" : "Mme");
+        jo.put("address", createJsonAddress(contact));
+        return jo.toString();
+
+    }
+
+    private JSONObject createJsonAddress(Contact contact) throws JSONException {
+        JSONObject jo = new JSONObject();
+        jo.put("city", contact.getAddress().getCity());
+        jo.put("streetName", contact.getAddress().getStreetName());
+        jo.put("countryName", contact.getAddress().getCountryName());
+        return jo;
     }
 
 }

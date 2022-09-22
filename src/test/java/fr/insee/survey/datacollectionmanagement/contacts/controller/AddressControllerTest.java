@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import fr.insee.survey.datacollectionmanagement.contact.domain.Address;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
+import fr.insee.survey.datacollectionmanagement.contact.service.AddressService;
 import fr.insee.survey.datacollectionmanagement.contact.service.ContactService;
 
 @AutoConfigureMockMvc
@@ -32,6 +33,9 @@ public class AddressControllerTest {
 
     @Autowired
     private ContactService contactService;
+    
+    @Autowired
+    private AddressService addressService;
 
     @Test
     public void getAddressOk() throws Exception {
@@ -57,7 +61,9 @@ public class AddressControllerTest {
 
         // Before: delete existing address
         contact.setAddress(null);
-        contact = contactService.updateOrCreateContact(contact);
+        contact = contactService.saveContact(contact);
+        addressService.deleteAddressById(addressBefore.getId());
+        
         this.mockMvc.perform(get("/contacts/" + identifier + "/address")).andDo(print()).andExpect(status().is(HttpStatus.NOT_FOUND.value()));
 
         // Create address - status created
@@ -84,13 +90,12 @@ public class AddressControllerTest {
         
         // back to before
         contact.setAddress(addressBefore);
-        contactService.updateOrCreateContact(contact);
+        addressService.saveAddress(addressBefore);
+        contactService.saveContact(contact);
         assertEquals(contact.getAddress().getCity(), addressBefore.getCity());
         assertEquals(contact.getAddress().getStreetName(), addressBefore.getStreetName());
         assertEquals(contact.getAddress().getCountryName(), addressBefore.getCountryName());
         
-        
-
     }
 
     private Address initAddressMock(String identifier) {

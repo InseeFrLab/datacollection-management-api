@@ -162,27 +162,22 @@ public class DataloaderTest {
         createContactAddressAndEvents(4);
         createContactAddressAndEvents(5);
 
-        LOGGER.info(contactEventRepository.count() + " contacts exist in database"); 
+        LOGGER.info(contactRepository.count() + " contacts exist in database"); 
 
 
     }
 
     private void createContactAddressAndEvents(int i) {
-        Address address = new Address();
-        address.setCountryName("country" + 1);
-        address.setStreetNumber(Integer.toString(i));
-        address.setStreetName("street name" + i);
-        address.setZipCode(Integer.toString(1000 * i));
-        address.setCity("city" + i);
-        addressRepository.save(address);
-        Contact contact = new Contact();
-        contact.setIdentifier("CONT" + Integer.toString(i));
-        contact.setFirstName("firstName" + i);
-        contact.setLastName("lastName" + i);
-        contact.setEmail(contact.getFirstName() + contact.getLastName() + "@test.com");
-        if (i % 2 == 0) contact.setGender(Contact.Gender.Female);
-        if (i % 2 != 0) contact.setGender(Contact.Gender.Male);
+        
+        //Address
+        Address address = createAddress(i);
+        Contact contact = createContact(i);
         contact.setAddress(address);
+        createContactEvent(contact);       
+        contactRepository.save(contact);
+    }
+
+    private void createContactEvent(Contact contact) {
         ContactEvent contactEvent = new ContactEvent();
         contactRepository.save(contact);
         contactEvent.setType(ContactEventType.create);
@@ -191,9 +186,32 @@ public class DataloaderTest {
         contactEventRepository.save(contactEvent);
         Set<ContactEvent> setContactEvents = new HashSet<>();
         setContactEvents.add(contactEvent);
-        contact.setContactEvents(setContactEvents);       
-        contactRepository.save(contact);
+        contact.setContactEvents(setContactEvents);
     }
+    
+    private Address createAddress(int i) {
+        Address address = new Address();
+        address.setCountryName("country" + 1);
+        address.setStreetNumber(Integer.toString(i));
+        address.setStreetName("street name" + i);
+        address.setZipCode(Integer.toString(1000 * i));
+        address.setCity("city" + i);
+        addressRepository.save(address);
+        return address;
+    }
+
+
+    private Contact createContact(int i) {
+        Contact contact = new Contact();
+        contact.setIdentifier("CONT" + Integer.toString(i));
+        contact.setFirstName("firstName" + i);
+        contact.setLastName("lastName" + i);
+        contact.setEmail(contact.getFirstName() + contact.getLastName() + "@test.com");
+        if (i % 2 == 0) contact.setGender(Contact.Gender.Female);
+        if (i % 2 != 0) contact.setGender(Contact.Gender.Male);
+        return contact;
+    }
+
 
     private void initMetadata(Faker faker, EasyRandom generator2) {
 
