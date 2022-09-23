@@ -50,17 +50,5 @@ public interface ContactService {
 
     public List<Contact> searchListContactParameters(String identifier, String lastName, String firstName, String email);
 
-    public Page<Contact> searchListContactAccreditationsCopy(
-        String identifier,
-        String lastName,
-        String firstName,
-        String email,
-        String idSu,
-        String surveyUnitId,
-        String companyName,
-        String source,
-        String year,
-        String period,
-        Pageable pageable);
 
 }

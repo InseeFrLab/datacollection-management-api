@@ -63,7 +63,7 @@ public interface ContactRepository extends PagingAndSortingRepository<Contact, S
 
     public List<Contact> findByEmailIgnoreCase(String email);
 
-    @Query(nativeQuery = true, value = 
+    @Query(nativeQuery = true, value = QUERY_CONTACTS_TABLE_ONLY
     )
     public Page<Contact> findContactTableOnly(
         @Param("identifier") String identifier,
