@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
@@ -59,5 +61,20 @@ public class QuestioningAccreditationServiceImpl implements QuestioningAccredita
     @Override
     public List<String> findIdContactsBySourceYearPeriod(String source, Integer year, String period) {
         return questioningAccreditationRepository.findIdContactsBySourceYearPeriod(source, year, period);
+    }
+
+    @Override
+    public Page<QuestioningAccreditation> findAll(Pageable pageable) {
+        return questioningAccreditationRepository.findAll(pageable);
+    }
+
+    @Override
+    public QuestioningAccreditation findById(Long id) {
+        return questioningAccreditationRepository.findById(id).orElseThrow();
+    }
+
+    @Override
+    public QuestioningAccreditation updateQuestioningAccreditation(QuestioningAccreditation questioningAccreditation) {
+        return questioningAccreditationRepository.save(questioningAccreditation);
     }
 }

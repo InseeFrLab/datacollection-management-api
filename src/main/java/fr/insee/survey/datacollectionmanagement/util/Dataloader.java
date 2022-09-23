@@ -19,18 +19,20 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jeasy.random.EasyRandom;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import com.github.javafaker.Animal;
 import com.github.javafaker.Faker;
 import com.github.javafaker.Name;
 
-import fr.insee.survey.datacollectionmanagement.contact.domain.AccreditationsCopy;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Address;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact.Gender;
-import fr.insee.survey.datacollectionmanagement.contact.repository.AccreditationsCopyRepository;
+import fr.insee.survey.datacollectionmanagement.contact.domain.ContactEvent;
+import fr.insee.survey.datacollectionmanagement.contact.domain.ContactEvent.ContactEventType;
 import fr.insee.survey.datacollectionmanagement.contact.repository.AddressRepository;
+import fr.insee.survey.datacollectionmanagement.contact.repository.ContactEventRepository;
 import fr.insee.survey.datacollectionmanagement.contact.repository.ContactRepository;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Campaign;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Owner;
@@ -45,14 +47,12 @@ import fr.insee.survey.datacollectionmanagement.metadata.repository.SourceReposi
 import fr.insee.survey.datacollectionmanagement.metadata.repository.SupportRepository;
 import fr.insee.survey.datacollectionmanagement.metadata.repository.SurveyRepository;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.EventOrder;
-import fr.insee.survey.datacollectionmanagement.questioning.domain.MetadataCopy;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningAccreditation;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningEvent;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.SurveyUnit;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.TypeQuestioningEvent;
 import fr.insee.survey.datacollectionmanagement.questioning.repository.EventOrderRepository;
-import fr.insee.survey.datacollectionmanagement.questioning.repository.MetadataCopyRepository;
 import fr.insee.survey.datacollectionmanagement.questioning.repository.QuestioningAccreditationRepository;
 import fr.insee.survey.datacollectionmanagement.questioning.repository.QuestioningEventRepository;
 import fr.insee.survey.datacollectionmanagement.questioning.repository.QuestioningRepository;
@@ -61,6 +61,7 @@ import fr.insee.survey.datacollectionmanagement.view.domain.View;
 import fr.insee.survey.datacollectionmanagement.view.repository.ViewRepository;
 
 @Component
+@Profile("poc")
 public class Dataloader {
 
     private static final Logger LOGGER = LogManager.getLogger(Dataloader.class);
@@ -70,6 +71,9 @@ public class Dataloader {
 
     @Autowired
     private AddressRepository addressRepository;
+    
+    @Autowired
+    private ContactEventRepository contactEventRepository;
 
     @Autowired
     private OwnerRepository ownerRepository;
@@ -105,12 +109,6 @@ public class Dataloader {
     private QuestioningEventRepository questioningEventRepository;
 
     @Autowired
-    private MetadataCopyRepository metadataCopyRepository;
-
-    @Autowired
-    private AccreditationsCopyRepository accreditationsCopyRepository;
-
-    @Autowired
     private ViewRepository viewRepository;
 
     @PostConstruct
@@ -120,11 +118,9 @@ public class Dataloader {
         EasyRandom generator = new EasyRandom();
 
 //        initOrder();
-//        initContact(faker);
+        initContact(faker);
 //        initMetadata(faker, generator);
 //        initQuestionning(faker, generator);
-//        initMetadatacopy();
-//        initAccreditationsCopy();
 //        initView();
 
     }
@@ -200,7 +196,25 @@ public class Dataloader {
 
                 LOGGER.info("It took {}ms to execute saveAll() for 10000 contacts.", (end - start));
             }
+            
 
+
+        }
+        
+        Long nbContactEvents = contactEventRepository.count();
+
+        
+        for (Long j = nbContactEvents; j < 300; j ++ ) {
+            Contact contact = contactRepository.findRandomContact();
+            ContactEvent contactEvent = new ContactEvent();
+            contactEvent.setType(ContactEventType.create);
+            contactEvent.setEventDate(new Date());
+            contactEvent.setContact(contact);
+            contactEventRepository.save(contactEvent);
+            Set<ContactEvent> setContactEvents =  new HashSet<>();
+            setContactEvents.add(contactEvent);
+            contact.setContactEvents(setContactEvents);
+            contactRepository.save(contact);
         }
         // addressRepository.saveAll(listAddresses);
         // contactRepository.saveAll(listContact);
@@ -512,39 +526,6 @@ public class Dataloader {
             }
         }
 
-    }
-
-    private void initMetadatacopy() {
-        if (metadataCopyRepository.count() == 0) {
-            List<Partitioning> listParts = partitioningRepository.findAll();
-
-            listParts.stream().forEach(p -> {
-                MetadataCopy mcc = new MetadataCopy();
-                mcc.setIdPartitioning(p.getId());
-                mcc.setIdSource(p.getCampaign().getSurvey().getSource().getIdSource());
-                mcc.setYear(p.getCampaign().getSurvey().getYear());
-                mcc.setPeriod(p.getCampaign().getPeriod());
-                metadataCopyRepository.save(mcc);
-            });
-        }
-    }
-
-    private void initAccreditationsCopy() {
-        if (accreditationsCopyRepository.count() == 0) {
-            List<QuestioningAccreditation> listAccreditations = questioningAccreditationRepository.findAll();
-            listAccreditations.stream().forEach(a -> {
-                Partitioning p = partitioningRepository.findById(a.getQuestioning().getIdPartitioning()).orElse(null);
-                AccreditationsCopy acc = new AccreditationsCopy();
-                acc.setContact(contactRepository.findById(a.getIdContact()).orElse(null));
-                acc.setSourceId(p.getCampaign().getSurvey().getSource().getIdSource());
-                acc.setSurveyUnitId(a.getQuestioning().getSurveyUnit().getSurveyUnitId());
-                acc.setIdSu(a.getQuestioning().getSurveyUnit().getIdSu());
-                acc.setCompanyName(a.getQuestioning().getSurveyUnit().getCompanyName());
-                acc.setYear(p.getCampaign().getSurvey().getYear());
-                acc.setPeriod(p.getCampaign().getPeriod());
-                accreditationsCopyRepository.save(acc);
-            });
-        }
     }
 
     private void initView() {

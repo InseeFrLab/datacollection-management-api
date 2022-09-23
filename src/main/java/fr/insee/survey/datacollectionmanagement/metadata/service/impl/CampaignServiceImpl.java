@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Campaign;
@@ -72,4 +74,15 @@ public class CampaignServiceImpl implements CampaignService {
     public List<Campaign> findbySourcePeriod(String source, String period) {
         return campaignRepository.findBySourcePeriod(source, period);
     }
+    
+    @Override
+    public Page<Campaign> findAll(Pageable pageable) {
+        return campaignRepository.findAll(pageable);
+    }
+
+    @Override
+    public Campaign updateCampaign(Campaign campaign) {
+        return campaignRepository.save(campaign);
+    }
+    
 }

@@ -9,6 +9,8 @@ import javax.persistence.Index;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -31,6 +33,7 @@ public class QuestioningAccreditation {
     private String idContact;
 
     @OneToOne
+    @JsonBackReference
     private Questioning questioning;
 
 }

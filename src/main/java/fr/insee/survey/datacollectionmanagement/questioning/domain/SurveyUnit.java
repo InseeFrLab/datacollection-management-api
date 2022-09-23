@@ -8,6 +8,8 @@ import javax.persistence.Index;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,6 +26,7 @@ public class SurveyUnit {
     private String idSu;
 
     @OneToMany
+    @JsonIgnore
     private Set<Questioning> questionings;
 
     private String surveyUnitId;

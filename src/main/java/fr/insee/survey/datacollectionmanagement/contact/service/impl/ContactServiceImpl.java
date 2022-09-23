@@ -23,8 +23,23 @@ public class ContactServiceImpl implements ContactService {
     private ContactRepository contactRepository;
 
     @Override
-    public Contact findByIdentifier(String identifier) {
-        return contactRepository.findById(identifier).orElseThrow(() -> new NoSuchElementException("Contact not found"));
+    public Page<Contact> findAll(Pageable pageable) {
+        return contactRepository.findAll(pageable);
+    }
+
+    @Override
+    public Contact findByIdentifier(String identifier) throws NoSuchElementException {
+        return contactRepository.findById(identifier).orElseThrow();
+    }
+
+    @Override
+    public Contact saveContact(Contact contact) {
+        return contactRepository.save(contact);
+    }
+
+    @Override
+    public void deleteContact(String identifier) throws NoSuchElementException {
+        contactRepository.deleteById(identifier);
     }
 
     @Override
@@ -110,6 +125,7 @@ public class ContactServiceImpl implements ContactService {
                 return contactRepository.findContactMultiCriteriaAccreditationsCopyYear(identifier, lastName, firstName, email, idSu, surveyUnitId, companyName,
                     source, Integer.parseInt(year), period, pageable);
         }
+
 
     }
 

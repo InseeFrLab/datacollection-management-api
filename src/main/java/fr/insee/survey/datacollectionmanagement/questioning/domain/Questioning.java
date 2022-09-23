@@ -10,6 +10,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,9 +32,11 @@ public class Questioning {
     private String idPartitioning;
 
     @OneToMany
+    @JsonManagedReference
     private Set<QuestioningAccreditation> questioningAccreditations;
 
     @OneToOne
+    @JsonBackReference
     private SurveyUnit surveyUnit;
 
 }

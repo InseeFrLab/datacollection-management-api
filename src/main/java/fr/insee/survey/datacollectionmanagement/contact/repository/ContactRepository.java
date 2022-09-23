@@ -4,13 +4,14 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
 
-public interface ContactRepository extends PagingAndSortingRepository<Contact, String> {
+public interface ContactRepository extends PagingAndSortingRepository<Contact, String>,JpaRepository<Contact, String>  {
     
     static final String QUERY_CONTACTS_TABLE_ONLY =
         "select                                                                                                                                 "
@@ -22,6 +23,7 @@ public interface ContactRepository extends PagingAndSortingRepository<Contact, S
             + "        and (:firstName is null or UPPER(c.first_name) = UPPER(cast( :firstName as text)))                                       "
             + "        and (:lastName is null or UPPER(c.last_name) = UPPER(cast(:lastName as text)))                                           "
             + "        and (:email is null or UPPER(c.email) = UPPER(cast( :email as text)))                                                    ";
+
 
 
     static final String QUERY_ACCREDITATIONS_COPY =
@@ -46,6 +48,8 @@ public interface ContactRepository extends PagingAndSortingRepository<Contact, S
 
 
     static final String CLAUSE_YEAR = " and (:year is null or y.\"year\" = :year)                   ";
+    
+    Page<Contact> findAll(Pageable pageable);
 
     @Query(nativeQuery = true, value = "SELECT *  FROM contact ORDER BY random() LIMIT 1")
     public Contact findRandomContact();
@@ -59,7 +63,8 @@ public interface ContactRepository extends PagingAndSortingRepository<Contact, S
 
     public List<Contact> findByEmailIgnoreCase(String email);
 
-    @Query(nativeQuery = true, value = QUERY_CONTACTS_TABLE_ONLY)
+    @Query(nativeQuery = true, value = 
+    )
     public Page<Contact> findContactTableOnly(
         @Param("identifier") String identifier,
         @Param("lastName") String lastName,
