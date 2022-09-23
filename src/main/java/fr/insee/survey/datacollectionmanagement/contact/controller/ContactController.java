@@ -65,7 +65,7 @@ public class ContactController {
     private ModelMapper modelMapper;
 
     @Operation(summary = "Search for contacts, paginated")
-    @GetMapping(value = "contacts", produces = "application/hal+json")
+    @GetMapping(value = Constants.API_CONTACTS_ALL, produces = "application/hal+json")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ContactPage.class))))
     })

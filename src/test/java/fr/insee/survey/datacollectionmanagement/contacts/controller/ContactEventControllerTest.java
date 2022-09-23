@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import fr.insee.survey.datacollectionmanagement.constants.Constants;
+
 @AutoConfigureMockMvc
 @SpringBootTest
 @ActiveProfiles("test")
@@ -23,13 +25,13 @@ public class ContactEventControllerTest {
     @Test
     public void getContactEventOk() throws Exception {
         String identifier = "CONT1";
-        this.mockMvc.perform(get("/contacts/" + identifier + "/contact-events")).andDo(print()).andExpect(status().isOk());
+        this.mockMvc.perform(get(Constants.API_CONTACTS + identifier + Constants.CONTACT_EVENTS)).andDo(print()).andExpect(status().isOk());
     }
 
     @Test
     public void getContactEventNotFound() throws Exception {
         String identifier = "CONT500";
-        this.mockMvc.perform(get("/contacts/" + identifier + "/contact-events")).andDo(print()).andExpect(status().is(HttpStatus.NOT_FOUND.value()));
+        this.mockMvc.perform(get(Constants.API_CONTACTS + identifier + Constants.CONTACT_EVENTS)).andDo(print()).andExpect(status().is(HttpStatus.NOT_FOUND.value()));
 
     }
 
