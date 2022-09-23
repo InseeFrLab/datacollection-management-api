@@ -35,25 +35,12 @@ public class CheckAccreditationControllerTest {
         String idSu = "12345";
         String campaginId = "CAMPAIGN";
 
-        when(checkAccreditationService.checkAccreditationV2(identifier, idSu, campaginId)).thenReturn(true);
-        this.mockMvc.perform(get(Constants.API_CHECK_ACCREDITATIONS_V2).param("identifier", identifier).param("idSu", idSu).param("campaignId", campaginId))
+        when(checkAccreditationService.checkAccreditation(identifier, idSu, campaginId)).thenReturn(true);
+        this.mockMvc.perform(get(Constants.API_CHECK_ACCREDITATIONS).param("identifier", identifier).param("idSu", idSu).param("campaignId", campaginId))
             .andDo(print()).andExpect(status().isOk()).andExpect(content().string(containsString("true")));
 
-        this.mockMvc.perform(get(Constants.API_CHECK_ACCREDITATIONS_V2).param("identifier", identifier).param("idSu", "bidon").param("campaignId", campaginId))
+        this.mockMvc.perform(get(Constants.API_CHECK_ACCREDITATIONS).param("identifier", identifier).param("idSu", "bidon").param("campaignId", campaginId))
             .andDo(print()).andExpect(status().isOk()).andExpect(content().string(containsString("false")));
     }
 
-    @Test
-    public void checkAccreditationV3() throws Exception {
-        String identifier = "IDEC";
-        String idSu = "12345";
-        String campaginId = "CAMPAIGN";
-
-        when(checkAccreditationService.checkAccreditationV3(identifier, idSu, campaginId)).thenReturn(true);
-        this.mockMvc.perform(get(Constants.API_CHECK_ACCREDITATIONS_V3).param("identifier", identifier).param("idSu", idSu).param("campaignId", campaginId))
-            .andDo(print()).andExpect(status().isOk()).andExpect(content().string(containsString("true")));
-
-        this.mockMvc.perform(get(Constants.API_CHECK_ACCREDITATIONS_V3).param("identifier", identifier).param("idSu", "bidon").param("campaignId", campaginId))
-            .andDo(print()).andExpect(status().isOk()).andExpect(content().string(containsString("false")));
-    }
 }

@@ -1,4 +1,4 @@
-package fr.insee.survey.datacollectionmanagement.contacts.controller;
+package fr.insee.survey.datacollectionmanagement.config;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,12 +25,10 @@ import org.springframework.stereotype.Component;
 import com.github.javafaker.Animal;
 import com.github.javafaker.Faker;
 
-import fr.insee.survey.datacollectionmanagement.contact.domain.AccreditationsCopy;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Address;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
 import fr.insee.survey.datacollectionmanagement.contact.domain.ContactEvent;
 import fr.insee.survey.datacollectionmanagement.contact.domain.ContactEvent.ContactEventType;
-import fr.insee.survey.datacollectionmanagement.contact.repository.AccreditationsCopyRepository;
 import fr.insee.survey.datacollectionmanagement.contact.repository.AddressRepository;
 import fr.insee.survey.datacollectionmanagement.contact.repository.ContactEventRepository;
 import fr.insee.survey.datacollectionmanagement.contact.repository.ContactRepository;
@@ -47,14 +45,12 @@ import fr.insee.survey.datacollectionmanagement.metadata.repository.SourceReposi
 import fr.insee.survey.datacollectionmanagement.metadata.repository.SupportRepository;
 import fr.insee.survey.datacollectionmanagement.metadata.repository.SurveyRepository;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.EventOrder;
-import fr.insee.survey.datacollectionmanagement.questioning.domain.MetadataCopy;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningAccreditation;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningEvent;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.SurveyUnit;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.TypeQuestioningEvent;
 import fr.insee.survey.datacollectionmanagement.questioning.repository.EventOrderRepository;
-import fr.insee.survey.datacollectionmanagement.questioning.repository.MetadataCopyRepository;
 import fr.insee.survey.datacollectionmanagement.questioning.repository.QuestioningAccreditationRepository;
 import fr.insee.survey.datacollectionmanagement.questioning.repository.QuestioningEventRepository;
 import fr.insee.survey.datacollectionmanagement.questioning.repository.QuestioningRepository;
@@ -111,12 +107,6 @@ public class DataloaderTest {
     private QuestioningEventRepository questioningEventRepository;
 
     @Autowired
-    private MetadataCopyRepository metadataCopyRepository;
-
-    @Autowired
-    private AccreditationsCopyRepository accreditationsCopyRepository;
-
-    @Autowired
     private ViewRepository viewRepository;
 
     @PostConstruct
@@ -162,18 +152,17 @@ public class DataloaderTest {
         createContactAddressAndEvents(4);
         createContactAddressAndEvents(5);
 
-        LOGGER.info(contactRepository.count() + " contacts exist in database"); 
-
+        LOGGER.info(contactRepository.count() + " contacts exist in database");
 
     }
 
     private void createContactAddressAndEvents(int i) {
-        
-        //Address
+
+        // Address
         Address address = createAddress(i);
         Contact contact = createContact(i);
         contact.setAddress(address);
-        createContactEvent(contact);       
+        createContactEvent(contact);
         contactRepository.save(contact);
     }
 
@@ -188,7 +177,7 @@ public class DataloaderTest {
         setContactEvents.add(contactEvent);
         contact.setContactEvents(setContactEvents);
     }
-    
+
     private Address createAddress(int i) {
         Address address = new Address();
         address.setCountryName("country" + 1);
@@ -198,8 +187,8 @@ public class DataloaderTest {
         address.setCity("city" + i);
         addressRepository.save(address);
         return address;
+        
     }
-
 
     private Contact createContact(int i) {
         Contact contact = new Contact();
@@ -211,7 +200,6 @@ public class DataloaderTest {
         if (i % 2 != 0) contact.setGender(Contact.Gender.Male);
         return contact;
     }
-
 
     private void initMetadata(Faker faker, EasyRandom generator2) {
 
@@ -513,39 +501,6 @@ public class DataloaderTest {
             }
         }
 
-    }
-
-    private void initMetadatacopy() {
-        if (metadataCopyRepository.count() == 0) {
-            List<Partitioning> listParts = partitioningRepository.findAll();
-
-            listParts.stream().forEach(p -> {
-                MetadataCopy mcc = new MetadataCopy();
-                mcc.setIdPartitioning(p.getId());
-                mcc.setIdSource(p.getCampaign().getSurvey().getSource().getIdSource());
-                mcc.setYear(p.getCampaign().getSurvey().getYear());
-                mcc.setPeriod(p.getCampaign().getPeriod());
-                metadataCopyRepository.save(mcc);
-            });
-        }
-    }
-
-    private void initAccreditationsCopy() {
-        if (accreditationsCopyRepository.count() == 0) {
-            List<QuestioningAccreditation> listAccreditations = questioningAccreditationRepository.findAll();
-            listAccreditations.stream().forEach(a -> {
-                Partitioning p = partitioningRepository.findById(a.getQuestioning().getIdPartitioning()).orElse(null);
-                AccreditationsCopy acc = new AccreditationsCopy();
-                acc.setContact(contactRepository.findById(a.getIdContact()).orElse(null));
-                acc.setSourceId(p.getCampaign().getSurvey().getSource().getIdSource());
-                acc.setSurveyUnitId(a.getQuestioning().getSurveyUnit().getSurveyUnitId());
-                acc.setIdSu(a.getQuestioning().getSurveyUnit().getIdSu());
-                acc.setCompanyName(a.getQuestioning().getSurveyUnit().getCompanyName());
-                acc.setYear(p.getCampaign().getSurvey().getYear());
-                acc.setPeriod(p.getCampaign().getPeriod());
-                accreditationsCopyRepository.save(acc);
-            });
-        }
     }
 
     private void initView() {

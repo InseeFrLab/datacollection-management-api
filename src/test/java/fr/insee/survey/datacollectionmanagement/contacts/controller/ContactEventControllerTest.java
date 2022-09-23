@@ -31,7 +31,8 @@ public class ContactEventControllerTest {
     @Test
     public void getContactEventNotFound() throws Exception {
         String identifier = "CONT500";
-        this.mockMvc.perform(get(Constants.API_CONTACTS + identifier + Constants.CONTACT_EVENTS)).andDo(print()).andExpect(status().is(HttpStatus.NOT_FOUND.value()));
+        this.mockMvc.perform(get(Constants.API_CONTACTS + identifier + Constants.CONTACT_EVENTS)).andDo(print())
+            .andExpect(status().is(HttpStatus.NOT_FOUND.value()));
 
     }
 

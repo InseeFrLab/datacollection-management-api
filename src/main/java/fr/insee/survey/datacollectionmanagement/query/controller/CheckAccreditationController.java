@@ -22,28 +22,13 @@ public class CheckAccreditationController {
     @Autowired
     private CheckAccreditationService checkAccreditationService;
 
-    @GetMapping(path = Constants.API_CHECK_ACCREDITATIONS_V2)
+    @GetMapping(path = Constants.API_CHECK_ACCREDITATIONS)
     public ResponseEntity<?> checkAccreditationV2(
         @RequestParam(required = true) String identifier,
         @RequestParam(required = true) String idSu,
         @RequestParam(required = true) String campaignId) {
 
-        boolean res = checkAccreditationService.checkAccreditationV2(identifier, idSu, campaignId);
-//        LOGGER.info("Check accreditation V2: identifier = {},  idSu= {}, campaignId= {} - res = {}", identifier, idSu, campaignId, res);
-
-        return new ResponseEntity<>(res, HttpStatus.OK);
-
-    }
-
-    @GetMapping(path = Constants.API_CHECK_ACCREDITATIONS_V3)
-    public ResponseEntity<?> checkAccreditationV3(
-        @RequestParam(required = true) String identifier,
-        @RequestParam(required = true) String idSu,
-        @RequestParam(required = true) String campaignId) {
-
-        boolean res = checkAccreditationService.checkAccreditationV3(identifier, idSu, campaignId);
-//        LOGGER.info("Check accreditation V3: identifier = {},  idSu= {}, campaignId= {} - res = {}", identifier, idSu, campaignId, res);
-
+        boolean res = checkAccreditationService.checkAccreditation(identifier, idSu, campaignId);
         return new ResponseEntity<>(res, HttpStatus.OK);
 
     }

@@ -19,6 +19,7 @@ public class Constants {
     // API CONTACTS METADATA
 
     // API CROSS DOMAIN
-    public static final String API_CHECK_ACCREDITATIONS_V2 = "/checkAccreditationV2";
-    public static final String API_CHECK_ACCREDITATIONS_V3 = "/checkAccreditationV3";
+    public static final String API_CHECK_ACCREDITATIONS = "/api/check-accreditations";
+    public static final String API_MOOG_SEARCH = "/api/moog/search";
+    public static final String API_CONTACTS_SEARCH = "/api/contacts/search";
 }

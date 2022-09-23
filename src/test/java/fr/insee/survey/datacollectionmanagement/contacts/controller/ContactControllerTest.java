@@ -32,7 +32,6 @@ import fr.insee.survey.datacollectionmanagement.contact.domain.Contact.Gender;
 import fr.insee.survey.datacollectionmanagement.contact.domain.ContactEvent;
 import fr.insee.survey.datacollectionmanagement.contact.domain.ContactEvent.ContactEventType;
 import fr.insee.survey.datacollectionmanagement.contact.repository.ContactRepository;
-import fr.insee.survey.datacollectionmanagement.contact.service.AddressService;
 import fr.insee.survey.datacollectionmanagement.contact.service.ContactEventService;
 import fr.insee.survey.datacollectionmanagement.contact.service.ContactService;
 
@@ -46,9 +45,6 @@ public class ContactControllerTest {
 
     @Autowired
     private ContactService contactService;
-
-    @Autowired
-    private AddressService addressService;
 
     @Autowired
     private ContactEventService contactEventService;
@@ -158,8 +154,8 @@ public class ContactControllerTest {
         String otherIdentifier = "WRONG";
         Contact contact = initContact(identifier);
         String jsonContact = createJson(contact);
-        mockMvc.perform(put(Constants.API_CONTACTS + otherIdentifier).content(jsonContact).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
-            .andExpect(content().string("id and contact identifier don't match"));
+        mockMvc.perform(put(Constants.API_CONTACTS + otherIdentifier).content(jsonContact).contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest()).andExpect(content().string("id and contact identifier don't match"));
 
     }
 
