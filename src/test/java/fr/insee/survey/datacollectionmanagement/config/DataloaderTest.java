@@ -22,6 +22,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Animal;
 import com.github.javafaker.Faker;
 
@@ -172,6 +175,15 @@ public class DataloaderTest {
         contactEvent.setType(ContactEventType.create);
         contactEvent.setEventDate(new Date());
         contactEvent.setContact(contact);
+        String json = "{\"contact_identifier\":\""+contact.getIdentifier()+"\",\"name\":\""+contact.getLastName()+"\"}";
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            JsonNode node = mapper.readTree(json);
+            contactEvent.setPayload(node);
+        }
+        catch (JsonProcessingException e) {
+            LOGGER.error("json error");
+        }
         contactEventRepository.save(contactEvent);
         Set<ContactEvent> setContactEvents = new HashSet<>();
         setContactEvents.add(contactEvent);
@@ -187,7 +199,7 @@ public class DataloaderTest {
         address.setCity("city" + i);
         addressRepository.save(address);
         return address;
-        
+
     }
 
     private Contact createContact(int i) {

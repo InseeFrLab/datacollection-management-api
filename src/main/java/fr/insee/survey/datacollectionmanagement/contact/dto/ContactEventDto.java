@@ -2,8 +2,9 @@ package fr.insee.survey.datacollectionmanagement.contact.dto;
 
 import java.util.Date;
 
-import org.json.simple.JSONObject;
 import org.springframework.hateoas.RepresentationModel;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -16,6 +17,6 @@ public class ContactEventDto extends RepresentationModel<ContactEventDto> {
     private String identifier;
     private Date eventDate;
     private String type;
-    private JSONObject payload;
+    private JsonNode payload;
 
 }

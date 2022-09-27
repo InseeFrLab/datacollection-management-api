@@ -11,6 +11,7 @@ import javax.persistence.ManyToOne;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 
 import lombok.Getter;
@@ -36,7 +37,7 @@ public class ContactEvent {
     private Contact contact;
     private ContactEventType type;
     @Type(type = "jsonb")
-    @Column(columnDefinition = "VARCHAR2(1000) CONSTRAINT IS_VALID_JSON CHECK (payload IS JSON)")
-    private String payload;
+    @Column(columnDefinition = "jsonb")
+    private JsonNode payload;
 
 }

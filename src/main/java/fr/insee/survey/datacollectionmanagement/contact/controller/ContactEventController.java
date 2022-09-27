@@ -130,27 +130,12 @@ public class ContactEventController {
 
     private ContactEventDto convertToDto(ContactEvent contactEvent) {
         ContactEventDto ceDto = modelMapper.map(contactEvent, ContactEventDto.class);
-        JSONParser parser = new JSONParser();
-        if (contactEvent.getPayload() != null) {
-            try {
-                JSONObject jsonObject = (JSONObject) parser.parse(contactEvent.getPayload());
-                ceDto.setPayload(jsonObject);
-            }
-            catch (ParseException e) {
-                LOGGER.error("Error reading json", e);
-            }
-        }
-
-        WebMvcLinkBuilder selfLinkBuider = linkTo(methodOn(this.getClass()).getContactContactEvent(contactEvent.getContact().getIdentifier()));
-        ceDto.add(selfLinkBuider.withSelfRel());
-        ceDto.add(selfLinkBuider.withRel("contactEvent"));
         ceDto.setIdentifier(contactEvent.getContact().getIdentifier());
         return ceDto;
     }
 
     private ContactEvent convertToEntity(ContactEventDto contactEventDto) {
         ContactEvent contactEvent = modelMapper.map(contactEventDto, ContactEvent.class);
-        if (contactEventDto.getPayload() != null) contactEvent.setPayload(contactEventDto.getPayload().toJSONString());
         return contactEvent;
     }
 
