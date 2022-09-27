@@ -22,13 +22,13 @@ public interface PartitioningRepository extends JpaRepository<Partitioning, Stri
             + "join \"source\" s2 on                                                                                       "
             + "        s2.id_source = su.source_id_source                                                                  ";
 
-    static final String QUERY_SOURCE_SURVEY_CAMPAIGN = FIND_ID_PARTITIONNING + " where s2.id_source = ?1 and su.\"year\" = cast(?2  as integer) and c.\"period\" = ?3  ";
+    static final String QUERY_SOURCE_SURVEY_CAMPAIGN = FIND_ID_PARTITIONNING + " where s2.id_source = ?1 and su.year_value = cast(?2  as integer) and c.period_value = ?3  ";
 
     static final String QUERY_SOURCE = FIND_ID_PARTITIONNING + " where s2.id_source = ?1 ";
 
-    static final String QUERY_YEAR = FIND_ID_PARTITIONNING + " where su.\"year\" = cast(?1 as integer) ";
+    static final String QUERY_YEAR = FIND_ID_PARTITIONNING + " where su.year_value = cast(?1 as integer) ";
 
-    static final String QUERY_PERIOD = FIND_ID_PARTITIONNING + " where c.\"period\" = ?1 ";
+    static final String QUERY_PERIOD = FIND_ID_PARTITIONNING + " where c.period_value = ?1 ";
 
     @Query(nativeQuery = true, value = "SELECT *  FROM partitioning ORDER BY random() LIMIT 1")
     public Partitioning findRandomPartitioning();
