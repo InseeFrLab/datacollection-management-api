@@ -1,5 +1,6 @@
 package fr.insee.survey.datacollectionmanagement.query.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -13,14 +14,26 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.insee.survey.datacollectionmanagement.constants.Constants;
+import fr.insee.survey.datacollectionmanagement.metadata.domain.Partitioning;
+import fr.insee.survey.datacollectionmanagement.metadata.service.PartitioningService;
+import fr.insee.survey.datacollectionmanagement.query.dto.AccreditationDetailDto;
 import fr.insee.survey.datacollectionmanagement.query.dto.SearchContactDto;
 import fr.insee.survey.datacollectionmanagement.query.service.SearchContactService;
+import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
+import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningAccreditation;
+import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningAccreditationService;
 import fr.insee.survey.datacollectionmanagement.view.domain.View;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 @RestController
 @CrossOrigin
@@ -31,8 +44,21 @@ public class SearchContactController {
     @Autowired
     private SearchContactService searchContactService;
 
-    @GetMapping(path = Constants.API_CONTACTS_SEARCH)
-    @Operation(summary = "Multi-criteria search ontacts")
+    @Autowired
+    private QuestioningAccreditationService questioningAccreditationService;
+
+    @Autowired
+    private PartitioningService partitioningService;
+
+    @GetMapping(path = Constants.API_CONTACTS_SEARCH, produces = "application/json")
+    @Operation(summary = "Multi-criteria search contacts")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = SearchContactDto.class)))),
+        @ApiResponse(responseCode = "400", description = "Bad Request")
+    })
     public ResponseEntity<?> searchContacts(
         @RequestParam(required = false) String identifier,
         @RequestParam(required = false) String lastName,
@@ -46,7 +72,7 @@ public class SearchContactController {
         @RequestParam(required = false) String period,
         @RequestParam(defaultValue = "0") Integer pageNo,
         @RequestParam(defaultValue = "10") Integer pageSize) {
-        
+
         LOGGER.info(
             "Search contact: identifier = {}, lastName= {}, firstName= {}, email= {}, idSu= {}, surveyUnitId= {}, companyName= {}, source= {}, year= {}, period= {}, pageNo= {}, pageSize= {} ",
             identifier, lastName, firstName, email, idSu, surveyUnitId, companyName, source, year, period, pageNo, pageSize);
@@ -67,6 +93,34 @@ public class SearchContactController {
         }
         else
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+    }
+
+    @GetMapping(path = Constants.API_CONTACTS_ACCREDITATIONS, produces = "application/json")
+    @Operation(summary = "Get a contact accreditations by idContact")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = AccreditationDetailDto.class)))),
+        @ApiResponse(responseCode = "400", description = "Bad Request")
+    })
+    public ResponseEntity<?> getContactAccreditations(@PathVariable("id") String id) {
+
+        List<AccreditationDetailDto> listAccreditations = new ArrayList<>();
+        List<QuestioningAccreditation> accreditations = questioningAccreditationService.findByContactIdentifier(id);
+        for (QuestioningAccreditation questioningAccreditation : accreditations) {
+            Questioning questioning = questioningAccreditation.getQuestioning();
+            Partitioning part = partitioningService.findById(questioning.getIdPartitioning());
+
+            listAccreditations.add(new AccreditationDetailDto(part.getCampaign().getSurvey().getSource().getIdSource(),
+                part.getCampaign().getSurvey().getSource().getShortWording(), part.getCampaign().getSurvey().getYear(), part.getCampaign().getPeriod(),
+                part.getId(), questioningAccreditation.getQuestioning().getSurveyUnit().getIdSu(),
+                questioningAccreditation.getQuestioning().getSurveyUnit().getCompanyName(), questioningAccreditation.isMain()));
+
+        }
+
+        return new ResponseEntity<>(listAccreditations, HttpStatus.OK);
 
     }
 

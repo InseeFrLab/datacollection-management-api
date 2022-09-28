@@ -1,23 +1,16 @@
 package fr.insee.survey.datacollectionmanagement.contact.controller;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,7 +52,7 @@ public class ContactEventController {
     private ModelMapper modelMapper;
 
     @Operation(summary = "Search for contactEvents by the contact identifier")
-    @GetMapping(value = Constants.API_CONTACTS_ID_CONTACTEVENTS, produces = "application/hal+json")
+    @GetMapping(value = Constants.API_CONTACTS_ID_CONTACTEVENTS, produces = "application/json")
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "200",
@@ -67,7 +60,7 @@ public class ContactEventController {
             content = @Content(array = @ArraySchema(schema = @Schema(implementation = ContactEventDto.class)))),
         @ApiResponse(responseCode = "404", description = "Not found"), @ApiResponse(responseCode = "500", description = "Internal servor error")
     })
-    public ResponseEntity<?> getContactContactEvent(@PathVariable("id") String identifier) {
+    public ResponseEntity<?> getContactContactEvents(@PathVariable("id") String identifier) {
         try {
             Contact contact = contactService.findByIdentifier(identifier);
             return new ResponseEntity<>(contact.getContactEvents().stream().map(ce -> convertToDto(ce)).collect(Collectors.toList()), HttpStatus.OK);
@@ -82,12 +75,12 @@ public class ContactEventController {
     }
 
     @Operation(summary = "Create a contactEvent")
-    @PostMapping(value = Constants.API_CONTACTEVENTS)
+    @PostMapping(value = Constants.API_CONTACTEVENTS, produces = "application/json", consumes = "application/json")
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "201",
             description = "Created",
-            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ContactEventDto.class)))),
+            content = @Content(schema = @Schema(implementation = ContactEventDto.class))),
         @ApiResponse(responseCode = "400", description = "Bad request")
     })
     public ResponseEntity<?> postContactEvent(@RequestBody ContactEventDto contactEventDto) {
@@ -110,7 +103,7 @@ public class ContactEventController {
     }
 
     @Operation(summary = "Delete a contact event")
-    @DeleteMapping(value = Constants.API_CONTACTEVENTS_ID, produces = "application/hal+json")
+    @DeleteMapping(value = Constants.API_CONTACTEVENTS_ID, produces = "application/json")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204", description = "No Content"), @ApiResponse(responseCode = "404", description = "Not found"),
         @ApiResponse(responseCode = "400", description = "Bad Request")

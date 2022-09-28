@@ -1,8 +1,5 @@
 package fr.insee.survey.datacollectionmanagement.metadata.controller;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
 import java.text.ParseException;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -18,8 +15,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -81,13 +76,7 @@ public class CampaignController {
     }
 
     private CampaignDto convertToDto(Campaign campaign) {
-        CampaignDto campaignDto = modelMapper.map(campaign, CampaignDto.class);
-        WebMvcLinkBuilder selfLinkBuider = linkTo(methodOn(this.getClass()).getCampaign(campaign.getCampaignId()));
-        campaignDto.add(selfLinkBuider.withSelfRel());
-        campaignDto.add(selfLinkBuider.withRel("campaign"));
-        Link linkSource = linkTo(methodOn(SurveyController.class).findSurvey(campaign.getSurvey().getId())).withRel("survey");
-        campaignDto.add(linkSource);
-        return campaignDto;
+        return modelMapper.map(campaign, CampaignDto.class);
     }
 
     private Campaign convertToEntity(CampaignDto campaignDto) throws ParseException {

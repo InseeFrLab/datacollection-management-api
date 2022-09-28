@@ -1,7 +1,5 @@
 package fr.insee.survey.datacollectionmanagement.contact.dto;
 
-import org.springframework.hateoas.RepresentationModel;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Getter;
@@ -9,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class AddressDto extends RepresentationModel<AddressDto> {
+public class AddressDto  {
 
     @JsonIgnore
     private Long id;

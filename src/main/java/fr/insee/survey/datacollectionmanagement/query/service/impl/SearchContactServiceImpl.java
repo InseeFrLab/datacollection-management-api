@@ -15,7 +15,7 @@ import fr.insee.survey.datacollectionmanagement.metadata.domain.Campaign;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Partitioning;
 import fr.insee.survey.datacollectionmanagement.metadata.service.CampaignService;
 import fr.insee.survey.datacollectionmanagement.metadata.service.PartitioningService;
-import fr.insee.survey.datacollectionmanagement.query.dto.AccreditationDetail;
+import fr.insee.survey.datacollectionmanagement.query.dto.AccreditationDetailDto;
 import fr.insee.survey.datacollectionmanagement.query.dto.SearchContactDto;
 import fr.insee.survey.datacollectionmanagement.query.service.SearchContactService;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
@@ -205,7 +205,7 @@ public class SearchContactServiceImpl implements SearchContactService {
         for (View v : listView) {
 
             SearchContactDto searchContact = new SearchContactDto();
-            List<AccreditationDetail> listAccreditations = new ArrayList<>();
+            List<AccreditationDetailDto> listAccreditations = new ArrayList<>();
             Contact c = contactService.findByIdentifier(v.getIdentifier());
 
             searchContact.setIdentifier(c.getIdentifier());
@@ -218,9 +218,10 @@ public class SearchContactServiceImpl implements SearchContactService {
                 Questioning questioning = questioningAccreditation.getQuestioning();
                 Partitioning part = partitioningService.findById(questioning.getIdPartitioning());
 
-                listAccreditations
-                    .add(new AccreditationDetail(part.getCampaign().getSurvey().getSource().getIdSource(), part.getCampaign().getSurvey().getYear(),
-                        part.getCampaign().getPeriod(), questioningAccreditation.getQuestioning().getSurveyUnit().getIdSu()));
+                listAccreditations.add(new AccreditationDetailDto(part.getCampaign().getSurvey().getSource().getIdSource(),
+                    part.getCampaign().getSurvey().getSource().getShortWording(), part.getCampaign().getSurvey().getYear(), part.getCampaign().getPeriod(),
+                    part.getId(), questioningAccreditation.getQuestioning().getSurveyUnit().getIdSu(),
+                    questioningAccreditation.getQuestioning().getSurveyUnit().getCompanyName(), questioningAccreditation.isMain()));
 
             }
             searchContact.setAccreditationsList(listAccreditations);

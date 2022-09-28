@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
 import fr.insee.survey.datacollectionmanagement.contact.service.ContactService;
-import fr.insee.survey.datacollectionmanagement.metadata.service.CampaignService;
 import fr.insee.survey.datacollectionmanagement.query.dto.MoogSearchDto;
 import fr.insee.survey.datacollectionmanagement.query.service.MoogSearchService;
 import fr.insee.survey.datacollectionmanagement.view.domain.View;
@@ -22,9 +21,6 @@ public class MoogSearchServiceImpl implements MoogSearchService {
 
     @Autowired
     private ContactService contactService;
-
-    @Autowired
-    private CampaignService campaignService;
 
     @Override
     public List<View> moogSearch(String field) {
