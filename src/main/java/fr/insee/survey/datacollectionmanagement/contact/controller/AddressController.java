@@ -27,7 +27,6 @@ import fr.insee.survey.datacollectionmanagement.contact.dto.ContactDto;
 import fr.insee.survey.datacollectionmanagement.contact.service.AddressService;
 import fr.insee.survey.datacollectionmanagement.contact.service.ContactService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -44,12 +43,11 @@ public class AddressController {
 
     @Autowired
     private ContactService contactService;
-    
 
     @Operation(summary = "Search for a contact address by the contact id")
-    @GetMapping(value = Constants.API_CONTACTS_ID_ADDRESS, produces = "application/hal+json")
+    @GetMapping(value = Constants.API_CONTACTS_ID_ADDRESS, produces = "application/json")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = AddressDto.class)))),
+        @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AddressDto.class))),
         @ApiResponse(responseCode = "404", description = "Not found"), @ApiResponse(responseCode = "500", description = "Internal servor error")
     })
     public ResponseEntity<?> getContactAddress(@PathVariable("id") String id) {
@@ -71,13 +69,10 @@ public class AddressController {
     }
 
     @Operation(summary = "Update or create an address by the contact id")
-    @PutMapping(value = Constants.API_CONTACTS_ID_ADDRESS)
+    @PutMapping(value = Constants.API_CONTACTS_ID_ADDRESS, produces = "application/json", consumes = "application/json")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = AddressDto.class)))),
-        @ApiResponse(
-            responseCode = "201",
-            description = "Created",
-            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ContactDto.class)))),
+        @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AddressDto.class))),
+        @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = ContactDto.class))),
         @ApiResponse(responseCode = "404", description = "Not found")
     })
     public ResponseEntity<?> putAddress(@PathVariable("id") String id, @RequestBody AddressDto addressDto) {

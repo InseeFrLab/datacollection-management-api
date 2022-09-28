@@ -54,12 +54,6 @@ Before to startup the tomcat server, some configurations are needed :
 
 #### External Properties file
 
-Create pearljambo.properties near war file and complete the following properties:
-
-```shell
-
-```
-
 #### External log file
 
 Create log4j2.xml near war file and define your external config for logs.
@@ -104,4 +98,5 @@ Before committing code please ensure,
 
 ### Cross domain
 
-- `GET /api/contacts/search` : Search contacts
+- `GET /api/contacts/search` : Multi-criteria search for contacts
+- `GET /api/contacts/{id}/accreditations` : Search for contact accreditations

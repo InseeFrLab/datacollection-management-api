@@ -1,7 +1,5 @@
 package fr.insee.survey.datacollectionmanagement.contact.controller;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.text.ParseException;
 import java.util.List;
@@ -17,8 +15,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -65,7 +61,7 @@ public class ContactController {
     private ModelMapper modelMapper;
 
     @Operation(summary = "Search for contacts, paginated")
-    @GetMapping(value = Constants.API_CONTACTS_ALL, produces = "application/hal+json")
+    @GetMapping(value = Constants.API_CONTACTS_ALL, produces = "application/json")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ContactPage.class))))
     })
@@ -79,9 +75,9 @@ public class ContactController {
     }
 
     @Operation(summary = "Search for a contact by its identifier")
-    @GetMapping(value = Constants.API_CONTACTS_ID, produces = "application/hal+json")
+    @GetMapping(value = Constants.API_CONTACTS_ID, produces = "application/json")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ContactDto.class)))),
+        @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ContactDto.class))),
         @ApiResponse(responseCode = "404", description = "Not found"), @ApiResponse(responseCode = "400", description = "Bad Request")
     })
     public ResponseEntity<?> getContact(@PathVariable("id") String id) {
@@ -100,9 +96,9 @@ public class ContactController {
     }
 
     @Operation(summary = "Update or create a contact")
-    @PutMapping(value = Constants.API_CONTACTS_ID)
+    @PutMapping(value = Constants.API_CONTACTS_ID, produces = "application/json", consumes = "application/json")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ContactDto.class)))),
+        @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ContactDto.class))),
         @ApiResponse(
             responseCode = "201",
             description = "Created",
@@ -138,7 +134,7 @@ public class ContactController {
     }
 
     @Operation(summary = "Delete a contact, its address and its contactEvents")
-    @DeleteMapping(value = Constants.API_CONTACTS_ID)
+    @DeleteMapping(value = Constants.API_CONTACTS_ID, produces = "application/json", consumes = "application/json")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204", description = "No Content"), @ApiResponse(responseCode = "404", description = "Not found"),
         @ApiResponse(responseCode = "400", description = "Bad Request")
@@ -161,14 +157,6 @@ public class ContactController {
         ContactDto contactDto = modelMapper.map(contact, ContactDto.class);
         String civility = contact.getGender().equals(Gender.Male) ? "Mr" : "Mme";
         contactDto.setCivility(civility);
-        WebMvcLinkBuilder selfLinkBuider = linkTo(methodOn(this.getClass()).getContact(contact.getIdentifier()));
-        contactDto.add(selfLinkBuider.withSelfRel());
-        contactDto.add(selfLinkBuider.withRel("contact"));
-        Link linkAddress = linkTo(methodOn(AddressController.class).getContactAddress(contact.getIdentifier())).withRel("address");
-        contactDto.add(linkAddress);
-        Link linkContactEvents = linkTo(methodOn(ContactEventController.class).getContactContactEvent(contact.getIdentifier())).withRel("contactEvents");
-        contactDto.add(linkContactEvents);
-
         return contactDto;
     }
 

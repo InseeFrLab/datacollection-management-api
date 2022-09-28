@@ -1,13 +1,11 @@
 package fr.insee.survey.datacollectionmanagement.metadata.dto;
 
-import org.springframework.hateoas.RepresentationModel;
-
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class SurveyDto extends RepresentationModel<SurveyDto> {
+public class SurveyDto {
 
     private String id;
     private Integer year;
