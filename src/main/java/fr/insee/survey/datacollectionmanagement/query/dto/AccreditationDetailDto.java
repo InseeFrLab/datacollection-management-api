@@ -12,8 +12,8 @@ public class AccreditationDetailDto {
     private int year;
     private String period;
     private String partition;
-    private String surveyUnitId;
-    private String companyName;
+    private String identificationCode;
+    private String identificationName;
     private boolean isMain;
 
     public AccreditationDetailDto(
@@ -22,8 +22,8 @@ public class AccreditationDetailDto {
         int year,
         String period,
         String partition,
-        String surveyUnitId,
-        String companyName,
+        String identificationCode,
+        String identificationName,
         boolean isMain) {
         super();
         this.sourceId = sourceId;
@@ -31,8 +31,8 @@ public class AccreditationDetailDto {
         this.year = year;
         this.period = period;
         this.partition = partition;
-        this.surveyUnitId = surveyUnitId;
-        this.companyName = companyName;
+        this.identificationCode = identificationCode;
+        this.identificationName = identificationName;
         this.isMain = isMain;
     }
 

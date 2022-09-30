@@ -54,8 +54,8 @@ public class SearchContactServiceImpl implements SearchContactService {
         String firstName,
         String email,
         String idSu,
-        String surveyUnitId,
-        String companyName,
+        String identificationCode,
+        String identificationName,
         String source,
         String year,
         String period,
@@ -163,35 +163,35 @@ public class SearchContactServiceImpl implements SearchContactService {
                         .collect(Collectors.toList());
         }
 
-        if ( !StringUtils.isEmpty(surveyUnitId)) {
+        if ( !StringUtils.isEmpty(identificationCode)) {
             if (listView.isEmpty() && alwaysEmpty) {
-                List<SurveyUnit> listSurveyUnits = surveyUnitService.findbySurveyUnitId(surveyUnitId);
+                List<SurveyUnit> listSurveyUnits = surveyUnitService.findbyIdentificationCode(identificationCode);
                 for (SurveyUnit s : listSurveyUnits) {
                     listView.addAll(viewService.findViewByIdSu(s.getIdSu()));
                 }
                 alwaysEmpty = false;
             }
             else if ( !alwaysEmpty) {
-                List<SurveyUnit> listSurveyUnits = surveyUnitService.findbySurveyUnitId(surveyUnitId);
+                List<SurveyUnit> listSurveyUnits = surveyUnitService.findbyIdentificationCode(identificationCode);
                 for (SurveyUnit s : listSurveyUnits) {
-                    listView = listView.stream().filter(v -> surveyUnitId.equalsIgnoreCase(s.getSurveyUnitId())).collect(Collectors.toList());
+                    listView = listView.stream().filter(v -> identificationCode.equalsIgnoreCase(s.getIdentificationCode())).collect(Collectors.toList());
                 }
 
             }
         }
 
-        if ( !StringUtils.isEmpty(companyName)) {
+        if ( !StringUtils.isEmpty(identificationName)) {
             if (listView.isEmpty() && alwaysEmpty) {
-                List<SurveyUnit> listSurveyUnits = surveyUnitService.findbyCompanyName(companyName);
+                List<SurveyUnit> listSurveyUnits = surveyUnitService.findbyIdentificationName(identificationName);
                 for (SurveyUnit s : listSurveyUnits) {
                     listView.addAll(viewService.findViewByIdSu(s.getIdSu()));
                 }
                 alwaysEmpty = false;
             }
             else if ( !alwaysEmpty) {
-                List<SurveyUnit> listSurveyUnits = surveyUnitService.findbySurveyUnitId(surveyUnitId);
+                List<SurveyUnit> listSurveyUnits = surveyUnitService.findbyIdentificationCode(identificationCode);
                 for (SurveyUnit s : listSurveyUnits) {
-                    listView = listView.stream().filter(v -> companyName.equalsIgnoreCase(s.getCompanyName())).collect(Collectors.toList());
+                    listView = listView.stream().filter(v -> identificationName.equalsIgnoreCase(s.getIdentificationName())).collect(Collectors.toList());
                 }
 
             }
@@ -221,7 +221,7 @@ public class SearchContactServiceImpl implements SearchContactService {
                 listAccreditations.add(new AccreditationDetailDto(part.getCampaign().getSurvey().getSource().getIdSource(),
                     part.getCampaign().getSurvey().getSource().getShortWording(), part.getCampaign().getSurvey().getYear(), part.getCampaign().getPeriod(),
                     part.getId(), questioningAccreditation.getQuestioning().getSurveyUnit().getIdSu(),
-                    questioningAccreditation.getQuestioning().getSurveyUnit().getCompanyName(), questioningAccreditation.isMain()));
+                    questioningAccreditation.getQuestioning().getSurveyUnit().getIdentificationName(), questioningAccreditation.isMain()));
 
             }
             searchContact.setAccreditationsList(listAccreditations);

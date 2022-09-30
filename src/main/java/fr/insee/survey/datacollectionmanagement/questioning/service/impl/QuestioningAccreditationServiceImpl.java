@@ -74,7 +74,8 @@ public class QuestioningAccreditationServiceImpl implements QuestioningAccredita
     }
 
     @Override
-    public QuestioningAccreditation updateQuestioningAccreditation(QuestioningAccreditation questioningAccreditation) {
+    public QuestioningAccreditation saveQuestioningAccreditation(QuestioningAccreditation questioningAccreditation) {
         return questioningAccreditationRepository.save(questioningAccreditation);
     }
+
 }

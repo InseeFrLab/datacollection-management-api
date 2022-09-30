@@ -47,15 +47,21 @@ import fr.insee.survey.datacollectionmanagement.metadata.repository.SourceReposi
 import fr.insee.survey.datacollectionmanagement.metadata.repository.SupportRepository;
 import fr.insee.survey.datacollectionmanagement.metadata.repository.SurveyRepository;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.EventOrder;
+import fr.insee.survey.datacollectionmanagement.questioning.domain.Operator;
+import fr.insee.survey.datacollectionmanagement.questioning.domain.OperatorService;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningAccreditation;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningEvent;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.SurveyUnit;
+import fr.insee.survey.datacollectionmanagement.questioning.domain.SurveyUnitAddress;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.TypeQuestioningEvent;
 import fr.insee.survey.datacollectionmanagement.questioning.repository.EventOrderRepository;
+import fr.insee.survey.datacollectionmanagement.questioning.repository.OperatorRepository;
+import fr.insee.survey.datacollectionmanagement.questioning.repository.OperatorServiceRepository;
 import fr.insee.survey.datacollectionmanagement.questioning.repository.QuestioningAccreditationRepository;
 import fr.insee.survey.datacollectionmanagement.questioning.repository.QuestioningEventRepository;
 import fr.insee.survey.datacollectionmanagement.questioning.repository.QuestioningRepository;
+import fr.insee.survey.datacollectionmanagement.questioning.repository.SurveyUnitAddressRepository;
 import fr.insee.survey.datacollectionmanagement.questioning.repository.SurveyUnitRepository;
 import fr.insee.survey.datacollectionmanagement.view.domain.View;
 import fr.insee.survey.datacollectionmanagement.view.repository.ViewRepository;
@@ -71,7 +77,7 @@ public class Dataloader {
 
     @Autowired
     private AddressRepository addressRepository;
-    
+
     @Autowired
     private ContactEventRepository contactEventRepository;
 
@@ -89,6 +95,15 @@ public class Dataloader {
 
     @Autowired
     private SurveyUnitRepository surveyUnitRepository;
+
+    @Autowired
+    private SurveyUnitAddressRepository surveyUnitAddressRepository;
+
+    @Autowired
+    private OperatorServiceRepository operatorServiceRepository;
+
+    @Autowired
+    private OperatorRepository operatorRepository;
 
     @Autowired
     private QuestioningRepository questioningRepository;
@@ -117,12 +132,102 @@ public class Dataloader {
         Faker faker = new Faker();
         EasyRandom generator = new EasyRandom();
 
-//        initOrder();
-        initContact(faker);
-//        initMetadata(faker, generator);
-//        initQuestionning(faker, generator);
-//        initView();
+        // initOrder();
+        // initContact(faker);
+        // initMetadata(faker, generator);
+        // initQuestionning(faker, generator);
+        // initView();
+        initSurveyUnitAddressAndOperators(faker);
 
+    }
+
+    private void initSurveyUnitAddressAndOperators(Faker faker) {
+        if (surveyUnitAddressRepository.count() == 0) {
+            for (SurveyUnit su : surveyUnitRepository.findAll()) {
+                SurveyUnitAddress a = new SurveyUnitAddress();
+                com.github.javafaker.Address fakeAddress = faker.address();
+
+                a.setCountryName(fakeAddress.country());
+                a.setStreetNumber(fakeAddress.buildingNumber());
+                a.setStreetName(fakeAddress.streetName());
+                a.setZipCode(fakeAddress.zipCode());
+                a.setCity(fakeAddress.cityName());
+                su.setSurveyUnitAddress(a);
+                surveyUnitRepository.save(su);
+            }
+        }
+
+        if (operatorServiceRepository.count() == 0) {
+            Set<Operator> setOpConj = new HashSet<>();
+            OperatorService operatorServiceConj = new OperatorService();
+            operatorServiceConj.setName("Conjoncture");
+            operatorServiceConj.setMail("conjoncture@Cocorico.fr");
+            for (int i = 0; i < 9; i ++ ) {
+                setOpConj.add(createOperator(faker));
+            }
+            operatorServiceConj.setOperators(setOpConj);
+            operatorServiceRepository.save(operatorServiceConj);
+
+            Set<Operator> setOpLogement = new HashSet<>();
+            OperatorService operatorServiceLogement = new OperatorService();
+            operatorServiceLogement.setName("Logement");
+            operatorServiceLogement.setMail("logement@Cocorico.fr");
+            operatorServiceRepository.save(operatorServiceLogement);
+            for (int i = 0; i < 9; i ++ ) {
+                setOpLogement.add(createOperator(faker));
+            }
+            operatorServiceLogement.setOperators(setOpLogement);
+            operatorServiceRepository.save(operatorServiceLogement);
+
+            Set<Operator> setOpEmploi = new HashSet<>();
+            OperatorService operatorServiceEmploi = new OperatorService();
+            operatorServiceEmploi.setName("Emploi");
+            operatorServiceEmploi.setMail("emploi@Cocorico.fr");
+            operatorServiceRepository.save(operatorServiceEmploi);
+            for (int i = 0; i < 9; i ++ ) {
+                setOpEmploi.add(createOperator(faker));
+            }
+            operatorServiceEmploi.setOperators(setOpEmploi);
+            operatorServiceRepository.save(operatorServiceEmploi);
+
+            Set<Operator> setOpPrix = new HashSet<>();
+            OperatorService operatorServicePrix = new OperatorService();
+            operatorServicePrix.setName("Prix");
+            operatorServicePrix.setMail("prix@Cocorico.fr");
+            operatorServiceRepository.save(operatorServicePrix);
+            for (int i = 0; i < 9; i ++ ) {
+                setOpPrix.add(createOperator(faker));
+            }
+            operatorServicePrix.setOperators(setOpPrix);
+            operatorServiceRepository.save(operatorServicePrix);
+        }
+
+        if (operatorServiceRepository.count() == 0) {
+            for (SurveyUnit su : surveyUnitRepository.findAll()) {
+                SurveyUnitAddress a = new SurveyUnitAddress();
+                com.github.javafaker.Address fakeAddress = faker.address();
+
+                a.setCountryName(fakeAddress.country());
+                a.setStreetNumber(fakeAddress.buildingNumber());
+                a.setStreetName(fakeAddress.streetName());
+                a.setZipCode(fakeAddress.zipCode());
+                a.setCity(fakeAddress.cityName());
+                su.setSurveyUnitAddress(a);
+                surveyUnitRepository.save(su);
+            }
+        }
+
+    }
+
+    private Operator createOperator(Faker faker) {
+        Operator operator = new Operator();
+        Name n = faker.name();
+        String name = n.lastName();
+        String firstName = n.firstName();
+        operator.setLastName(name);
+        operator.setFirstName(firstName);
+        operator.setPhoneNumber(faker.phoneNumber().phoneNumber());
+        return operatorRepository.save(operator);
     }
 
     private void initOrder() {
@@ -196,14 +301,11 @@ public class Dataloader {
 
                 LOGGER.info("It took {}ms to execute saveAll() for 10000 contacts.", (end - start));
             }
-            
-
 
         }
-        
+
         Long nbContactEvents = contactEventRepository.count();
 
-        
         for (Long j = nbContactEvents; j < 300; j ++ ) {
             Contact contact = contactRepository.findRandomContact();
             ContactEvent contactEvent = new ContactEvent();
@@ -211,7 +313,7 @@ public class Dataloader {
             contactEvent.setEventDate(new Date());
             contactEvent.setContact(contact);
             contactEventRepository.save(contactEvent);
-            Set<ContactEvent> setContactEvents =  new HashSet<>();
+            Set<ContactEvent> setContactEvents = new HashSet<>();
             setContactEvents.add(contactEvent);
             contact.setContactEvents(setContactEvents);
             contactRepository.save(contact);
@@ -375,8 +477,8 @@ public class Dataloader {
             fakeSiren = RandomStringUtils.randomNumeric(9);
 
             su.setIdSu(fakeSiren);
-            su.setCompanyName(faker.company().name());
-            su.setSurveyUnitId(fakeSiren);
+            su.setIdentificationName(faker.company().name());
+            su.setIdentificationCode(fakeSiren);
             surveyUnitRepository.save(su);
 
         }

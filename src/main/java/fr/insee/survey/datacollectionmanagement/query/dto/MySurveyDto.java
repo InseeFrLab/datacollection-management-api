@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 public class MySurveyDto {
     
-    private String surveyUnitId;
+    private String identificationCode;
     private String surveyWording;
     private String surveyObjectives;
     private Timestamp monitoringDate;

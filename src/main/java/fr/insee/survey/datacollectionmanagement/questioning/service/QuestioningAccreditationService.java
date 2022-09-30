@@ -30,7 +30,7 @@ public interface QuestioningAccreditationService {
     public Page<QuestioningAccreditation> findAll(Pageable pageable);
 
     public QuestioningAccreditation findById(Long id);
-
-    public QuestioningAccreditation updateQuestioningAccreditation(QuestioningAccreditation questioningAccreditation);
+   
+    public QuestioningAccreditation saveQuestioningAccreditation(QuestioningAccreditation questioningAccreditation);
 
 }

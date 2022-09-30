@@ -42,12 +42,12 @@ public class MySurveysController {
             Partitioning part = partitioningService.findById(questioning.getIdPartitioning());
             if (part != null) {
                 Survey survey = part.getCampaign().getSurvey();
-                String surveyUnitId = questioning.getSurveyUnit().getSurveyUnitId();
+                String identificationCode = questioning.getSurveyUnit().getIdentificationCode();
                 surveyDto.setSurveyWording(survey.getLongWording());
                 surveyDto.setSurveyObjectives(survey.getLongObjectives());
                 surveyDto.setMonitoringDate(new Timestamp(part.getReturnDate().getTime()));
-                surveyDto.setAccessUrl(STROMAE_URL + part.getCampaign().getCampaignId() + "/unite-enquetee/" + surveyUnitId);
-                surveyDto.setSurveyUnitId(surveyUnitId);
+                surveyDto.setAccessUrl(STROMAE_URL + part.getCampaign().getCampaignId() + "/unite-enquetee/" + identificationCode);
+                surveyDto.setIdentificationCode(identificationCode);
                 surveyDto.setMonitoringStatus(part.getStatus());
             }
 

@@ -26,7 +26,7 @@ public class QuestioningServiceImpl implements QuestioningService {
     }
 
     @Override
-    public Questioning updateQuestioning(Questioning questioning) {
+    public Questioning saveQuestioning(Questioning questioning) {
         return questioningRepository.save(questioning);
     }
 

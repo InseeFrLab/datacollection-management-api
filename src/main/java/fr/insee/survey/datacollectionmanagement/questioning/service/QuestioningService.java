@@ -11,6 +11,6 @@ public interface QuestioningService {
 
     public Questioning findbyId(Long id);
 
-    public Questioning updateQuestioning(Questioning questioning);
+    public Questioning saveQuestioning(Questioning questioning);
 
 }

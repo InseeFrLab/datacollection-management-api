@@ -1,29 +1,33 @@
 package fr.insee.survey.datacollectionmanagement.questioning.controller;
 
+import java.text.ParseException;
 import java.util.NoSuchElementException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import fr.insee.survey.datacollectionmanagement.constants.Constants;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.SurveyUnit;
+import fr.insee.survey.datacollectionmanagement.questioning.dto.SurveyUnitDto;
 import fr.insee.survey.datacollectionmanagement.questioning.service.SurveyUnitService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 @RestController
 @CrossOrigin
@@ -34,51 +38,71 @@ public class SurveyUnitController {
     @Autowired
     private SurveyUnitService surveyUnitService;
 
-    @GetMapping(value = "surveyUnits")
-    public Page<SurveyUnit> findSurveyUnits(
-        @RequestParam(defaultValue = "0") Integer page,
-        @RequestParam(defaultValue = "20") Integer size,
-        @RequestParam(defaultValue = "idSu") String sort) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
-        return surveyUnitService.findAll(pageable);
-    }
+    @Autowired
+    private ModelMapper modelMapper;
 
-    @GetMapping(value = "surveyUnits/{id}")
+    @Operation(summary = "Search for a survey unit by its id")
+    @GetMapping(value = Constants.API_SURVEY_UNITS_ID, produces = "application/json")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SurveyUnitDto.class))),
+        @ApiResponse(responseCode = "404", description = "Not found"), @ApiResponse(responseCode = "400", description = "Bad Request")
+    })
     public ResponseEntity<?> findSurveyUnit(@PathVariable("id") String id) {
         SurveyUnit surveyUnit = null;
         try {
             surveyUnit = surveyUnitService.findbyId(StringUtils.upperCase(id));
-            return new ResponseEntity<>(surveyUnit, HttpStatus.OK);
+            return new ResponseEntity<>(convertToDto(surveyUnit), HttpStatus.OK);
         }
         catch (NoSuchElementException e) {
-            return new ResponseEntity<>(surveyUnit, HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("survey unit not found");
         }
         catch (Exception e) {
-            return new ResponseEntity<String>("Error", HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
         }
 
     }
 
-    @PutMapping(value = "surveyUnits/{id}")
-    public ResponseEntity<?> putSurveyUnit(@PathVariable("id") String id, @RequestBody SurveyUnit surveyUnit) {
-        if (StringUtils.isBlank(surveyUnit.getIdSu()) || !surveyUnit.getIdSu().equalsIgnoreCase(id)) {
-            return new ResponseEntity<>("id and surveyUnit identifier don't match", HttpStatus.BAD_REQUEST);
+    @Operation(summary = "Create or update a survey unit")
+    @PutMapping(value = Constants.API_SURVEY_UNITS_ID, produces = "application/json", consumes = "application/json")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SurveyUnitDto.class))),
+        @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = SurveyUnitDto.class))),
+        @ApiResponse(responseCode = "400", description = "Bad request")
+    })
+    public ResponseEntity<?> putSurveyUnit(@PathVariable("id") String id, @RequestBody SurveyUnitDto surveyUnitDto) {
+        if (StringUtils.isBlank(surveyUnitDto.getIdSu()) || !surveyUnitDto.getIdSu().equalsIgnoreCase(id)) {
+            return new ResponseEntity<>("id and idSu don't match", HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(surveyUnitService.updateSurveyUnit(surveyUnit), HttpStatus.OK);
-    }
 
-    @DeleteMapping(value = "surveyUnits/{id}")
-    public ResponseEntity<?> deleteSurveyUnit(@PathVariable("id") String id) {
+        SurveyUnit surveyUnit;
+        HttpStatus responseStatus;
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set(HttpHeaders.LOCATION, ServletUriComponentsBuilder.fromCurrentRequest().buildAndExpand(surveyUnitDto.getIdSu()).toUriString());
+
         try {
-            surveyUnitService.deleteSurveyUnit(id);
-            return new ResponseEntity<>("SurveyUnit deleted", HttpStatus.OK);
+            surveyUnit = convertToEntity(surveyUnitDto);
         }
-        catch (EmptyResultDataAccessException e) {
-            return new ResponseEntity<>("SurveyUnit not found", HttpStatus.NOT_FOUND);
+        catch (ParseException e) {
+            return new ResponseEntity<>("Impossible to parse survey unit", HttpStatus.BAD_REQUEST);
         }
-        catch (Exception e) {
-            return new ResponseEntity<String>("Error", HttpStatus.INTERNAL_SERVER_ERROR);
+
+        try {
+            surveyUnitService.findbyId(surveyUnitDto.getIdSu());
+            responseStatus = HttpStatus.OK;
         }
+        catch (NoSuchElementException e) {
+            LOGGER.info("Creating survey with the id {}", surveyUnitDto.getIdSu());
+            responseStatus = HttpStatus.CREATED;
+        }
+        return new ResponseEntity<>(convertToDto(surveyUnitService.saveSurveyUnit(surveyUnit)), responseStatus);
+
     }
 
+    private SurveyUnitDto convertToDto(SurveyUnit surveyUnit) {
+        return modelMapper.map(surveyUnit, SurveyUnitDto.class);
+    }
+
+    private SurveyUnit convertToEntity(SurveyUnitDto surveyUnitDto) throws ParseException {
+        return modelMapper.map(surveyUnitDto, SurveyUnit.class);
+    }
 }

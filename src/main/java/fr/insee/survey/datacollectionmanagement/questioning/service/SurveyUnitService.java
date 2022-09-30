@@ -11,22 +11,14 @@ public interface SurveyUnitService {
 
     public SurveyUnit findbyId(String idSu);
 
-    public List<SurveyUnit> findbySurveyUnitId(String surveyUnitId);
+    public List<SurveyUnit> findbyIdentificationCode(String identificationCode);
 
-    public List<SurveyUnit> findbyCompanyName(String companyName);
-    
-    public List<String> findIdContactbySurveyUnitId(String surveyUnitId);
-    
-    public List<String> findIdContactsByIdSu(String idSu);
-
-    public List<String> findIdContactsbyCompanyName(String companyName);
+    public List<SurveyUnit> findbyIdentificationName(String identificationName);
 
     public Page<SurveyUnit> findAll(Pageable pageable);
 
-    public SurveyUnit updateSurveyUnit(SurveyUnit surveyUnit);
+    public SurveyUnit saveSurveyUnit(SurveyUnit surveyUnit);
 
     public void deleteSurveyUnit(String id);
-
-
 
 }

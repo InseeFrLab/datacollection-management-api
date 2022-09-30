@@ -65,8 +65,8 @@ public class SearchContactController {
         @RequestParam(required = false) String firstName,
         @RequestParam(required = false) String email,
         @RequestParam(required = false) String idSu,
-        @RequestParam(required = false) String surveyUnitId,
-        @RequestParam(required = false) String companyName,
+        @RequestParam(required = false) String identificationCode,
+        @RequestParam(required = false) String identificationName,
         @RequestParam(required = false) String source,
         @RequestParam(required = false) String year,
         @RequestParam(required = false) String period,
@@ -74,13 +74,13 @@ public class SearchContactController {
         @RequestParam(defaultValue = "10") Integer pageSize) {
 
         LOGGER.info(
-            "Search contact: identifier = {}, lastName= {}, firstName= {}, email= {}, idSu= {}, surveyUnitId= {}, companyName= {}, source= {}, year= {}, period= {}, pageNo= {}, pageSize= {} ",
-            identifier, lastName, firstName, email, idSu, surveyUnitId, companyName, source, year, period, pageNo, pageSize);
+            "Search contact: identifier = {}, lastName= {}, firstName= {}, email= {}, idSu= {}, identificationCode= {}, identificationName= {}, source= {}, year= {}, period= {}, pageNo= {}, pageSize= {} ",
+            identifier, lastName, firstName, email, idSu, identificationCode, identificationName, source, year, period, pageNo, pageSize);
 
         Pageable pageable = PageRequest.of(pageNo, pageSize);
 
         List<View> listView =
-            searchContactService.searchContactCrossDomain(identifier, lastName, firstName, email, idSu, surveyUnitId, companyName, source, year, period,
+            searchContactService.searchContactCrossDomain(identifier, lastName, firstName, email, idSu, identificationCode, identificationName, source, year, period,
                 pageable);
         int start = (int) pageable.getOffset();
         int end = (int) ((start + pageable.getPageSize()) > listView.size() ? listView.size() : (start + pageable.getPageSize()));
@@ -116,7 +116,7 @@ public class SearchContactController {
             listAccreditations.add(new AccreditationDetailDto(part.getCampaign().getSurvey().getSource().getIdSource(),
                 part.getCampaign().getSurvey().getSource().getShortWording(), part.getCampaign().getSurvey().getYear(), part.getCampaign().getPeriod(),
                 part.getId(), questioningAccreditation.getQuestioning().getSurveyUnit().getIdSu(),
-                questioningAccreditation.getQuestioning().getSurveyUnit().getCompanyName(), questioningAccreditation.isMain()));
+                questioningAccreditation.getQuestioning().getSurveyUnit().getIdentificationName(), questioningAccreditation.isMain()));
 
         }
 

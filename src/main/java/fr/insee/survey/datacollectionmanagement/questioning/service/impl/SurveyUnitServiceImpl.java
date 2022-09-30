@@ -19,33 +19,17 @@ public class SurveyUnitServiceImpl implements SurveyUnitService {
 
     @Override
     public SurveyUnit findbyId(String idSu) {
-        return surveyUnitRepository.findById(idSu).orElse(null);
+        return surveyUnitRepository.findById(idSu).orElseThrow();
     }
 
     @Override
-    public List<SurveyUnit> findbySurveyUnitId(String surveyUnitId) {
-        return surveyUnitRepository.findAllBySurveyUnitId(surveyUnitId);
+    public List<SurveyUnit> findbyIdentificationCode(String identificationCode) {
+        return surveyUnitRepository.findAllByIdentificationCode(identificationCode);
     }
 
     @Override
-    public List<SurveyUnit> findbyCompanyName(String companyName) {
-        return surveyUnitRepository.findByCompanyNameIgnoreCase(companyName);
-    }
-
-    @Override
-    public List<String> findIdContactbySurveyUnitId(String surveyUnitId) {
-        return surveyUnitRepository.findIdContactsBySurveyUnitId(surveyUnitId);
-    }
-
-    @Override
-    public List<String> findIdContactsByIdSu(String idSu) {
-        return surveyUnitRepository.findIdContactsByIdSu(idSu);
-    }
-
-    @Override
-    public List<String> findIdContactsbyCompanyName(String companyName) {
-        return surveyUnitRepository.findIdContactsByCompanyName(companyName);
-
+    public List<SurveyUnit> findbyIdentificationName(String identificationName) {
+        return surveyUnitRepository.findByIdentificationNameIgnoreCase(identificationName);
     }
 
     @Override
@@ -54,13 +38,13 @@ public class SurveyUnitServiceImpl implements SurveyUnitService {
     }
 
     @Override
-    public SurveyUnit updateSurveyUnit(SurveyUnit surveyUnit) {
+    public SurveyUnit saveSurveyUnit(SurveyUnit surveyUnit) {
         return surveyUnitRepository.save(surveyUnit);
     }
 
     @Override
     public void deleteSurveyUnit(String id) {
         surveyUnitRepository.deleteById(id);
-        
+
     }
 }

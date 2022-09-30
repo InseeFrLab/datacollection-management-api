@@ -20,7 +20,7 @@ public class PartioningServiceImpl implements PartitioningService {
 
     @Override
     public Partitioning findById(String id) {
-        return partitioningRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Partitioning not found"));
+        return partitioningRepository.findById(id).orElseThrow();
 
     }
 
