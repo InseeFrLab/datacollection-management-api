@@ -135,7 +135,7 @@ package View {
 }
 View "0..*" .. "0..1" Contact
 View "0..*" .. "0..1" SurveyUnit
-View "0..*" .. "0..1" Partitionning
+View "0..*" .. "0..1" Campaign
 }
 
 
