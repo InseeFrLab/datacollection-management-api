@@ -2,14 +2,14 @@ package fr.insee.survey.datacollectionmanagement.questioning.domain;
 
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -18,9 +18,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(indexes = {
-    @Index(name = "idContact_index", columnList = "idContact"),
-    @Index(name = "questioning_index", columnList = "questioning_id")
-  })
+    @Index(name = "idContact_index", columnList = "idContact"), @Index(name = "questioning_index", columnList = "questioning_id")
+})
 public class QuestioningAccreditation {
 
     @Id
@@ -32,8 +31,7 @@ public class QuestioningAccreditation {
     private String creationAuthor;
     private String idContact;
 
-    @OneToOne
-    @JsonBackReference
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Questioning questioning;
 
 }

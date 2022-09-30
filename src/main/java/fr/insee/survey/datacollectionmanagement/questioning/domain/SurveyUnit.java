@@ -2,13 +2,14 @@ package fr.insee.survey.datacollectionmanagement.questioning.domain;
 
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -17,20 +18,22 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(indexes = {
-    @Index(name = "companyName_index", columnList = "companyName"),
-    @Index(name = "surveyUnitId_index", columnList = "surveyUnitId")
-  })
+    @Index(name = "identificationName_index", columnList = "identificationName"), @Index(name = "identificationCode_index", columnList = "identificationCode")
+})
 public class SurveyUnit {
 
     @Id
     private String idSu;
 
     @OneToMany
-    @JsonIgnore
     private Set<Questioning> questionings;
 
-    private String surveyUnitId;
+    private String identificationCode;
 
-    //"Raison Sociale"
-    private String companyName;
+    // "Raison Sociale"
+    private String identificationName;
+
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private SurveyUnitAddress surveyUnitAddress;
+
 }

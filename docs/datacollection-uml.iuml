@@ -124,6 +124,20 @@ package User {
 
 }
 
+package View {
+
+  class Source{
+    periodicity
+
+  }
+
+  class View{
+}
+View "0..*" .. "0..1" Contact
+View "0..*" .. "0..1" SurveyUnit
+View "0..*" .. "0..1" Partitionning
+}
+
 
 
 package Reporting {

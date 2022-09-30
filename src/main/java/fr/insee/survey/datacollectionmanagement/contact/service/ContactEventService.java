@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
 import fr.insee.survey.datacollectionmanagement.contact.domain.ContactEvent;
+import fr.insee.survey.datacollectionmanagement.contact.domain.ContactEvent.ContactEventType;
 
 @Service
 public interface ContactEventService {
@@ -21,5 +22,7 @@ public interface ContactEventService {
     public void deleteContactEvent(Long id);
     
     public Set<ContactEvent> findContactEventsByContact (Contact contact);
+
+    ContactEvent createContactEvent(Contact contact, ContactEventType type);
 
 }

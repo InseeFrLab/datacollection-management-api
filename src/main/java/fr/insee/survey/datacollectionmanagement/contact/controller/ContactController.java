@@ -1,6 +1,5 @@
 package fr.insee.survey.datacollectionmanagement.contact.controller;
 
-
 import java.text.ParseException;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -35,6 +34,7 @@ import fr.insee.survey.datacollectionmanagement.contact.dto.ContactDto;
 import fr.insee.survey.datacollectionmanagement.contact.service.AddressService;
 import fr.insee.survey.datacollectionmanagement.contact.service.AdvancedContactService;
 import fr.insee.survey.datacollectionmanagement.contact.service.ContactService;
+import fr.insee.survey.datacollectionmanagement.view.service.ViewService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -56,6 +56,9 @@ public class ContactController {
 
     @Autowired
     private AddressService addressService;
+    
+    @Autowired
+    private ViewService viewService;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -71,7 +74,7 @@ public class ContactController {
         @RequestParam(defaultValue = "identifier") String sort) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
         List<ContactDto> listC = contactService.findAll(pageable).stream().map(c -> convertToDto(c)).collect(Collectors.toList());
-        return new ResponseEntity<>(new ContactPage(listC, pageable, listC.size()), HttpStatus.OK);
+        return ResponseEntity.ok().body(new ContactPage(listC, pageable, listC.size()));
     }
 
     @Operation(summary = "Search for a contact by its identifier")
@@ -84,13 +87,13 @@ public class ContactController {
         Contact contact = null;
         try {
             contact = contactService.findByIdentifier(StringUtils.upperCase(id));
-            return new ResponseEntity<>(convertToDto(contact), HttpStatus.OK);
+            return ResponseEntity.ok().body(convertToDto(contact));
         }
         catch (NoSuchElementException e) {
-            return new ResponseEntity<>("Not Found", HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Contact does not exist");
         }
         catch (Exception e) {
-            return new ResponseEntity<String>("Error", HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
         }
 
     }
@@ -99,15 +102,12 @@ public class ContactController {
     @PutMapping(value = Constants.API_CONTACTS_ID, produces = "application/json", consumes = "application/json")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ContactDto.class))),
-        @ApiResponse(
-            responseCode = "201",
-            description = "Created",
-            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ContactDto.class)))),
+        @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = ContactDto.class))),
         @ApiResponse(responseCode = "400", description = "Bad request")
     })
     public ResponseEntity<?> putContact(@PathVariable("id") String id, @RequestBody ContactDto contactDto) {
         if (StringUtils.isBlank(contactDto.getIdentifier()) || !contactDto.getIdentifier().equalsIgnoreCase(id)) {
-            return new ResponseEntity<>("id and contact identifier don't match", HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("id and contact identifier don't match");
         }
         Contact contact;
         HttpHeaders responseHeaders = new HttpHeaders();
@@ -118,13 +118,14 @@ public class ContactController {
 
         }
         catch (ParseException e) {
-            return new ResponseEntity<>("Impossible to parse contact", HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Impossible to parse contact");
         }
         catch (NoSuchElementException e) {
             LOGGER.info("Creating contact with the identifier {}", contactDto.getIdentifier());
             contact = convertToEntityNewContact(contactDto);
             if (contactDto.getAddress() != null) contact.setAddress(addressService.convertToEntity(contactDto.getAddress()));
             Contact contactCreate = advancedContactService.createContactAddressEvent(contact);
+            viewService.createView(id, null, null);
             return ResponseEntity.status(HttpStatus.CREATED).headers(responseHeaders).body(convertToDto(contactCreate));
 
         }
@@ -134,7 +135,7 @@ public class ContactController {
     }
 
     @Operation(summary = "Delete a contact, its address and its contactEvents")
-    @DeleteMapping(value = Constants.API_CONTACTS_ID, produces = "application/json", consumes = "application/json")
+    @DeleteMapping(value = Constants.API_CONTACTS_ID)
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204", description = "No Content"), @ApiResponse(responseCode = "404", description = "Not found"),
         @ApiResponse(responseCode = "400", description = "Bad Request")
@@ -143,13 +144,13 @@ public class ContactController {
         try {
             Contact contact = contactService.findByIdentifier(id);
             advancedContactService.deleteContactAddressEvent(contact);
-            return new ResponseEntity<>("Contact deleted", HttpStatus.NO_CONTENT);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Contact deleted");
         }
         catch (NoSuchElementException e) {
-            return new ResponseEntity<>("Contact not found", HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Contact does not exist");
         }
         catch (Exception e) {
-            return new ResponseEntity<String>("Error", HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
         }
     }
 

@@ -362,8 +362,8 @@ public class DataloaderTest {
             fakeSiren = RandomStringUtils.randomNumeric(9);
 
             su.setIdSu(fakeSiren);
-            su.setCompanyName(faker.company().name());
-            su.setSurveyUnitId(fakeSiren);
+            su.setIdentificationName(faker.company().name());
+            su.setIdentificationCode(fakeSiren);
             surveyUnitRepository.save(su);
 
         }

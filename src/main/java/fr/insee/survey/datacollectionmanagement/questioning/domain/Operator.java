@@ -15,8 +15,7 @@ public class Operator {
     private Long id;
 
     private String firstName;
-    private String name;
-    private String mail;
+    private String lastName;
     private String phoneNumber;
 
 

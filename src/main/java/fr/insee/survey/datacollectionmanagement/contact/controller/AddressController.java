@@ -22,9 +22,12 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import fr.insee.survey.datacollectionmanagement.constants.Constants;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Address;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
+import fr.insee.survey.datacollectionmanagement.contact.domain.ContactEvent;
+import fr.insee.survey.datacollectionmanagement.contact.domain.ContactEvent.ContactEventType;
 import fr.insee.survey.datacollectionmanagement.contact.dto.AddressDto;
 import fr.insee.survey.datacollectionmanagement.contact.dto.ContactDto;
 import fr.insee.survey.datacollectionmanagement.contact.service.AddressService;
+import fr.insee.survey.datacollectionmanagement.contact.service.ContactEventService;
 import fr.insee.survey.datacollectionmanagement.contact.service.ContactService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -43,6 +46,9 @@ public class AddressController {
 
     @Autowired
     private ContactService contactService;
+
+    @Autowired
+    private ContactEventService contactEventService;
 
     @Operation(summary = "Search for a contact address by the contact id")
     @GetMapping(value = Constants.API_CONTACTS_ID_ADDRESS, produces = "application/json")
@@ -78,23 +84,31 @@ public class AddressController {
     public ResponseEntity<?> putAddress(@PathVariable("id") String id, @RequestBody AddressDto addressDto) {
         try {
             Contact contact = contactService.findByIdentifier(id);
-
+            HttpStatus httpStatus;
+            Address addressUpdate;
+            
             Address address = addressService.convertToEntity(addressDto);
             HttpHeaders responseHeaders = new HttpHeaders();
             responseHeaders.set(HttpHeaders.LOCATION, ServletUriComponentsBuilder.fromCurrentRequest().toUriString());
 
             if (contact.getAddress() != null) {
+                LOGGER.info("Update address for the contact {} ", id);
                 address.setId(contact.getAddress().getId());
-                Address addressUpdate = addressService.saveAddress(address);
-                return ResponseEntity.status(HttpStatus.OK).headers(responseHeaders).body(addressService.convertToDto(addressUpdate));
+                addressUpdate = addressService.saveAddress(address);
+                httpStatus = HttpStatus.OK;
             }
             else {
-                LOGGER.info("Creating address for the contact {} ", id);
-                Address addressUpdate = addressService.saveAddress(address);
+                LOGGER.info("Create address for the contact {} ", id);
+                addressUpdate = addressService.saveAddress(address);
                 contact.setAddress(addressUpdate);
                 contactService.saveContact(contact);
-                return ResponseEntity.status(HttpStatus.CREATED).headers(responseHeaders).body(addressService.convertToDto(addressUpdate));
+                httpStatus = HttpStatus.CREATED;
             }
+            
+            ContactEvent contactEventUpdate = contactEventService.createContactEvent(contact, ContactEventType.update);
+            contactEventService.saveContactEvent(contactEventUpdate);
+            return ResponseEntity.status(httpStatus).headers(responseHeaders).body(addressService.convertToDto(addressUpdate));
+
         }
         catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Contact does not exist");

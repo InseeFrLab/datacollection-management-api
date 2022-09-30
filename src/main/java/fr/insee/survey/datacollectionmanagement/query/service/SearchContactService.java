@@ -16,8 +16,8 @@ public interface SearchContactService {
      * @param firstName
      * @param email
      * @param idSu
-     * @param surveyUnitId
-     * @param companyName
+     * @param identificationCode
+     * @param identificationName
      * @param source
      * @param year
      * @param period
@@ -29,8 +29,8 @@ public interface SearchContactService {
         String firstName,
         String email,
         String idSu,
-        String surveyUnitId,
-        String companyName,
+        String identificationCode,
+        String identificationName,
         String source,
         String year,
         String period,
