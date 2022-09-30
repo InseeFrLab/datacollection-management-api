@@ -1,5 +1,6 @@
 package fr.insee.survey.datacollectionmanagement.contact.service.impl;
 
+import java.util.Date;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
 import fr.insee.survey.datacollectionmanagement.contact.domain.ContactEvent;
+import fr.insee.survey.datacollectionmanagement.contact.domain.ContactEvent.ContactEventType;
 import fr.insee.survey.datacollectionmanagement.contact.repository.ContactEventRepository;
 import fr.insee.survey.datacollectionmanagement.contact.service.ContactEventService;
 
@@ -42,5 +44,13 @@ public class ContactEventServiceImpl implements ContactEventService {
     public Set<ContactEvent> findContactEventsByContact(Contact contact) {
         return contactEventRepository.findByContact(contact);
     }
-
+    
+    @Override
+    public ContactEvent createContactEvent(Contact contact, ContactEventType type) {
+        ContactEvent contactEventCreate = new ContactEvent();
+        contactEventCreate.setContact(contact);
+        contactEventCreate.setType(type);
+        contactEventCreate.setEventDate(new Date());
+        return contactEventCreate;
+    }
 }

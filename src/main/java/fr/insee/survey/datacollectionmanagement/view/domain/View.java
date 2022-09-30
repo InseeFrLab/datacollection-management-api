@@ -12,7 +12,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(indexes = {
+@Table( indexes = {
     @Index(name = "view_identifier_index", columnList = "identifier"), @Index(name = "view_campaignId_index", columnList = "campaignId"),
     @Index(name = "view_idSu_index", columnList = "idSu")
 })

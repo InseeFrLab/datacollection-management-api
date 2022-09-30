@@ -1,7 +1,6 @@
 package fr.insee.survey.datacollectionmanagement.contact.service.impl;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -33,20 +32,24 @@ public class AdvancedContactServiceImpl implements AdvancedContactService {
         if (contact.getAddress() != null) {
             addressService.saveAddress(contact.getAddress());
         }
-        ContactEvent newContactEvent = createContactEvent(contact, ContactEventType.create);
+        ContactEvent newContactEvent = contactEventService.createContactEvent(contact, ContactEventType.create);
         contact.setContactEvents(new HashSet<>(Arrays.asList(newContactEvent)));
         return contactService.saveContact(contact);
     }
 
-
     @Override
     public Contact updateContactAddressEvent(Contact contact) {
+
+        Contact existingContact = contactService.findByIdentifier(contact.getIdentifier());
         if (contact.getAddress() != null) {
+            if (existingContact.getAddress() != null) {
+                contact.getAddress().setId(existingContact.getAddress().getId());
+            }
             addressService.saveAddress(contact.getAddress());
         }
 
         Set<ContactEvent> setContactEventsContact = contactEventService.findContactEventsByContact(contact);
-        ContactEvent contactEventUpdate = createContactEvent(contact, ContactEventType.update);
+        ContactEvent contactEventUpdate = contactEventService.createContactEvent(contact, ContactEventType.update);
         setContactEventsContact.add(contactEventUpdate);
         contact.setContactEvents(setContactEventsContact);
         return contactService.saveContact(contact);
@@ -54,17 +57,9 @@ public class AdvancedContactServiceImpl implements AdvancedContactService {
 
     @Override
     public void deleteContactAddressEvent(Contact contact) {
-        //delete cascade
+        // delete cascade
         contactService.deleteContact(contact.getIdentifier());
 
-    }
-
-    private ContactEvent createContactEvent(Contact contact, ContactEventType type) {
-        ContactEvent contactEventCreate = new ContactEvent();
-        contactEventCreate.setContact(contact);
-        contactEventCreate.setType(type);
-        contactEventCreate.setEventDate(new Date());
-        return contactEventCreate;
     }
 
 }

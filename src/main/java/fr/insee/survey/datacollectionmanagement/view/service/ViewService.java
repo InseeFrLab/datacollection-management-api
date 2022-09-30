@@ -9,16 +9,22 @@ import fr.insee.survey.datacollectionmanagement.view.domain.View;
 @Service
 public interface ViewService {
 
+    View saveView(View view);
+
     List<View> findViewByIdentifier(String identifier);
 
     List<View> findViewByCampaignId(String campaignId);
 
     List<View> findViewByIdSu(String idSu);
-    
+
     List<View> findViewByIdentifierIdSuCampaignId(String identifier, String idSu, String campaignId);
 
     List<View> findByIdentifierContainingAndIdSuNotNull(String identifier);
 
     List<View> findViewByIdSuContaining(String field);
+    
+    View createView(String identifier, String idSu, String campaignId);
+
+    void deleteView(View view);
 
 }
