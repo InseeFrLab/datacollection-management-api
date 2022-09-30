@@ -20,7 +20,7 @@ public class MetadataController {
     @Autowired
     CampaignService campaignService;
 
-    @GetMapping(value = "moog/campaigns")
+    @GetMapping(value = "/api/moog/campaigns")
     public JSONCollectionWrapper<CampaignMoogDto> displayCampaignInProgress() {
         LOGGER.info("Request GET campaigns");
         return new JSONCollectionWrapper<CampaignMoogDto>(campaignService.getCampaigns());

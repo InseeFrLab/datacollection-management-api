@@ -45,19 +45,19 @@ public class MonitoringController {
     CampaignService campaignService;
 
 
-    @GetMapping(value = "/moog/campaigns/{idCampaign}/monitoring/progress", produces = "application/json")
+    @GetMapping(value = "/api/moog/campaigns/{idCampaign}/monitoring/progress", produces = "application/json")
     public JSONCollectionWrapper<MoogProgressDto> getDataForProgress(@PathVariable String idCampaign) {
         LOGGER.info("Request GET for monitoring moog progress table for campaign : {}", idCampaign);
         return monitoringService.getProgress(idCampaign);
     }
 
-    @GetMapping(value = "/moog/campaigns/{idCampaign}/monitoring/follow-up", produces = "application/json")
+    @GetMapping(value = "/api/moog/campaigns/{idCampaign}/monitoring/follow-up", produces = "application/json")
     public JSONCollectionWrapper<MoogFollowUpDto> getDataToFollowUp(@PathVariable String idCampaign) {
         LOGGER.info("Request GET for following table for campaign : {}", idCampaign);
         return monitoringService.getFollowUp(idCampaign);
     }
 
-    @GetMapping(value = "/temp/moog/campaigns/{idCampaign}/monitoring/progress", produces = "application/json")
+    @GetMapping(value = "/api/temp/moog/campaigns/{idCampaign}/monitoring/progress", produces = "application/json")
     public JSONCollectionWrapper<MoogProgressDto> getDataForProgressTemp(@PathVariable String idCampaign) {
         LOGGER.info("Request GET for monitoring moog progress table for campaign : {}", idCampaign);
         List<MoogProgressDto> moogProgressCampaign = new ArrayList<>();
@@ -73,7 +73,7 @@ public class MonitoringController {
         return null;
     }
 
-    @GetMapping(value = "/temp/moog/campaigns/{idCampaign}/monitoring/follow-up", produces = "application/json")
+    @GetMapping(value = "/api/temp/moog/campaigns/{idCampaign}/monitoring/follow-up", produces = "application/json")
     public JSONCollectionWrapper<MoogFollowUpDto> getDataToFollowUpTemp(@PathVariable String idCampaign) {
         LOGGER.info("Request GET for following table for campaign : {}", idCampaign);
         return monitoringService.getFollowUp(idCampaign);
