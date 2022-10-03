@@ -14,12 +14,16 @@ import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningAc
 import fr.insee.survey.datacollectionmanagement.questioning.domain.SurveyUnit;
 import fr.insee.survey.datacollectionmanagement.questioning.repository.QuestioningAccreditationRepository;
 import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningAccreditationService;
+import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningService;
 
 @Service
 public class QuestioningAccreditationServiceImpl implements QuestioningAccreditationService {
 
     @Autowired
     private QuestioningAccreditationRepository questioningAccreditationRepository;
+
+    @Autowired
+    private QuestioningService questioningService;
 
     public List<QuestioningAccreditation> findByContactIdentifier(String id) {
         return questioningAccreditationRepository.findByIdContact(id);
@@ -76,6 +80,14 @@ public class QuestioningAccreditationServiceImpl implements QuestioningAccredita
     @Override
     public QuestioningAccreditation saveQuestioningAccreditation(QuestioningAccreditation questioningAccreditation) {
         return questioningAccreditationRepository.save(questioningAccreditation);
+    }
+
+    @Override
+    public void deleteAccreditation(QuestioningAccreditation acc) {
+        Questioning questioning = questioningService.findbyId(acc.getQuestioning().getId());
+        questioning.getQuestioningAccreditations().remove(acc);
+        questioningService.saveQuestioning(questioning);
+        questioningAccreditationRepository.delete(acc);
     }
 
 }

@@ -30,7 +30,7 @@ public class Questioning {
     private String modelName;
     private String idPartitioning;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private Set<QuestioningAccreditation> questioningAccreditations;
 
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)

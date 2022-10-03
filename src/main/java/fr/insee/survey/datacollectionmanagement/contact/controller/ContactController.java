@@ -17,6 +17,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -140,10 +141,14 @@ public class ContactController {
         @ApiResponse(responseCode = "204", description = "No Content"), @ApiResponse(responseCode = "404", description = "Not found"),
         @ApiResponse(responseCode = "400", description = "Bad Request")
     })
+    @Transactional
     public ResponseEntity<?> deleteContact(@PathVariable("id") String id) {
         try {
             Contact contact = contactService.findByIdentifier(id);
             contactService.deleteContactAddressEvent(contact);
+            
+            viewService.findViewByIdentifier(id).stream().forEach(c-> viewService.deleteView(c));
+            questioningAccreditationService.findByContactIdentifier(id).stream().forEach(c-> questioningAccreditationService.deleteAccreditation(c));
 
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Contact deleted");
         }

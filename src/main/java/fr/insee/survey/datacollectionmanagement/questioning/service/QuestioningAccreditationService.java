@@ -33,4 +33,6 @@ public interface QuestioningAccreditationService {
    
     public QuestioningAccreditation saveQuestioningAccreditation(QuestioningAccreditation questioningAccreditation);
 
+    public void deleteAccreditation(QuestioningAccreditation c);
+
 }

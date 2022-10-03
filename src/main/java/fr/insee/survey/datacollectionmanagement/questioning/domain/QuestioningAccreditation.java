@@ -18,7 +18,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(indexes = {
-    @Index(name = "idContact_index", columnList = "idContact"), @Index(name = "questioning_index", columnList = "questioning_id")
+        @Index(name = "idContact_index", columnList = "idContact"),
+        @Index(name = "questioning_index", columnList = "questioning_id")
 })
 public class QuestioningAccreditation {
 
@@ -31,7 +32,7 @@ public class QuestioningAccreditation {
     private String creationAuthor;
     private String idContact;
 
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToOne
     private Questioning questioning;
 
 }
