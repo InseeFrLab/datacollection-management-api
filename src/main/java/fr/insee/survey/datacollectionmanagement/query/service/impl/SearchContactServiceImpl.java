@@ -122,7 +122,7 @@ public class SearchContactServiceImpl implements SearchContactService {
             if (listView.isEmpty() && alwaysEmpty) {
                 List<Contact> listC = contactService.findByLastName(lastName);
                 for (Contact c : listC) {
-                    listView.addAll(viewService.findViewByIdentifier(c.getIdentifier()));
+                    listView.add(viewService.findFirstViewByIdentifier(c.getIdentifier()));
                 }
                 alwaysEmpty = false;
             } else if (!alwaysEmpty)
@@ -137,7 +137,7 @@ public class SearchContactServiceImpl implements SearchContactService {
             if (listView.isEmpty() && alwaysEmpty) {
                 List<Contact> listC = contactService.findByFirstName(firstName);
                 for (Contact c : listC) {
-                    listView.addAll(viewService.findViewByIdentifier(c.getIdentifier()));
+                    listView.add(viewService.findFirstViewByIdentifier(c.getIdentifier()));
                 }
                 alwaysEmpty = false;
             } else if (!alwaysEmpty)
@@ -152,7 +152,7 @@ public class SearchContactServiceImpl implements SearchContactService {
             if (listView.isEmpty() && alwaysEmpty) {
                 List<Contact> listC = contactService.findByEmail(email);
                 for (Contact c : listC) {
-                    listView.addAll(viewService.findViewByIdentifier(c.getIdentifier()));
+                    listView.add(viewService.findFirstViewByIdentifier(c.getIdentifier()));
                 }
                 alwaysEmpty = false;
             } else if (!alwaysEmpty)

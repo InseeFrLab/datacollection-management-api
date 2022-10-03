@@ -15,7 +15,6 @@ public interface ViewService {
     
     View findFirstViewByIdentifier(String identifier);
 
-
     List<View> findViewByCampaignId(String campaignId);
 
     List<View> findViewByIdSu(String idSu);
