@@ -3,6 +3,9 @@ package fr.insee.survey.datacollectionmanagement.query.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.insee.survey.datacollectionmanagement.metadata.domain.Campaign;
+import fr.insee.survey.datacollectionmanagement.metadata.service.CampaignService;
+import fr.insee.survey.datacollectionmanagement.query.domain.MoogCampaign;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +25,9 @@ public class MoogSearchServiceImpl implements MoogSearchService {
     @Autowired
     private ContactService contactService;
 
+    @Autowired
+    private CampaignService campaignService;
+
     @Override
     public List<View> moogSearch(String field) {
 
@@ -36,12 +42,18 @@ public class MoogSearchServiceImpl implements MoogSearchService {
         for (View view : listView) {
             MoogSearchDto moogSearchDto = new MoogSearchDto();
             Contact c = contactService.findByIdentifier(view.getIdentifier());
-            moogSearchDto.setIdentifier(view.getIdentifier());
-            moogSearchDto.setAddress(c.getAddress());
+            Campaign camp = campaignService.findById(view.getCampaignId());
+            MoogCampaign moogCampaign = new MoogCampaign();
+            moogCampaign.setId(view.getCampaignId());
+            moogCampaign.setLabel(camp.getCampaignWording());
+            moogCampaign.setCollectionEndDate(camp.getPartitionings().iterator().next().getClosingDate().getTime());
+            moogCampaign.setCollectionStartDate(camp.getPartitionings().iterator().next().getOpeningDate().getTime());
+            moogSearchDto.setIdContact(view.getIdentifier());
+            moogSearchDto.setAddress(c.getAddress().getZipCode().concat(c.getAddress().getCity()));
             moogSearchDto.setIdSu(view.getIdSu());
-            moogSearchDto.setCampaign(view.getCampaignId());
+            moogSearchDto.setCampaign(moogCampaign);
             moogSearchDto.setFirstName(c.getFirstName());
-            moogSearchDto.setLastName(c.getLastName());
+            moogSearchDto.setLastname(c.getLastName());
             listResult.add(moogSearchDto);
         }
         return listResult;
