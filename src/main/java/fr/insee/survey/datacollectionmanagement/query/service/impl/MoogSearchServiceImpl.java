@@ -49,7 +49,7 @@ public class MoogSearchServiceImpl implements MoogSearchService {
             moogCampaign.setCollectionEndDate(camp.getPartitionings().iterator().next().getClosingDate().getTime());
             moogCampaign.setCollectionStartDate(camp.getPartitionings().iterator().next().getOpeningDate().getTime());
             moogSearchDto.setIdContact(view.getIdentifier());
-            moogSearchDto.setAddress(c.getAddress().getZipCode().concat(c.getAddress().getCity()));
+            moogSearchDto.setAddress(c.getAddress().getZipCode().concat(" ").concat(c.getAddress().getCity()));
             moogSearchDto.setIdSu(view.getIdSu());
             moogSearchDto.setCampaign(moogCampaign);
             moogSearchDto.setFirstName(c.getFirstName());
