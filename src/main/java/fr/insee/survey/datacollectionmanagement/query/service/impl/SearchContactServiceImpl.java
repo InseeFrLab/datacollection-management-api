@@ -12,14 +12,10 @@ import org.springframework.stereotype.Service;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
 import fr.insee.survey.datacollectionmanagement.contact.service.ContactService;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Campaign;
-import fr.insee.survey.datacollectionmanagement.metadata.domain.Partitioning;
 import fr.insee.survey.datacollectionmanagement.metadata.service.CampaignService;
 import fr.insee.survey.datacollectionmanagement.metadata.service.PartitioningService;
-import fr.insee.survey.datacollectionmanagement.query.dto.AccreditationDetailDto;
 import fr.insee.survey.datacollectionmanagement.query.dto.SearchContactDto;
 import fr.insee.survey.datacollectionmanagement.query.service.SearchContactService;
-import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
-import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningAccreditation;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.SurveyUnit;
 import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningAccreditationService;
 import fr.insee.survey.datacollectionmanagement.questioning.service.SurveyUnitService;
@@ -49,56 +45,59 @@ public class SearchContactServiceImpl implements SearchContactService {
 
     @Override
     public List<View> searchContactCrossDomain(
-        String identifier,
-        String lastName,
-        String firstName,
-        String email,
-        String idSu,
-        String identificationCode,
-        String identificationName,
-        String source,
-        String year,
-        String period,
-        Pageable pageable) {
+            String identifier,
+            String lastName,
+            String firstName,
+            String email,
+            String idSu,
+            String identificationCode,
+            String identificationName,
+            String source,
+            String year,
+            String period,
+            Pageable pageable) {
 
         List<View> listView = new ArrayList<>();
         boolean alwaysEmpty = true;
 
-        if ( !StringUtils.isEmpty(identifier)) {
+        if (!StringUtils.isEmpty(identifier)) {
             listView.add(viewService.findFirstViewByIdentifier(identifier));
             alwaysEmpty = false;
         }
 
-        if ( !StringUtils.isEmpty(idSu)) {
+        if (!StringUtils.isEmpty(idSu)) {
             if (listView.isEmpty() && alwaysEmpty) {
                 listView = viewService.findViewByIdSu(idSu);
                 alwaysEmpty = false;
-            }
-            else if ( !alwaysEmpty) {
-                listView = listView.stream().filter(v -> viewService.findViewByIdSu(idSu).contains(v)).collect(Collectors.toList());
+            } else if (!alwaysEmpty) {
+                listView = listView.stream().filter(v -> viewService.findViewByIdSu(idSu).contains(v))
+                        .collect(Collectors.toList());
             }
         }
 
-        if ( !StringUtils.isEmpty(source) && !StringUtils.isEmpty(year) && !StringUtils.isEmpty(period)) {
+        if (!StringUtils.isEmpty(source) && !StringUtils.isEmpty(year) && !StringUtils.isEmpty(period)) {
             if (listView.isEmpty() && alwaysEmpty) {
-                List<Campaign> listCampains = campaignService.findbySourceYearPeriod(source, Integer.parseInt(year), period);
+                List<Campaign> listCampains = campaignService.findbySourceYearPeriod(source, Integer.parseInt(year),
+                        period);
                 for (Campaign campain : listCampains) {
                     listView.addAll(viewService.findViewByCampaignId(campain.getCampaignId()));
                 }
 
                 alwaysEmpty = false;
-            }
-            else if ( !alwaysEmpty) {
-                List<Campaign> listCampains = campaignService.findbySourceYearPeriod(source, Integer.parseInt(year), period);
+            } else if (!alwaysEmpty) {
+                List<Campaign> listCampains = campaignService.findbySourceYearPeriod(source, Integer.parseInt(year),
+                        period);
                 List<View> listViewC = new ArrayList<>();
                 for (Campaign c : listCampains) {
                     listViewC
-                        .addAll(listView.stream().filter(v -> viewService.findViewByCampaignId(c.getCampaignId()).contains(v)).collect(Collectors.toList()));
+                            .addAll(listView.stream()
+                                    .filter(v -> viewService.findViewByCampaignId(c.getCampaignId()).contains(v))
+                                    .collect(Collectors.toList()));
                 }
                 listView = listViewC;
             }
         }
-        if (( !StringUtils.isEmpty(source) || !StringUtils.isEmpty(period)) && StringUtils.isEmpty(year)) {
+        if ((!StringUtils.isEmpty(source) || !StringUtils.isEmpty(period)) && StringUtils.isEmpty(year)) {
             if (listView.isEmpty() && alwaysEmpty) {
                 List<Campaign> listCampains = campaignService.findbySourcePeriod(source, period);
                 for (Campaign campain : listCampains) {
@@ -106,92 +105,94 @@ public class SearchContactServiceImpl implements SearchContactService {
                 }
 
                 alwaysEmpty = false;
-            }
-            else if ( !alwaysEmpty) {
+            } else if (!alwaysEmpty) {
                 List<Campaign> listCampains = campaignService.findbySourcePeriod(source, period);
                 List<View> listViewC = new ArrayList<>();
                 for (Campaign c : listCampains) {
                     listViewC
-                        .addAll(listView.stream().filter(v -> viewService.findViewByCampaignId(c.getCampaignId()).contains(v)).collect(Collectors.toList()));
+                            .addAll(listView.stream()
+                                    .filter(v -> viewService.findViewByCampaignId(c.getCampaignId()).contains(v))
+                                    .collect(Collectors.toList()));
                 }
                 listView = listViewC;
             }
         }
 
-        if ( !StringUtils.isEmpty(lastName)) {
+        if (!StringUtils.isEmpty(lastName)) {
             if (listView.isEmpty() && alwaysEmpty) {
                 List<Contact> listC = contactService.findByLastName(lastName);
                 for (Contact c : listC) {
                     listView.addAll(viewService.findViewByIdentifier(c.getIdentifier()));
                 }
                 alwaysEmpty = false;
-            }
-            else if ( !alwaysEmpty)
+            } else if (!alwaysEmpty)
 
-                listView =
-                    listView.stream().filter(v -> lastName.equalsIgnoreCase(contactService.findByIdentifier(v.getIdentifier()).getLastName()))
+                listView = listView.stream()
+                        .filter(v -> lastName
+                                .equalsIgnoreCase(contactService.findByIdentifier(v.getIdentifier()).getLastName()))
                         .collect(Collectors.toList());
         }
 
-        if ( !StringUtils.isEmpty(firstName)) {
+        if (!StringUtils.isEmpty(firstName)) {
             if (listView.isEmpty() && alwaysEmpty) {
                 List<Contact> listC = contactService.findByFirstName(firstName);
                 for (Contact c : listC) {
                     listView.addAll(viewService.findViewByIdentifier(c.getIdentifier()));
                 }
                 alwaysEmpty = false;
-            }
-            else if ( !alwaysEmpty)
+            } else if (!alwaysEmpty)
 
-                listView =
-                    listView.stream().filter(v -> firstName.equalsIgnoreCase(contactService.findByIdentifier(v.getIdentifier()).getFirstName()))
+                listView = listView.stream()
+                        .filter(v -> firstName
+                                .equalsIgnoreCase(contactService.findByIdentifier(v.getIdentifier()).getFirstName()))
                         .collect(Collectors.toList());
         }
 
-        if ( !StringUtils.isEmpty(email)) {
+        if (!StringUtils.isEmpty(email)) {
             if (listView.isEmpty() && alwaysEmpty) {
                 List<Contact> listC = contactService.findByEmail(email);
                 for (Contact c : listC) {
                     listView.addAll(viewService.findViewByIdentifier(c.getIdentifier()));
                 }
                 alwaysEmpty = false;
-            }
-            else if ( !alwaysEmpty)
+            } else if (!alwaysEmpty)
 
-                listView =
-                    listView.stream().filter(v -> email.equalsIgnoreCase(contactService.findByIdentifier(v.getIdentifier()).getEmail()))
+                listView = listView.stream().filter(
+                        v -> email.equalsIgnoreCase(contactService.findByIdentifier(v.getIdentifier()).getEmail()))
                         .collect(Collectors.toList());
         }
 
-        if ( !StringUtils.isEmpty(identificationCode)) {
+        if (!StringUtils.isEmpty(identificationCode)) {
             if (listView.isEmpty() && alwaysEmpty) {
                 List<SurveyUnit> listSurveyUnits = surveyUnitService.findbyIdentificationCode(identificationCode);
                 for (SurveyUnit s : listSurveyUnits) {
                     listView.addAll(viewService.findViewByIdSu(s.getIdSu()));
                 }
                 alwaysEmpty = false;
-            }
-            else if ( !alwaysEmpty) {
+            } else if (!alwaysEmpty) {
                 List<SurveyUnit> listSurveyUnits = surveyUnitService.findbyIdentificationCode(identificationCode);
                 for (SurveyUnit s : listSurveyUnits) {
-                    listView = listView.stream().filter(v -> identificationCode.equalsIgnoreCase(s.getIdentificationCode())).collect(Collectors.toList());
+                    listView = listView.stream()
+                            .filter(v -> identificationCode.equalsIgnoreCase(s.getIdentificationCode()))
+                            .collect(Collectors.toList());
                 }
 
             }
         }
 
-        if ( !StringUtils.isEmpty(identificationName)) {
+        if (!StringUtils.isEmpty(identificationName)) {
             if (listView.isEmpty() && alwaysEmpty) {
                 List<SurveyUnit> listSurveyUnits = surveyUnitService.findbyIdentificationName(identificationName);
                 for (SurveyUnit s : listSurveyUnits) {
                     listView.addAll(viewService.findViewByIdSu(s.getIdSu()));
                 }
                 alwaysEmpty = false;
-            }
-            else if ( !alwaysEmpty) {
+            } else if (!alwaysEmpty) {
                 List<SurveyUnit> listSurveyUnits = surveyUnitService.findbyIdentificationCode(identificationCode);
                 for (SurveyUnit s : listSurveyUnits) {
-                    listView = listView.stream().filter(v -> identificationName.equalsIgnoreCase(s.getIdentificationName())).collect(Collectors.toList());
+                    listView = listView.stream()
+                            .filter(v -> identificationName.equalsIgnoreCase(s.getIdentificationName()))
+                            .collect(Collectors.toList());
                 }
 
             }
@@ -205,26 +206,12 @@ public class SearchContactServiceImpl implements SearchContactService {
         for (View v : listView) {
 
             SearchContactDto searchContact = new SearchContactDto();
-            List<AccreditationDetailDto> listAccreditations = new ArrayList<>();
             Contact c = contactService.findByIdentifier(v.getIdentifier());
-
             searchContact.setIdentifier(c.getIdentifier());
             searchContact.setFirstName(c.getFirstName());
             searchContact.setLastName(c.getLastName());
             searchContact.setEmail(c.getEmail());
 
-            List<QuestioningAccreditation> accreditations = questioningAccreditationService.findByContactIdentifier(c.getIdentifier());
-            for (QuestioningAccreditation questioningAccreditation : accreditations) {
-                Questioning questioning = questioningAccreditation.getQuestioning();
-                Partitioning part = partitioningService.findById(questioning.getIdPartitioning());
-
-                listAccreditations.add(new AccreditationDetailDto(part.getCampaign().getSurvey().getSource().getIdSource(),
-                    part.getCampaign().getSurvey().getSource().getShortWording(), part.getCampaign().getSurvey().getYear(), part.getCampaign().getPeriod(),
-                    part.getId(), questioningAccreditation.getQuestioning().getSurveyUnit().getIdSu(),
-                    questioningAccreditation.getQuestioning().getSurveyUnit().getIdentificationName(), questioningAccreditation.isMain()));
-
-            }
-            searchContact.setAccreditationsList(listAccreditations);
             listResult.add(searchContact);
         }
         return listResult;
