@@ -12,6 +12,9 @@ public interface ViewService {
     View saveView(View view);
 
     List<View> findViewByIdentifier(String identifier);
+    
+    View findFirstViewByIdentifier(String identifier);
+
 
     List<View> findViewByCampaignId(String campaignId);
 
@@ -27,4 +30,7 @@ public interface ViewService {
 
     void deleteView(View view);
 
+    void deleteViewByIdentifier(String identifier);
+
+   
 }

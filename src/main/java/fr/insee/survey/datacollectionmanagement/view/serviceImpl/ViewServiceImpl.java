@@ -20,6 +20,12 @@ public class ViewServiceImpl implements ViewService {
     public List<View> findViewByIdentifier(String identifier) {
         return viewRepository.findByIdentifier(identifier);
     }
+    
+    @Override
+    public View findFirstViewByIdentifier(String identifier) {
+        return viewRepository.findFirstByIdentifier(identifier);
+    }
+
 
     @Override
     public List<View> findByIdentifierContainingAndIdSuNotNull(String identifier) {
@@ -55,6 +61,11 @@ public class ViewServiceImpl implements ViewService {
     public void deleteView(View view) {
         viewRepository.delete(view);
     }
+    
+    @Override
+    public void deleteViewByIdentifier(String identifier) {
+        viewRepository.deleteByIdentifier(identifier);
+    }
 
     @Override
     public View createView(String identifier, String idSu, String campaignId) {
@@ -62,9 +73,9 @@ public class ViewServiceImpl implements ViewService {
         view.setIdentifier(identifier);
         view.setCampaignId(campaignId);
         view.setIdSu(idSu);
-        List<View> listContactView = findViewByIdentifier(identifier);
-        if (listContactView.size() == 1 && StringUtils.isEmpty(listContactView.get(0).getIdSu())) {
-            deleteView(listContactView.get(0));
+        View contactView = findFirstViewByIdentifier(identifier);
+        if (contactView !=null) {
+            deleteView(contactView);
         }
         return saveView(view);
     }

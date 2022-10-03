@@ -49,6 +49,12 @@ public interface ContactService {
     public List<Contact> findByEmail(String email);
 
     public List<Contact> searchListContactParameters(String identifier, String lastName, String firstName, String email);
+    
+    public Contact createContactAddressEvent(Contact contact);
+
+    public Contact updateContactAddressEvent(Contact contact);
+
+    public void deleteContactAddressEvent(Contact contact);
 
 
 }

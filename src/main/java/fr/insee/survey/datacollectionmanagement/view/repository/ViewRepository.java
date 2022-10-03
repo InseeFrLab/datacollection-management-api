@@ -11,6 +11,8 @@ import fr.insee.survey.datacollectionmanagement.view.domain.View;
 @Repository
 public interface ViewRepository extends PagingAndSortingRepository<View, Long> {
     
+    View findFirstByIdentifier(String identifier);
+    
     List<View> findByIdentifier(String identifier);
     
     List<View> findByCampaignId(String campaignId);
@@ -22,6 +24,8 @@ public interface ViewRepository extends PagingAndSortingRepository<View, Long> {
     List<View> findViewByIdentifierAndIdSuAndCampaignId(String identifier, String idSu, String campaignId);
 
     List<View> findByIdentifierContainingAndIdSuNotNull(String identifier);
+    
+    void deleteByIdentifier(String identifier);
 
 
 }

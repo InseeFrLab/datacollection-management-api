@@ -65,7 +65,7 @@ public class SearchContactServiceImpl implements SearchContactService {
         boolean alwaysEmpty = true;
 
         if ( !StringUtils.isEmpty(identifier)) {
-            listView.addAll(viewService.findViewByIdentifier(identifier));
+            listView.add(viewService.findFirstViewByIdentifier(identifier));
             alwaysEmpty = false;
         }
 

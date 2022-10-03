@@ -32,8 +32,8 @@ import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact.Gender;
 import fr.insee.survey.datacollectionmanagement.contact.dto.ContactDto;
 import fr.insee.survey.datacollectionmanagement.contact.service.AddressService;
-import fr.insee.survey.datacollectionmanagement.contact.service.AdvancedContactService;
 import fr.insee.survey.datacollectionmanagement.contact.service.ContactService;
+import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningAccreditationService;
 import fr.insee.survey.datacollectionmanagement.view.service.ViewService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -49,16 +49,16 @@ public class ContactController {
     static final Logger LOGGER = LoggerFactory.getLogger(ContactController.class);
 
     @Autowired
-    private AdvancedContactService advancedContactService;
-
-    @Autowired
     private ContactService contactService;
 
     @Autowired
     private AddressService addressService;
-    
+
     @Autowired
     private ViewService viewService;
+
+    @Autowired
+    private QuestioningAccreditationService questioningAccreditationService;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -124,17 +124,17 @@ public class ContactController {
             LOGGER.info("Creating contact with the identifier {}", contactDto.getIdentifier());
             contact = convertToEntityNewContact(contactDto);
             if (contactDto.getAddress() != null) contact.setAddress(addressService.convertToEntity(contactDto.getAddress()));
-            Contact contactCreate = advancedContactService.createContactAddressEvent(contact);
+            Contact contactCreate = contactService.createContactAddressEvent(contact);
             viewService.createView(id, null, null);
             return ResponseEntity.status(HttpStatus.CREATED).headers(responseHeaders).body(convertToDto(contactCreate));
 
         }
         if (contactDto.getAddress() != null) contact.setAddress(addressService.convertToEntity(contactDto.getAddress()));
-        Contact contactUpdate = advancedContactService.updateContactAddressEvent(contact);
+        Contact contactUpdate = contactService.updateContactAddressEvent(contact);
         return ResponseEntity.ok().headers(responseHeaders).body(convertToDto(contactUpdate));
     }
 
-    @Operation(summary = "Delete a contact, its address and its contactEvents")
+    @Operation(summary = "Delete a contact, its address, its contactEvents and its accreditations")
     @DeleteMapping(value = Constants.API_CONTACTS_ID)
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204", description = "No Content"), @ApiResponse(responseCode = "404", description = "Not found"),
@@ -143,7 +143,8 @@ public class ContactController {
     public ResponseEntity<?> deleteContact(@PathVariable("id") String id) {
         try {
             Contact contact = contactService.findByIdentifier(id);
-            advancedContactService.deleteContactAddressEvent(contact);
+            contactService.deleteContactAddressEvent(contact);
+
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Contact deleted");
         }
         catch (NoSuchElementException e) {

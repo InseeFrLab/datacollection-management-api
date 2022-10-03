@@ -136,7 +136,7 @@ public class DataloaderTest {
         if (nbExistingOrders == 0) {
             // Creating table order
             LOGGER.info("loading eventorder data");
-            orderRepository.saveAndFlush(new EventOrder(Long.parseLong("8"), TypeQuestioningEvent.REFUSAL.toString(), 8));
+            orderRepository.saveAndFlush(new EventOrder(Long.parseLong("8"), TypeQuestioningEvent.REFUSAL.toString().toString(), 8));
             orderRepository.saveAndFlush(new EventOrder(Long.parseLong("7"), TypeQuestioningEvent.VALINT.toString(), 7));
             orderRepository.saveAndFlush(new EventOrder(Long.parseLong("6"), TypeQuestioningEvent.VALPAP.toString(), 6));
             orderRepository.saveAndFlush(new EventOrder(Long.parseLong("5"), TypeQuestioningEvent.HC.toString(), 5));
@@ -386,7 +386,7 @@ public class DataloaderTest {
             // everybody in INITLA
             Optional<Partitioning> part = partitioningRepository.findById(qu.getIdPartitioning());
             Date eventDate = faker.date().between(part.get().getOpeningDate(), part.get().getClosingDate());
-            qe.setType(TypeQuestioningEvent.INITLA.toString());
+            qe.setType(TypeQuestioningEvent.INITLA);
             qe.setDate(eventDate);
             qe.setQuestioning(qu);
             qeList.add(qe);
@@ -396,36 +396,36 @@ public class DataloaderTest {
             switch (qeProfile) {
                 case 0:
                     qeList.add(new QuestioningEvent(faker.date().between(part.get().getOpeningDate(), part.get().getClosingDate()),
-                        TypeQuestioningEvent.REFUSAL.toString(), qu));
+                        TypeQuestioningEvent.REFUSAL, qu));
                 break;
                 case 1:
                     qeList.add(new QuestioningEvent(faker.date().between(part.get().getOpeningDate(), part.get().getClosingDate()),
-                        TypeQuestioningEvent.PND.toString(), qu));
+                        TypeQuestioningEvent.PND, qu));
                 break;
                 case 2:
                     qeList.add(new QuestioningEvent(faker.date().between(part.get().getOpeningDate(), part.get().getClosingDate()),
-                        TypeQuestioningEvent.FOLLOWUP.toString(), qu));
+                        TypeQuestioningEvent.FOLLOWUP, qu));
                     qeList.add(new QuestioningEvent(faker.date().between(part.get().getOpeningDate(), part.get().getClosingDate()),
-                        TypeQuestioningEvent.FOLLOWUP.toString(), qu));
+                        TypeQuestioningEvent.FOLLOWUP, qu));
                     qeList.add(new QuestioningEvent(faker.date().between(part.get().getOpeningDate(), part.get().getClosingDate()),
-                        TypeQuestioningEvent.PARTIELINT.toString(), qu));
+                        TypeQuestioningEvent.PARTIELINT, qu));
                 break;
                 case 3:
                 case 4:
                     qeList.add(new QuestioningEvent(faker.date().between(part.get().getOpeningDate(), part.get().getClosingDate()),
-                        TypeQuestioningEvent.FOLLOWUP.toString(), qu));
+                        TypeQuestioningEvent.FOLLOWUP, qu));
                     qeList.add(new QuestioningEvent(faker.date().between(part.get().getOpeningDate(), part.get().getClosingDate()),
-                        TypeQuestioningEvent.FOLLOWUP.toString(), qu));
+                        TypeQuestioningEvent.FOLLOWUP, qu));
                     qeList.add(new QuestioningEvent(faker.date().between(part.get().getOpeningDate(), part.get().getClosingDate()),
-                        TypeQuestioningEvent.VALINT.toString(), qu));
+                        TypeQuestioningEvent.VALINT, qu));
                 break;
                 case 5:
                 case 6:
                 case 7:
                     qeList.add(new QuestioningEvent(faker.date().between(part.get().getOpeningDate(), part.get().getClosingDate()),
-                        TypeQuestioningEvent.PARTIELINT.toString(), qu));
+                        TypeQuestioningEvent.PARTIELINT, qu));
                     qeList.add(new QuestioningEvent(faker.date().between(part.get().getOpeningDate(), part.get().getClosingDate()),
-                        TypeQuestioningEvent.VALINT.toString(), qu));
+                        TypeQuestioningEvent.VALINT, qu));
                 break;
             }
 
@@ -465,7 +465,7 @@ public class DataloaderTest {
                 // everybody in INITLA
                 Optional<Partitioning> part = partitioningRepository.findById(qu.getIdPartitioning());
                 Date eventDate = faker.date().between(part.get().getOpeningDate(), part.get().getClosingDate());
-                qe.setType(TypeQuestioningEvent.INITLA.toString());
+                qe.setType(TypeQuestioningEvent.INITLA);
                 qe.setDate(eventDate);
                 qe.setQuestioning(qu);
                 qeList.add(qe);
@@ -475,36 +475,36 @@ public class DataloaderTest {
                 switch (qeProfile) {
                     case 0:
                         qeList.add(new QuestioningEvent(faker.date().between(part.get().getOpeningDate(), part.get().getClosingDate()),
-                            TypeQuestioningEvent.REFUSAL.toString(), qu));
+                            TypeQuestioningEvent.REFUSAL, qu));
                     break;
                     case 1:
                         qeList.add(new QuestioningEvent(faker.date().between(part.get().getOpeningDate(), part.get().getClosingDate()),
-                            TypeQuestioningEvent.PND.toString(), qu));
+                            TypeQuestioningEvent.PND, qu));
                     break;
                     case 2:
                         qeList.add(new QuestioningEvent(faker.date().between(part.get().getOpeningDate(), part.get().getClosingDate()),
-                            TypeQuestioningEvent.FOLLOWUP.toString(), qu));
+                            TypeQuestioningEvent.FOLLOWUP, qu));
                         qeList.add(new QuestioningEvent(faker.date().between(part.get().getOpeningDate(), part.get().getClosingDate()),
-                            TypeQuestioningEvent.FOLLOWUP.toString(), qu));
+                            TypeQuestioningEvent.FOLLOWUP, qu));
                         qeList.add(new QuestioningEvent(faker.date().between(part.get().getOpeningDate(), part.get().getClosingDate()),
-                            TypeQuestioningEvent.PARTIELINT.toString(), qu));
+                            TypeQuestioningEvent.PARTIELINT, qu));
                     break;
                     case 3:
                     case 4:
                         qeList.add(new QuestioningEvent(faker.date().between(part.get().getOpeningDate(), part.get().getClosingDate()),
-                            TypeQuestioningEvent.FOLLOWUP.toString(), qu));
+                            TypeQuestioningEvent.FOLLOWUP, qu));
                         qeList.add(new QuestioningEvent(faker.date().between(part.get().getOpeningDate(), part.get().getClosingDate()),
-                            TypeQuestioningEvent.FOLLOWUP.toString(), qu));
+                            TypeQuestioningEvent.FOLLOWUP, qu));
                         qeList.add(new QuestioningEvent(faker.date().between(part.get().getOpeningDate(), part.get().getClosingDate()),
-                            TypeQuestioningEvent.VALINT.toString(), qu));
+                            TypeQuestioningEvent.VALINT, qu));
                     break;
                     case 5:
                     case 6:
                     case 7:
                         qeList.add(new QuestioningEvent(faker.date().between(part.get().getOpeningDate(), part.get().getClosingDate()),
-                            TypeQuestioningEvent.PARTIELINT.toString(), qu));
+                            TypeQuestioningEvent.PARTIELINT, qu));
                         qeList.add(new QuestioningEvent(faker.date().between(part.get().getOpeningDate(), part.get().getClosingDate()),
-                            TypeQuestioningEvent.VALINT.toString(), qu));
+                            TypeQuestioningEvent.VALINT, qu));
                     break;
                 }
 
