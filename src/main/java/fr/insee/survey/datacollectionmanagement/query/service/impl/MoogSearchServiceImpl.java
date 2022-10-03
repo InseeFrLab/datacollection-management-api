@@ -53,7 +53,7 @@ public class MoogSearchServiceImpl implements MoogSearchService {
             moogSearchDto.setIdSu(view.getIdSu());
             moogSearchDto.setCampaign(moogCampaign);
             moogSearchDto.setFirstName(c.getFirstName());
-            moogSearchDto.setLastName(c.getLastName());
+            moogSearchDto.setLastname(c.getLastName());
             listResult.add(moogSearchDto);
         }
         return listResult;

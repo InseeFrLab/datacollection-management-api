@@ -16,7 +16,7 @@ public class MoogSearchDto implements Serializable {
     private String address;
     private MoogCampaign campaign;
     private String firstName;
-    private String lastName;
+    private String lastname;
     private int batchNumber;
 
 }
