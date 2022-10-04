@@ -1,7 +1,10 @@
 package fr.insee.survey.datacollectionmanagement.query.controller;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,44 +56,48 @@ public class SearchContactController {
     @GetMapping(path = Constants.API_CONTACTS_SEARCH, produces = "application/json")
     @Operation(summary = "Multi-criteria search contacts")
     @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "OK",
-            content = @Content(array = @ArraySchema(schema = @Schema(implementation = SearchContactDto.class)))),
-        @ApiResponse(responseCode = "400", description = "Bad Request")
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = SearchContactDto.class)))),
+            @ApiResponse(responseCode = "400", description = "Bad Request")
     })
     public ResponseEntity<?> searchContacts(
-        @RequestParam(required = false) String identifier,
-        @RequestParam(required = false) String lastName,
-        @RequestParam(required = false) String firstName,
-        @RequestParam(required = false) String email,
-        @RequestParam(required = false) String idSu,
-        @RequestParam(required = false) String identificationCode,
-        @RequestParam(required = false) String identificationName,
-        @RequestParam(required = false) String source,
-        @RequestParam(required = false) String year,
-        @RequestParam(required = false) String period,
-        @RequestParam(defaultValue = "0") Integer pageNo,
-        @RequestParam(defaultValue = "10") Integer pageSize) {
+            @RequestParam(required = false) String identifier,
+            @RequestParam(required = false) String lastName,
+            @RequestParam(required = false) String firstName,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String idSu,
+            @RequestParam(required = false) String identificationCode,
+            @RequestParam(required = false) String identificationName,
+            @RequestParam(required = false) String source,
+            @RequestParam(required = false) String year,
+            @RequestParam(required = false) String period,
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize) {
 
         LOGGER.info(
-            "Search contact: identifier = {}, lastName= {}, firstName= {}, email= {}, idSu= {}, identificationCode= {}, identificationName= {}, source= {}, year= {}, period= {}, pageNo= {}, pageSize= {} ",
-            identifier, lastName, firstName, email, idSu, identificationCode, identificationName, source, year, period, pageNo, pageSize);
+                "Search contact: identifier = {}, lastName= {}, firstName= {}, email= {}, idSu= {}, identificationCode= {}, identificationName= {}, source= {}, year= {}, period= {}, pageNo= {}, pageSize= {} ",
+                identifier, lastName, firstName, email, idSu, identificationCode, identificationName, source, year,
+                period, pageNo, pageSize);
 
         Pageable pageable = PageRequest.of(pageNo, pageSize);
 
-        List<View> listView =
-            searchContactService.searchContactCrossDomain(identifier, lastName, firstName, email, idSu, identificationCode, identificationName, source, year, period,
+        List<View> listView = searchContactService.searchContactCrossDomain(identifier, lastName, firstName, email,
+                idSu, identificationCode, identificationName, source, year, period,
                 pageable);
         int start = (int) pageable.getOffset();
-        int end = (int) ((start + pageable.getPageSize()) > listView.size() ? listView.size() : (start + pageable.getPageSize()));
+        int end = (int) ((start + pageable.getPageSize()) > listView.size() ? listView.size()
+                : (start + pageable.getPageSize()));
 
+        if (listView.isEmpty()) {
+            return new ResponseEntity<>(Collections.EMPTY_LIST, HttpStatus.NOT_FOUND);
+        }
         if (start <= end) {
-            Page<SearchContactDto> page =
-                new PageImpl<SearchContactDto>(searchContactService.transformListViewDaoToDto(listView.subList(start, end)), pageable, listView.size());
+            Page<SearchContactDto> page = new PageImpl<SearchContactDto>(
+                    searchContactService.transformListViewDaoToDto(listView.subList(start, end)), pageable,
+                    listView.size());
             return new ResponseEntity<>(page, HttpStatus.OK);
 
         }
+
         else
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
@@ -99,11 +106,8 @@ public class SearchContactController {
     @GetMapping(path = Constants.API_CONTACTS_ACCREDITATIONS, produces = "application/json")
     @Operation(summary = "Get a contact accreditations by idContact")
     @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "OK",
-            content = @Content(array = @ArraySchema(schema = @Schema(implementation = AccreditationDetailDto.class)))),
-        @ApiResponse(responseCode = "400", description = "Bad Request")
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = AccreditationDetailDto.class)))),
+            @ApiResponse(responseCode = "400", description = "Bad Request")
     })
     public ResponseEntity<?> getContactAccreditations(@PathVariable("id") String id) {
 
@@ -114,9 +118,11 @@ public class SearchContactController {
             Partitioning part = partitioningService.findById(questioning.getIdPartitioning());
 
             listAccreditations.add(new AccreditationDetailDto(part.getCampaign().getSurvey().getSource().getIdSource(),
-                part.getCampaign().getSurvey().getSource().getShortWording(), part.getCampaign().getSurvey().getYear(), part.getCampaign().getPeriod(),
-                part.getId(), questioningAccreditation.getQuestioning().getSurveyUnit().getIdSu(),
-                questioningAccreditation.getQuestioning().getSurveyUnit().getIdentificationName(), questioningAccreditation.isMain()));
+                    part.getCampaign().getSurvey().getSource().getShortWording(),
+                    part.getCampaign().getSurvey().getYear(), part.getCampaign().getPeriod(),
+                    part.getId(), questioningAccreditation.getQuestioning().getSurveyUnit().getIdSu(),
+                    questioningAccreditation.getQuestioning().getSurveyUnit().getIdentificationName(),
+                    questioningAccreditation.isMain()));
 
         }
 
