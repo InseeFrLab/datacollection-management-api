@@ -10,6 +10,7 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -74,8 +75,9 @@ public class ContactController {
         @RequestParam(defaultValue = "20") Integer size,
         @RequestParam(defaultValue = "identifier") String sort) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
-        List<ContactDto> listC = contactService.findAll(pageable).stream().map(c -> convertToDto(c)).collect(Collectors.toList());
-        return ResponseEntity.ok().body(new ContactPage(listC, pageable, listC.size()));
+        Page<Contact> pageC = contactService.findAll(pageable);
+        List<ContactDto> listC = pageC.stream().map(c -> convertToDto(c)).collect(Collectors.toList());
+        return ResponseEntity.ok().body(new ContactPage(listC, pageable,pageC.getTotalElements()));
     }
 
     @Operation(summary = "Search for a contact by its identifier")

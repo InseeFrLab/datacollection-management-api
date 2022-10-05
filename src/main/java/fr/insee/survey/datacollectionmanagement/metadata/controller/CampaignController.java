@@ -47,8 +47,9 @@ public class CampaignController {
         @RequestParam(defaultValue = "20") Integer size,
         @RequestParam(defaultValue = "campaignId") String sort) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
-        List<CampaignDto> listCampaignsDto = campaignService.findAll(pageable).stream().map(c -> convertToDto(c)).collect(Collectors.toList());
-        return new CampaignPage(listCampaignsDto, pageable, listCampaignsDto.size());
+        Page<Campaign> pageC = campaignService.findAll(pageable);
+        List<CampaignDto> listCampaignsDto = pageC.stream().map(c -> convertToDto(c)).collect(Collectors.toList());
+        return new CampaignPage(listCampaignsDto, pageable, pageC.getTotalElements());
     }
 
     @GetMapping(value = "campaigns/{id}")
