@@ -6,18 +6,20 @@ import java.util.List;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Campaign;
 import fr.insee.survey.datacollectionmanagement.metadata.service.CampaignService;
 import fr.insee.survey.datacollectionmanagement.query.domain.MoogCampaign;
+import fr.insee.survey.datacollectionmanagement.query.dto.MoogQuestioningEventDto;
+import fr.insee.survey.datacollectionmanagement.query.repository.MoogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
 import fr.insee.survey.datacollectionmanagement.contact.service.ContactService;
 import fr.insee.survey.datacollectionmanagement.query.dto.MoogSearchDto;
-import fr.insee.survey.datacollectionmanagement.query.service.MoogSearchService;
+import fr.insee.survey.datacollectionmanagement.query.service.MoogService;
 import fr.insee.survey.datacollectionmanagement.view.domain.View;
 import fr.insee.survey.datacollectionmanagement.view.service.ViewService;
 
 @Service
-public class MoogSearchServiceImpl implements MoogSearchService {
+public class MoogServiceImpl implements MoogService {
 
     @Autowired
     private ViewService viewService;
@@ -27,6 +29,9 @@ public class MoogSearchServiceImpl implements MoogSearchService {
 
     @Autowired
     private CampaignService campaignService;
+
+    @Autowired
+    private MoogRepository moogRepository;
 
     @Override
     public List<View> moogSearch(String field) {
@@ -57,6 +62,26 @@ public class MoogSearchServiceImpl implements MoogSearchService {
             listResult.add(moogSearchDto);
         }
         return listResult;
+    }
+
+    @Override
+    public List<MoogQuestioningEventDto> getMoogEvents(String campaign, String idSu){
+
+        List<MoogQuestioningEventDto> moogEvents = moogRepository.getEventsByIdSuByCampaign(campaign, idSu);
+
+        Campaign camp = campaignService.findById(campaign);
+        MoogCampaign moogCampaign = new MoogCampaign();
+        moogCampaign.setId(campaign);
+        moogCampaign.setLabel(camp.getCampaignWording());
+        moogCampaign.setCollectionEndDate(camp.getPartitionings().iterator().next().getClosingDate().getTime());
+        moogCampaign.setCollectionStartDate(camp.getPartitionings().iterator().next().getOpeningDate().getTime());
+        MoogSearchDto surveyUnit = new MoogSearchDto();
+        surveyUnit.setCampaign(moogCampaign);
+        moogEvents.stream().forEach(e -> e.setSurveyUnit(surveyUnit));
+
+
+
+        return moogEvents;
     }
 
 }
