@@ -27,7 +27,7 @@ public class MoogRepository {
                 MoogQuestioningEventDto moogEvent = new MoogQuestioningEventDto();
                 moogEvent.setIdManagementMonitoringInfo(rs.getString("id"));
                 moogEvent.setStatus(rs.getString("type"));
-                moogEvent.setDateInfo(rs.getString("date_timestamp"));
+                moogEvent.setDateInfo(rs.getLong("date_timestamp"));
                 return moogEvent;
             }
         }, new Object[]{idSu,idCampaign});

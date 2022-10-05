@@ -14,5 +14,5 @@ public class MoogQuestioningEventDto implements Serializable {
     private MoogSearchDto surveyUnit;
     private String status;
     private String upload;
-    private String dateInfo;
+    private Long dateInfo;
 }
