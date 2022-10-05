@@ -1,6 +1,7 @@
 package fr.insee.survey.datacollectionmanagement.query.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import fr.insee.survey.datacollectionmanagement.query.dto.AccreditationDetailDto;
 import fr.insee.survey.datacollectionmanagement.query.dto.MoogQuestioningEventDto;
@@ -71,7 +72,8 @@ public class MoogController {
     public ResponseEntity<?> getMoogQuestioningEvents(@PathVariable("campaign") String campaignId,
                                         @PathVariable("id") String idSu) {
 
-        return new ResponseEntity<>(moogService.getMoogEvents(campaignId, idSu), HttpStatus.OK);
+
+        return new ResponseEntity<>(Map.of("datas",moogService.getMoogEvents(campaignId, idSu)), HttpStatus.OK);
 
 
 
