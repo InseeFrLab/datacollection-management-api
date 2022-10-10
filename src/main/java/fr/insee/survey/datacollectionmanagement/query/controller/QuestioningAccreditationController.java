@@ -37,9 +37,11 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @CrossOrigin
+@Tag(name = "2 - Questioning", description = "Enpoints to create, update, delete and find entities around the samples")
 public class QuestioningAccreditationController {
 
     static final Logger LOGGER = LoggerFactory.getLogger(QuestioningAccreditationController.class);
@@ -65,24 +67,22 @@ public class QuestioningAccreditationController {
     @Operation(summary = "Search for questioning accreditations by questioning id")
     @GetMapping(value = Constants.API_QUESTIONINGS_ID_QUESTIONING_ACCREDITATIONS_ID, produces = "application/json")
     @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "OK",
-            content = @Content(array = @ArraySchema(schema = @Schema(implementation = QuestioningAccreditationDto.class)))),
-        @ApiResponse(responseCode = "404", description = "Not found"), @ApiResponse(responseCode = "400", description = "Bad Request")
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = QuestioningAccreditationDto.class)))),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "400", description = "Bad Request")
     })
     public ResponseEntity<?> getQuestioningAccreditation(@PathVariable("id") Long id) {
 
         try {
             Questioning questioning = questioningService.findbyId(id);
             questioning.getQuestioningAccreditations();
-            return new ResponseEntity<>(questioning.getQuestioningAccreditations().stream().map(c -> convertToDto(c)).collect(Collectors.toList()),
-                HttpStatus.OK);
-        }
-        catch (NoSuchElementException e) {
+            return new ResponseEntity<>(
+                    questioning.getQuestioningAccreditations().stream().map(c -> convertToDto(c))
+                            .collect(Collectors.toList()),
+                    HttpStatus.OK);
+        } catch (NoSuchElementException e) {
             return new ResponseEntity<>("Questioning does not exist", HttpStatus.NOT_FOUND);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return new ResponseEntity<String>("Error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -90,15 +90,14 @@ public class QuestioningAccreditationController {
     @Operation(summary = "Create or update a questioning accreditation for a questioning")
     @PostMapping(value = Constants.API_QUESTIONINGS_ID_QUESTIONING_ACCREDITATIONS_ID, produces = "application/json", consumes = "application/json")
     @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "201",
-            description = "Created",
+            @ApiResponse(responseCode = "201", description = "Created",
 
-            content = @Content(schema = @Schema(implementation = QuestioningAccreditationDto.class))),
-        @ApiResponse(responseCode = "404", description = "NotFound")
+                    content = @Content(schema = @Schema(implementation = QuestioningAccreditationDto.class))),
+            @ApiResponse(responseCode = "404", description = "NotFound")
     })
     @Transactional
-    public ResponseEntity<?> postQuestioningAccreditation(@PathVariable("id") Long id, @RequestBody QuestioningAccreditationDto questioningAccreditationDto) {
+    public ResponseEntity<?> postQuestioningAccreditation(@PathVariable("id") Long id,
+            @RequestBody QuestioningAccreditationDto questioningAccreditationDto) {
 
         Questioning questioning = null;
 
@@ -107,19 +106,16 @@ public class QuestioningAccreditationController {
         // Check if questioning exists
         try {
             questioning = questioningService.findbyId(id);
-        }
-        catch (NoSuchElementException e) {
+        } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Questioning does not exist");
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error");
         }
 
         // Check if contact exists
         try {
             contactService.findByIdentifier(idContact);
-        }
-        catch (NoSuchElementException e) {
+        } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Contact does not exist");
         }
 
@@ -128,8 +124,8 @@ public class QuestioningAccreditationController {
         // save new accreditation or update existing one
         Set<QuestioningAccreditation> setExistingAccreditations = questioning.getQuestioningAccreditations();
 
-        List<QuestioningAccreditation> listContactAccreditations =
-            setExistingAccreditations.stream().filter(acc -> acc.getIdContact().equals(idContact)).collect(Collectors.toList());
+        List<QuestioningAccreditation> listContactAccreditations = setExistingAccreditations.stream()
+                .filter(acc -> acc.getIdContact().equals(idContact)).collect(Collectors.toList());
 
         if (listContactAccreditations.isEmpty()) {
             // Create new accreditation
@@ -141,27 +137,33 @@ public class QuestioningAccreditationController {
 
             // create view
             Partitioning part = partitioningService.findById(questioning.getIdPartitioning());
-            viewService.createView(idContact, questioning.getSurveyUnit().getIdSu(), part.getCampaign().getCampaignId());
+            viewService.createView(idContact, questioning.getSurveyUnit().getIdSu(),
+                    part.getCampaign().getCampaignId());
 
             // location header
             responseHeaders.set(HttpHeaders.LOCATION,
-                ServletUriComponentsBuilder.fromCurrentRequest().path(questioningAccreditation.getId().toString()).toUriString());
+                    ServletUriComponentsBuilder.fromCurrentRequest().path(questioningAccreditation.getId().toString())
+                            .toUriString());
 
-            return ResponseEntity.status(HttpStatus.CREATED).headers(responseHeaders).body(convertToDto(questioningAccreditation));
+            return ResponseEntity.status(HttpStatus.CREATED).headers(responseHeaders)
+                    .body(convertToDto(questioningAccreditation));
 
-        }
-        else {
+        } else {
             // update accreditation
             QuestioningAccreditation questioningAccreditation = listContactAccreditations.get(0);
             questioningAccreditationDto.setId(questioningAccreditation.getId());
-            questioningAccreditationService.saveQuestioningAccreditation(convertToEntity(questioningAccreditationDto));
+            questioningAccreditation = convertToEntity(questioningAccreditationDto);
+            questioningAccreditation.setQuestioning(questioning);
+            questioningAccreditationService.saveQuestioningAccreditation(questioningAccreditation);
 
             // view already exists
 
             // location header
             responseHeaders.set(HttpHeaders.LOCATION,
-                ServletUriComponentsBuilder.fromCurrentRequest().path(questioningAccreditation.getId().toString()).toUriString());
-            return ResponseEntity.status(HttpStatus.OK).headers(responseHeaders).body(convertToDto(questioningAccreditation));
+                    ServletUriComponentsBuilder.fromCurrentRequest().path(questioningAccreditation.getId().toString())
+                            .toUriString());
+            return ResponseEntity.status(HttpStatus.OK).headers(responseHeaders)
+                    .body(convertToDto(questioningAccreditation));
         }
 
     }

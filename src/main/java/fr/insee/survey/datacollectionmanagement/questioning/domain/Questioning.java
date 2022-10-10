@@ -19,7 +19,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(indexes = {
-    @Index(name = "idPartitioning_index", columnList = "idPartitioning")
+        @Index(name = "idPartitioning_index", columnList = "idPartitioning")
 })
 public class Questioning {
 
@@ -32,6 +32,9 @@ public class Questioning {
 
     @OneToMany(cascade = CascadeType.ALL)
     private Set<QuestioningAccreditation> questioningAccreditations;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    private Set<QuestioningEvent> questioningEvents;
 
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private SurveyUnit surveyUnit;

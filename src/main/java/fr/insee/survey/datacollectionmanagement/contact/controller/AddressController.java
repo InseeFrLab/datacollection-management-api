@@ -34,9 +34,11 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @CrossOrigin
+@Tag(name = "1 - Contacts", description = "Enpoints to create, update, delete and find contacts")
 public class AddressController {
 
     static final Logger LOGGER = LoggerFactory.getLogger(AddressController.class);
@@ -53,23 +55,22 @@ public class AddressController {
     @Operation(summary = "Search for a contact address by the contact id")
     @GetMapping(value = Constants.API_CONTACTS_ID_ADDRESS, produces = "application/json")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AddressDto.class))),
-        @ApiResponse(responseCode = "404", description = "Not found"), @ApiResponse(responseCode = "500", description = "Internal servor error")
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AddressDto.class))),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "500", description = "Internal servor error")
     })
     public ResponseEntity<?> getContactAddress(@PathVariable("id") String id) {
         try {
             Contact contact = contactService.findByIdentifier(id);
             if (contact.getAddress() != null)
-                return new ResponseEntity<>(addressService.convertToDto(contact.getAddress()), HttpStatus.OK);
+                return ResponseEntity.status(HttpStatus.OK).body(addressService.convertToDto(contact.getAddress()));
             else {
-                return new ResponseEntity<>("Not Found", HttpStatus.NOT_FOUND);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Address does not exist");
             }
-        }
-        catch (NoSuchElementException e) {
-            return new ResponseEntity<>("Not Found", HttpStatus.NOT_FOUND);
-        }
-        catch (Exception e) {
-            return new ResponseEntity<String>("Error", HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Contact does not exist");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error");
         }
 
     }
@@ -77,16 +78,16 @@ public class AddressController {
     @Operation(summary = "Update or create an address by the contact id")
     @PutMapping(value = Constants.API_CONTACTS_ID_ADDRESS, produces = "application/json", consumes = "application/json")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AddressDto.class))),
-        @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = ContactDto.class))),
-        @ApiResponse(responseCode = "404", description = "Not found")
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AddressDto.class))),
+            @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = ContactDto.class))),
+            @ApiResponse(responseCode = "404", description = "Not found")
     })
     public ResponseEntity<?> putAddress(@PathVariable("id") String id, @RequestBody AddressDto addressDto) {
         try {
             Contact contact = contactService.findByIdentifier(id);
             HttpStatus httpStatus;
             Address addressUpdate;
-            
+
             Address address = addressService.convertToEntity(addressDto);
             HttpHeaders responseHeaders = new HttpHeaders();
             responseHeaders.set(HttpHeaders.LOCATION, ServletUriComponentsBuilder.fromCurrentRequest().toUriString());
@@ -96,21 +97,20 @@ public class AddressController {
                 address.setId(contact.getAddress().getId());
                 addressUpdate = addressService.saveAddress(address);
                 httpStatus = HttpStatus.OK;
-            }
-            else {
+            } else {
                 LOGGER.info("Create address for the contact {} ", id);
                 addressUpdate = addressService.saveAddress(address);
                 contact.setAddress(addressUpdate);
                 contactService.saveContact(contact);
                 httpStatus = HttpStatus.CREATED;
             }
-            
+
             ContactEvent contactEventUpdate = contactEventService.createContactEvent(contact, ContactEventType.update);
             contactEventService.saveContactEvent(contactEventUpdate);
-            return ResponseEntity.status(httpStatus).headers(responseHeaders).body(addressService.convertToDto(addressUpdate));
+            return ResponseEntity.status(httpStatus).headers(responseHeaders)
+                    .body(addressService.convertToDto(addressUpdate));
 
-        }
-        catch (NoSuchElementException e) {
+        } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Contact does not exist");
         }
 

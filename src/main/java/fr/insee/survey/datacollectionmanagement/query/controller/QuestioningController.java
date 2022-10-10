@@ -1,7 +1,9 @@
 package fr.insee.survey.datacollectionmanagement.query.controller;
 
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,13 +27,16 @@ import fr.insee.survey.datacollectionmanagement.questioning.dto.QuestioningDto;
 import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningService;
 import fr.insee.survey.datacollectionmanagement.questioning.service.SurveyUnitService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @CrossOrigin
+@Tag(name = "2 - Questioning", description = "Enpoints to create, update, delete and find entities around the samples")
 public class QuestioningController {
 
     static final Logger LOGGER = LoggerFactory.getLogger(QuestioningController.class);
@@ -51,8 +56,9 @@ public class QuestioningController {
     @Operation(summary = "Search for a questioning by id")
     @GetMapping(value = Constants.API_QUESTIONINGS_ID, produces = "application/json")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = QuestioningDto.class))),
-        @ApiResponse(responseCode = "404", description = "Not found"), @ApiResponse(responseCode = "400", description = "Bad Request")
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = QuestioningDto.class))),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "400", description = "Bad Request")
     })
     public ResponseEntity<?> getQuestioning(@PathVariable("id") Long id) {
 
@@ -60,11 +66,9 @@ public class QuestioningController {
         try {
             questioning = questioningService.findbyId(id);
             return new ResponseEntity<>(convertToDto(questioning), HttpStatus.OK);
-        }
-        catch (NoSuchElementException e) {
+        } catch (NoSuchElementException e) {
             return new ResponseEntity<>("Not Found", HttpStatus.NOT_FOUND);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return new ResponseEntity<String>("Error", HttpStatus.BAD_REQUEST);
         }
     }
@@ -72,21 +76,19 @@ public class QuestioningController {
     @Operation(summary = "Create or update questioning")
     @PostMapping(value = Constants.API_QUESTIONINGS, produces = "application/json", consumes = "application/json")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = QuestioningDto.class))),
-        @ApiResponse(responseCode = "404", description = "NotFound")
+            @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = QuestioningDto.class))),
+            @ApiResponse(responseCode = "404", description = "NotFound")
     })
     public ResponseEntity<?> postQuestioning(@RequestBody QuestioningDto questioningDto) {
         SurveyUnit su;
         try {
             su = surveyUnitService.findbyId(questioningDto.getSurveyUnitId());
-        }
-        catch (NoSuchElementException e) {
+        } catch (NoSuchElementException e) {
             return new ResponseEntity<>("survey unit does not exist", HttpStatus.NOT_FOUND);
         }
         try {
             partitioningService.findById(questioningDto.getIdPartitioning());
-        }
-        catch (NoSuchElementException e) {
+        } catch (NoSuchElementException e) {
             return new ResponseEntity<>("partitioning does not exist", HttpStatus.NOT_FOUND);
         }
         Questioning questioning = convertToEntity(questioningDto);
@@ -95,8 +97,30 @@ public class QuestioningController {
         su.getQuestionings().add(questioning);
         surveyUnitService.saveSurveyUnit(su);
         HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set(HttpHeaders.LOCATION, ServletUriComponentsBuilder.fromCurrentRequest().path(questioning.getId().toString()).toUriString());
+        responseHeaders.set(HttpHeaders.LOCATION, ServletUriComponentsBuilder.fromCurrentRequest().toUriString());
         return ResponseEntity.status(HttpStatus.CREATED).headers(responseHeaders).body(convertToDto(questioning));
+
+    }
+
+    @Operation(summary = "Search for questionings by survey unit id")
+    @GetMapping(value = Constants.API_SURVEY_UNITS_ID_QUESTIONINGS, produces = "application/json")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = QuestioningDto.class)))),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "400", description = "Bad Request")
+    })
+    public ResponseEntity<?> findQuestioningsBySurveyUnit(@PathVariable("id") String id) {
+        SurveyUnit surveyUnit = null;
+        try {
+            surveyUnit = surveyUnitService.findbyId(StringUtils.upperCase(id));
+            return new ResponseEntity<>(
+                    surveyUnit.getQuestionings().stream().map(q -> convertToDto(q)).collect(Collectors.toList()),
+                    HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("survey unit not found");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
+        }
 
     }
 

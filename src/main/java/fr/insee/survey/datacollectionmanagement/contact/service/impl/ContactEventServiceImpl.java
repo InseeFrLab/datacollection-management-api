@@ -44,7 +44,7 @@ public class ContactEventServiceImpl implements ContactEventService {
     public Set<ContactEvent> findContactEventsByContact(Contact contact) {
         return contactEventRepository.findByContact(contact);
     }
-    
+
     @Override
     public ContactEvent createContactEvent(Contact contact, ContactEventType type) {
         ContactEvent contactEventCreate = new ContactEvent();
