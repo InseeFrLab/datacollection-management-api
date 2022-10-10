@@ -35,4 +35,12 @@ public class QuestioningAccreditation {
     @OneToOne
     private Questioning questioning;
 
+    @Override
+    public String toString() {
+        return "QuestioningAccreditation [id=" + id + ", isMain=" + isMain + ", creationDate=" + creationDate
+                + ", creationAuthor=" + creationAuthor + ", idContact=" + idContact + "]";
+    }
+    
+    
+
 }

@@ -13,16 +13,14 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 @Entity
 @Table(indexes = {
     @Index(name = "fn_index", columnList = "firstName"), @Index(name = "ln_index", columnList = "lastName"),
     @Index(name = "lnfn_index", columnList = "lastName, firstName"), @Index(name = "email_index", columnList = "email")
 })
-@Getter
-@Setter
+@Data
 public class Contact {
 
     public enum Gender {

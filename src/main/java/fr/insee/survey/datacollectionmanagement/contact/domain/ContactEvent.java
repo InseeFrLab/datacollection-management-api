@@ -40,4 +40,10 @@ public class ContactEvent {
     @Column(columnDefinition = "jsonb")
     private JsonNode payload;
 
+    @Override
+    public String toString() {
+        return "ContactEvent [id=" + id + ", eventDate=" + eventDate + ", type=" + type.name()
+                + ", payload=" + payload.toString() + "]";
+    }
+
 }

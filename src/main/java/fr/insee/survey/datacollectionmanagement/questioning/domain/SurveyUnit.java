@@ -36,4 +36,12 @@ public class SurveyUnit {
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private SurveyUnitAddress surveyUnitAddress;
 
+    @Override
+    public String toString() {
+        return "SurveyUnit [idSu=" + idSu + ", identificationCode=" + identificationCode + ", identificationName="
+                + identificationName + ", surveyUnitAddress=" + surveyUnitAddress + "]";
+    }
+    
+    
+
 }
