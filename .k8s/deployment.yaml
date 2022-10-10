@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: dc-management-api
-          image: inseefrlab/datacollection-management-api:v0.0.48
+          image: inseefrlab/datacollection-management-api:0.0.49
           ports:
             - containerPort: 8080
           resources: {}

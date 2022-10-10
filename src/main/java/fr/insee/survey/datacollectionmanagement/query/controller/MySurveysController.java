@@ -49,6 +49,7 @@ public class MySurveysController {
                 surveyDto.setAccessUrl(STROMAE_URL + part.getCampaign().getCampaignId() + "/unite-enquetee/" + identificationCode);
                 surveyDto.setIdentificationCode(identificationCode);
                 surveyDto.setMonitoringStatus(part.getStatus());
+                surveyDto.setMandatoryMySurveys(survey.getSource().getMandatoryMySurveys());
             }
 
             listSurveys.add(surveyDto);

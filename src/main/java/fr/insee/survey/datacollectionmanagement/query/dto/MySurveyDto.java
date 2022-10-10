@@ -15,6 +15,7 @@ public class MySurveyDto {
     private Timestamp monitoringDate;
     private String monitoringStatus;
     private String accessUrl;
+    private boolean mandatoryMySurveys;
 
 
 }

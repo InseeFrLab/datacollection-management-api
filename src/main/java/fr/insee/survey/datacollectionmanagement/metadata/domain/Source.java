@@ -21,6 +21,7 @@ public class Source {
     private String longWording;
     private String shortWording;
     private String periodicity;
+    private Boolean mandatoryMySurveys;
     
     @OneToMany
     @JsonBackReference
