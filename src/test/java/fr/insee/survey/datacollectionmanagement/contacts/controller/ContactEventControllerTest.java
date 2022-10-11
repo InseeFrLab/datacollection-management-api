@@ -30,14 +30,14 @@ public class ContactEventControllerTest {
     public void getContactEventOk() throws Exception {
         String identifier = "CONT1";
         String json = createJsonContactEvent(identifier);
-        this.mockMvc.perform(get(Constants.API_CONTACTS + identifier + Constants.CONTACT_EVENTS)).andDo(print()).andExpect(status().isOk())
+        this.mockMvc.perform(get(Constants.API_CONTACTS + identifier + "/contact-events")).andDo(print()).andExpect(status().isOk())
             .andExpect(content().json(json, false));
     }
 
     @Test
     public void getContactEventNotFound() throws Exception {
         String identifier = "CONT500";
-        this.mockMvc.perform(get(Constants.API_CONTACTS + identifier + Constants.CONTACT_EVENTS)).andDo(print())
+        this.mockMvc.perform(get(Constants.API_CONTACTS + identifier + "/contact-events")).andDo(print())
             .andExpect(status().is(HttpStatus.NOT_FOUND.value()));
 
     }

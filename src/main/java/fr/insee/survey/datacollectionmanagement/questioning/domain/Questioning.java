@@ -28,10 +28,10 @@ public class Questioning {
     private String modelName;
     private String idPartitioning;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<QuestioningAccreditation> questioningAccreditations;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<QuestioningEvent> questioningEvents;
 
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)

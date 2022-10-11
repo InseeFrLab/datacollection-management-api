@@ -51,7 +51,7 @@ public class QuestioningEvent {
 
     @Override
     public String toString() {
-        return "QuestioningEvent [id=" + id + ", date=" + date + ", type=" + type + ", payload=" + payload.toString()
+        return "QuestioningEvent [id=" + id + ", date=" + date + ", type=" + type + ", payload=" + payload
                 + "]";
     }
 

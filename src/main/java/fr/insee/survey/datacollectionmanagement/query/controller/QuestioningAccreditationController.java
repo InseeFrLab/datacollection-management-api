@@ -75,7 +75,6 @@ public class QuestioningAccreditationController {
 
         try {
             Questioning questioning = questioningService.findbyId(id);
-            questioning.getQuestioningAccreditations();
             return new ResponseEntity<>(
                     questioning.getQuestioningAccreditations().stream().map(c -> convertToDto(c))
                             .collect(Collectors.toList()),

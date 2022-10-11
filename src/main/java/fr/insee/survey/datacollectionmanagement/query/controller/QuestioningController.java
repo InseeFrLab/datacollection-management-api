@@ -109,7 +109,7 @@ public class QuestioningController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "400", description = "Bad Request")
     })
-    public ResponseEntity<?> findQuestioningsBySurveyUnit(@PathVariable("id") String id) {
+    public ResponseEntity<?> getQuestioningsBySurveyUnit(@PathVariable("id") String id) {
         SurveyUnit surveyUnit = null;
         try {
             surveyUnit = surveyUnitService.findbyId(StringUtils.upperCase(id));
