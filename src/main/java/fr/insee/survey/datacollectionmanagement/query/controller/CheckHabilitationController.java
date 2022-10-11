@@ -15,15 +15,15 @@ import fr.insee.survey.datacollectionmanagement.query.service.CheckAccreditation
 
 @RestController
 @CrossOrigin
-public class CheckAccreditationController {
+public class CheckHabilitationController {
 
-    static final Logger LOGGER = LoggerFactory.getLogger(CheckAccreditationController.class);
+    static final Logger LOGGER = LoggerFactory.getLogger(CheckHabilitationController.class);
 
     @Autowired
     private CheckAccreditationService checkAccreditationService;
 
-    @GetMapping(path = Constants.API_CHECK_ACCREDITATIONS)
-    public ResponseEntity<?> checkAccreditationV2(
+    @GetMapping(path = Constants.API_CHECK_HABILITATION)
+    public ResponseEntity<?> checkHabilitation(
         @RequestParam(required = true) String identifier,
         @RequestParam(required = true) String idSu,
         @RequestParam(required = true) String campaignId) {
