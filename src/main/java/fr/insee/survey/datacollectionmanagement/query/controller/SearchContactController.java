@@ -1,10 +1,8 @@
 package fr.insee.survey.datacollectionmanagement.query.controller;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,9 +35,11 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @CrossOrigin
+@Tag(name = "1 - Contacts", description = "Enpoints to create, update, delete and find contacts")
 public class SearchContactController {
 
     static final Logger LOGGER = LoggerFactory.getLogger(SearchContactController.class);
@@ -104,7 +104,7 @@ public class SearchContactController {
     }
 
     @GetMapping(path = Constants.API_CONTACTS_ACCREDITATIONS, produces = "application/json")
-    @Operation(summary = "Get a contact accreditations by idContact")
+    @Operation(summary = "Get contact accreditations by the contact id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = AccreditationDetailDto.class)))),
             @ApiResponse(responseCode = "400", description = "Bad Request")

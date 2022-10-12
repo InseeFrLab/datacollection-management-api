@@ -35,9 +35,11 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController(value = "contactEvents")
 @CrossOrigin
+@Tag(name = "1 - Contacts", description = "Enpoints to create, update, delete and find contacts")
 public class ContactEventController {
 
     static final Logger LOGGER = LoggerFactory.getLogger(ContactEventController.class);
@@ -51,25 +53,23 @@ public class ContactEventController {
     @Autowired
     private ModelMapper modelMapper;
 
-    @Operation(summary = "Search for contactEvents by the contact identifier")
+    @Operation(summary = "Search for contactEvents by the contact id")
     @GetMapping(value = Constants.API_CONTACTS_ID_CONTACTEVENTS, produces = "application/json")
     @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "OK",
-            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ContactEventDto.class)))),
-        @ApiResponse(responseCode = "404", description = "Not found"), @ApiResponse(responseCode = "500", description = "Internal servor error")
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ContactEventDto.class)))),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "400", description = "Internal servor error")
     })
     public ResponseEntity<?> getContactContactEvents(@PathVariable("id") String identifier) {
         try {
             Contact contact = contactService.findByIdentifier(identifier);
-            return new ResponseEntity<>(contact.getContactEvents().stream().map(ce -> convertToDto(ce)).collect(Collectors.toList()), HttpStatus.OK);
-        }
-        catch (NoSuchElementException e) {
-            return new ResponseEntity<>("Not Found", HttpStatus.NOT_FOUND);
-        }
-        catch (Exception e) {
-            return new ResponseEntity<String>("Error", HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(contact.getContactEvents().stream().map(ce -> convertToDto(ce)).collect(Collectors.toList()));
+
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Contact does not exist");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
         }
 
     }
@@ -77,11 +77,8 @@ public class ContactEventController {
     @Operation(summary = "Create a contactEvent")
     @PostMapping(value = Constants.API_CONTACTEVENTS, produces = "application/json", consumes = "application/json")
     @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "201",
-            description = "Created",
-            content = @Content(schema = @Schema(implementation = ContactEventDto.class))),
-        @ApiResponse(responseCode = "400", description = "Bad request")
+            @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = ContactEventDto.class))),
+            @ApiResponse(responseCode = "400", description = "Bad request")
     })
     public ResponseEntity<?> postContactEvent(@RequestBody ContactEventDto contactEventDto) {
         try {
@@ -93,11 +90,12 @@ public class ContactEventController {
             contact.setContactEvents(setContactEvents);
             contactService.saveContact(contact);
             HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.set(HttpHeaders.LOCATION, ServletUriComponentsBuilder.fromCurrentRequest().toUriString());;
-            return ResponseEntity.status(HttpStatus.CREATED).headers(responseHeaders).body(convertToDto(newContactEvent));
-        }
-        catch (NoSuchElementException e) {
-            return new ResponseEntity<>("Not Found", HttpStatus.NOT_FOUND);
+            responseHeaders.set(HttpHeaders.LOCATION, ServletUriComponentsBuilder.fromCurrentRequest().toUriString());
+            return ResponseEntity.status(HttpStatus.CREATED).headers(responseHeaders)
+                    .body(convertToDto(newContactEvent));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Contact does not exist");
+
         }
 
     }
@@ -105,19 +103,23 @@ public class ContactEventController {
     @Operation(summary = "Delete a contact event")
     @DeleteMapping(value = Constants.API_CONTACTEVENTS_ID, produces = "application/json")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "204", description = "No Content"), @ApiResponse(responseCode = "404", description = "Not found"),
-        @ApiResponse(responseCode = "400", description = "Bad Request")
+            @ApiResponse(responseCode = "204", description = "No Content"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "400", description = "Bad Request")
     })
     public ResponseEntity<?> deleteContactEvent(@PathVariable("id") Long id) {
         try {
+            ContactEvent contactEvent = contactEventService.findById(id);
+            Contact contact = contactEvent.getContact();
+            contact.setContactEvents(contact.getContactEvents().stream().filter(ce->!ce.equals(contactEvent)).collect(Collectors.toSet()));
+            contactService.saveContact(contact);
             contactEventService.deleteContactEvent(id);
-            return new ResponseEntity<>("ContactEvent deleted", HttpStatus.NO_CONTENT);
-        }
-        catch (NoSuchElementException e) {
-            return new ResponseEntity<>("ContactEvent not found", HttpStatus.NOT_FOUND);
-        }
-        catch (Exception e) {
-            return new ResponseEntity<String>("Error", HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Contact event deleted");
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Contact event does not exist");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
+
         }
     }
 

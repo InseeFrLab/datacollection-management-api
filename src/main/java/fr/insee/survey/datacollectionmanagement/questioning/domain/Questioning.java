@@ -12,14 +12,12 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 @Entity
-@Getter
-@Setter
+@Data
 @Table(indexes = {
-    @Index(name = "idPartitioning_index", columnList = "idPartitioning")
+        @Index(name = "idPartitioning_index", columnList = "idPartitioning")
 })
 public class Questioning {
 
@@ -30,8 +28,11 @@ public class Questioning {
     private String modelName;
     private String idPartitioning;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<QuestioningAccreditation> questioningAccreditations;
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Set<QuestioningEvent> questioningEvents;
 
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private SurveyUnit surveyUnit;

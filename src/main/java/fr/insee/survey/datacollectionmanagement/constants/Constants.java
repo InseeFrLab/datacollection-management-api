@@ -9,8 +9,8 @@ public class Constants {
     public static final String API_CONTACTS = "/api/contacts/";
     public static final String API_CONTACTS_ALL = "/api/contacts";
     public static final String API_CONTACTS_ID = "/api/contacts/{id}";
-    public static final String ADDRESS = "/address";
-    public static final String CONTACT_EVENTS = "/contact-events";
+    public static final String ADDRESS = "/api/address";
+    public static final String CONTACT_EVENTS = "/api/contact-events";
     public static final String API_CONTACTS_ID_ADDRESS = "/api/contacts/{id}/address";
     public static final String API_CONTACTS_ID_CONTACTEVENTS = "/api/contacts/{id}/contact-events";
     public static final String API_CONTACTEVENTS = "/api/contacts/contact-events";
@@ -19,10 +19,17 @@ public class Constants {
     //API QUESTIONING DOMAIN
     public static final String API_QUESTIONINGS = "/api/questionings/";
     public static final String API_QUESTIONINGS_ID = "/api/questionings/{id}";
-    public static final String API_SURVEY_UNITS ="api/survey-units";
+    public static final String API_SURVEY_UNITS ="/api/survey-units/";
     public static final String API_SURVEY_UNITS_ID = "/api/survey-units/{id}";
-    public static final String API_QUESTIONING_ACCREDITATIONS = "/api/questioniong-accreditations";
-    public static final String API_QUESTIONINGS_ID_QUESTIONING_ACCREDITATIONS_ID = "/api/questionings/{id}/questioniong-accreditations";
+    public static final String API_SURVEY_UNITS_ID_QUESTIONINGS = "/api/survey-units/{id}/questionings";
+    public static final String API_QUESTIONING_ACCREDITATIONS = "/api/questioning-accreditations";
+    public static final String API_QUESTIONINGS_ID_QUESTIONING_ACCREDITATIONS_ID = "/api/questionings/{id}/questioning-accreditations";
+    public static final String API_QUESTIONING_QUESTIONING_EVENTS = "/api/questionings/questioning-events";
+    public static final String API_QUESTIONING_ID_QUESTIONING_EVENTS = "/api/questionings/{id}/questioning-events";
+    public static final String API_QUESTIONING_QUESTIONING_EVENTS_ID = "/api/questionings/questioning-events/{id}";
+
+
+
     
     // API METADATA DOMAIN
 

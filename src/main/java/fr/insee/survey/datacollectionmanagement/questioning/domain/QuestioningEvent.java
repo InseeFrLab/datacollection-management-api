@@ -4,9 +4,11 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -14,10 +16,12 @@ import org.hibernate.annotations.TypeDef;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
-@Data
+@Getter
+@Setter
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class QuestioningEvent {
 
@@ -26,9 +30,10 @@ public class QuestioningEvent {
     private Long id;
 
     private Date date;
+    @Enumerated(EnumType.STRING)
     private TypeQuestioningEvent type;
 
-    @ManyToOne
+    @OneToOne
     private Questioning questioning;
 
     @Type(type = "jsonb")
@@ -41,5 +46,13 @@ public class QuestioningEvent {
         this.questioning = questioning;
     }
 
-    public QuestioningEvent() {}
+    public QuestioningEvent() {
+    }
+
+    @Override
+    public String toString() {
+        return "QuestioningEvent [id=" + id + ", date=" + date + ", type=" + type + ", payload=" + payload
+                + "]";
+    }
+
 }

@@ -38,14 +38,15 @@ import fr.insee.survey.datacollectionmanagement.contact.service.ContactService;
 import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningAccreditationService;
 import fr.insee.survey.datacollectionmanagement.view.service.ViewService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @CrossOrigin
+@Tag(name="1 - Contacts", description = "Enpoints to create, update, delete and find contacts")
 public class ContactController {
 
     static final Logger LOGGER = LoggerFactory.getLogger(ContactController.class);
@@ -68,7 +69,7 @@ public class ContactController {
     @Operation(summary = "Search for contacts, paginated")
     @GetMapping(value = Constants.API_CONTACTS_ALL, produces = "application/json")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ContactPage.class))))
+        @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ContactPage.class)))
     })
     public ResponseEntity<?> getContacts(
         @RequestParam(defaultValue = "0") Integer page,
@@ -80,7 +81,7 @@ public class ContactController {
         return ResponseEntity.ok().body(new ContactPage(listC, pageable,pageC.getTotalElements()));
     }
 
-    @Operation(summary = "Search for a contact by its identifier")
+    @Operation(summary = "Search for a contact by its id")
     @GetMapping(value = Constants.API_CONTACTS_ID, produces = "application/json")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ContactDto.class))),

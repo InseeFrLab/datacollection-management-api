@@ -36,9 +36,11 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @CrossOrigin
+@Tag(name = "2 - Questioning", description = "Enpoints to create, update, delete and find entities around the questionings")
 public class SurveyUnitController {
 
     static final Logger LOGGER = LoggerFactory.getLogger(SurveyUnitController.class);
@@ -49,20 +51,22 @@ public class SurveyUnitController {
     @Autowired
     private ModelMapper modelMapper;
 
-    @Operation(summary = "Search for a survey unit by its id")
+    @Operation(summary = "Search for a survey units, paginated")
     @GetMapping(value = Constants.API_SURVEY_UNITS, produces = "application/json")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SurveyUnitDto.class))),
-        @ApiResponse(responseCode = "404", description = "Not found"), @ApiResponse(responseCode = "400", description = "Bad Request")
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SurveyUnitDto.class))),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "400", description = "Bad Request")
     })
     public Page<SurveyUnitDto> getSurveyUnits(
-        @RequestParam(defaultValue = "0") Integer page,
-        @RequestParam(defaultValue = "20") Integer size,
-        @RequestParam(defaultValue = "idSu") String sort) {
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "20") Integer size,
+            @RequestParam(defaultValue = "idSu") String sort) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
         Page<SurveyUnit> pageC = surveyUnitService.findAll(pageable);
         List<SurveyUnitDto> listSuDto = pageC.stream().map(c -> convertToDto(c)).collect(Collectors.toList());
-        return new SurveyUnitPage(listSuDto, pageable, pageC.getTotalElements());}
+        return new SurveyUnitPage(listSuDto, pageable, pageC.getTotalElements());
+    }
 
     @Operation(summary = "Search for a survey unit by its id")
     @GetMapping(value = Constants.API_SURVEY_UNITS_ID, produces = "application/json")
@@ -75,7 +79,7 @@ public class SurveyUnitController {
         SurveyUnit surveyUnit = null;
         try {
             surveyUnit = surveyUnitService.findbyId(StringUtils.upperCase(id));
-            return new ResponseEntity<>(convertToDto(surveyUnit), HttpStatus.OK);
+            return ResponseEntity.status(HttpStatus.OK).body(convertToDto(surveyUnit));
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("survey unit not found");
         } catch (Exception e) {
@@ -93,7 +97,8 @@ public class SurveyUnitController {
     })
     public ResponseEntity<?> putSurveyUnit(@PathVariable("id") String id, @RequestBody SurveyUnitDto surveyUnitDto) {
         if (StringUtils.isBlank(surveyUnitDto.getIdSu()) || !surveyUnitDto.getIdSu().equalsIgnoreCase(id)) {
-            return new ResponseEntity<>("id and idSu don't match", HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("id and idSu don't match");
+
         }
 
         SurveyUnit surveyUnit;
@@ -105,7 +110,7 @@ public class SurveyUnitController {
         try {
             surveyUnit = convertToEntity(surveyUnitDto);
         } catch (ParseException e) {
-            return new ResponseEntity<>("Impossible to parse survey unit", HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Impossible to parse survey unit");
         }
 
         try {
@@ -115,7 +120,7 @@ public class SurveyUnitController {
             LOGGER.info("Creating survey with the id {}", surveyUnitDto.getIdSu());
             responseStatus = HttpStatus.CREATED;
         }
-        return new ResponseEntity<>(convertToDto(surveyUnitService.saveSurveyUnit(surveyUnit)), responseStatus);
+        return ResponseEntity.status(responseStatus).body(convertToDto(surveyUnitService.saveSurveyUnit(surveyUnit)));
 
     }
 
