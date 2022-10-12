@@ -41,7 +41,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @CrossOrigin
-@Tag(name = "2 - Questioning", description = "Enpoints to create, update, delete and find entities around the samples")
+@Tag(name = "2 - Questioning", description = "Enpoints to create, update, delete and find entities around the questionings")
 public class QuestioningAccreditationController {
 
     static final Logger LOGGER = LoggerFactory.getLogger(QuestioningAccreditationController.class);
