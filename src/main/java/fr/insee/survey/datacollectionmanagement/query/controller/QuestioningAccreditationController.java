@@ -23,6 +23,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import fr.insee.survey.datacollectionmanagement.constants.Constants;
 import fr.insee.survey.datacollectionmanagement.contact.service.ContactService;
+import fr.insee.survey.datacollectionmanagement.metadata.domain.Campaign;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Partitioning;
 import fr.insee.survey.datacollectionmanagement.metadata.service.PartitioningService;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
@@ -122,9 +123,15 @@ public class QuestioningAccreditationController {
 
         // save new accreditation or update existing one
         Set<QuestioningAccreditation> setExistingAccreditations = questioning.getQuestioningAccreditations();
+        Partitioning part = partitioningService.findById(questioning.getIdPartitioning());
+        String idSu  = questioning.getSurveyUnit().getIdSu();
+
 
         List<QuestioningAccreditation> listContactAccreditations = setExistingAccreditations.stream()
-                .filter(acc -> acc.getIdContact().equals(idContact)).collect(Collectors.toList());
+                .filter(acc -> acc.getIdContact().equals(idContact)
+                        && acc.getQuestioning().getIdPartitioning().equals(part.getId())
+                        && acc.getQuestioning().getSurveyUnit().getIdSu().equals(idSu))
+                .collect(Collectors.toList());
 
         if (listContactAccreditations.isEmpty()) {
             // Create new accreditation
@@ -135,7 +142,6 @@ public class QuestioningAccreditationController {
             questioningService.saveQuestioning(questioning);
 
             // create view
-            Partitioning part = partitioningService.findById(questioning.getIdPartitioning());
             viewService.createView(idContact, questioning.getSurveyUnit().getIdSu(),
                     part.getCampaign().getCampaignId());
 
