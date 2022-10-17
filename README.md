@@ -40,25 +40,9 @@ Use the [Spring Boot Maven plugin] (https://docs.spring.io/spring-boot/docs/curr
 mvn clean package
 ```
 
-The war will be generate in `/target` repository
+The jar will be generate in `/target` repository
 
-### 2. Install tomcat and deploy war
-
-To deploy the war file in Tomcat, you need to :
-Download Apache Tomcat and unpackage it into a tomcat folder  
-Copy your WAR file from target/ to the tomcat/webapps/ folder
-
-### 3. Tomcat config
-
-Before to startup the tomcat server, some configurations are needed :
-
-#### External Properties file
-
-#### External log file
-
-Create log4j2.xml near war file and define your external config for logs.
-
-### 4. Tomcat start
+### 2. Tomcat start
 
 From a terminal navigate to tomcat/bin folder and execute
 
@@ -70,7 +54,7 @@ catalina.bat run (on Windows)
 catalina.sh run (on Unix-based systems)
 ```
 
-### 5. Application Access
+### 3. Application Access
 
 To access to swagger-ui, use this url : [http://localhost:8080/swagger-ui.html](http://localhost:8080/pearljam/swagger-ui.html)
 
@@ -95,6 +79,19 @@ Before committing code please ensure,
 - `GET /api/contacts/{id}/contact-events` : Search for contactEvents by the contact identifier
 - `POST /api/contacts/{id}/contact-events` : Create a contactEvent
 - `DELETE /api/contacts/contact-events/{id}` : Delete a contactEvent
+
+### Questioning domain
+
+- `POST /api/questionings` : ereate or update a questioning
+- `PUT /api/questionings/{id}` : Search for a questioning by id
+- `GET /api/questionings/{id}/questioning-accreditations` Search for questioning accreditations by questioning id
+- `POST /api/questionings/{id}/questioning-accreditations` Create or update a questioning accreditation for a questioning
+- `GET /api/questionings/{id}/questioning-events` Search for a questioning event by questioning id
+- `POST /api/questionings/questioning-events` Create a questioning event
+- `DELETE /api/questionings/questioning-events` Delete a questioning event
+- `GET /api/survey-units` : Search for survey units, paginated
+- `PUT /api/survey-units/{id}` : Create or update a survey unit
+- `GET /api/survey-units/{id}/questionings` : Search for questionings by survey unit id
 
 ### Cross domain
 
