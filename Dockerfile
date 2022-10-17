@@ -1,4 +1,4 @@
-FROM maven:3-jdk-17-slim AS build
+FROM maven:3-openjdk-17 AS build
 
 WORKDIR /pwd
 
@@ -9,7 +9,7 @@ RUN mvn package -Dspring-boot.repackage.skip=true
 COPY ./src /pwd/src
 RUN mvn package -DskipTests=true
 
-FROM openjdk:17-jre-slim
+FROM openjdk:17
 
 COPY --from=build /pwd/target/*.jar /usr/src/app/main.jar
 
