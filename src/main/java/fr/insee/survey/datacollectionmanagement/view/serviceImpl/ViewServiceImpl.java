@@ -1,6 +1,5 @@
 package fr.insee.survey.datacollectionmanagement.view.serviceImpl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,10 +32,7 @@ public class ViewServiceImpl implements ViewService {
 
     @Override
     public List<View> findViewByCampaignId(String campaignId) {
-        List<View> listView = new ArrayList<>();
-        List<String> listIdentifier = viewRepository.findDistinctId(campaignId);
-        listIdentifier.stream().forEach(i -> listView.add (findFirstViewByIdentifier(i)));
-        return listView;
+        return viewRepository.findDistinctViewByCampaignId(campaignId);
     }
 
     @Override

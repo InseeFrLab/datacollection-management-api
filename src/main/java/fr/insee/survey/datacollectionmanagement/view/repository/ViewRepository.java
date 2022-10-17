@@ -11,19 +11,22 @@ import fr.insee.survey.datacollectionmanagement.view.domain.View;
 @Repository
 public interface ViewRepository extends PagingAndSortingRepository<View, Long> {
 
-    static final String FIND_DISTNCT_ID = "select                                                "
-            + "    distinct(identifier)                                                             "
-            + "from                                                                                 "
-            + "    public.\"view\"                                                                  "
-            + "where                                                                                "
-            + "    campaign_id =?1                                                               ";
+    static final String FIND_DISTNCT_VIEW_BY_IDENTIFIER = "select                                                           "
+            + "    distinct on                                                                                              "
+            + "    (v.identifier) v.identifier,                                                                             "
+            + "    v.id_su,                                                                                                 "
+            + "    v.campaign_id                                                                                            "
+            + "from                                                                                                         "
+            + "    \"view\" v                                                                                               "
+            + "where                                                                                                        "
+            + "    campaign_id =?1;                                                                                         ";   
 
     View findFirstByIdentifier(String identifier);
 
     List<View> findByIdentifier(String identifier);
     
-    @Query(nativeQuery = true, value=FIND_DISTNCT_ID)
-    List<String> findDistinctId(String campaignId);
+    @Query(nativeQuery = true, value=FIND_DISTNCT_VIEW_BY_IDENTIFIER)
+    List<View> findDistinctViewByCampaignId(String campaignId);
 
     List<View> findByIdSu(String idSu);
 
