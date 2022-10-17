@@ -84,5 +84,10 @@ public class CampaignServiceImpl implements CampaignService {
     public Campaign updateCampaign(Campaign campaign) {
         return campaignRepository.save(campaign);
     }
+
+    @Override
+    public void deleteCampaignById(String id) {
+        campaignRepository.deleteById(id);
+    }
     
 }

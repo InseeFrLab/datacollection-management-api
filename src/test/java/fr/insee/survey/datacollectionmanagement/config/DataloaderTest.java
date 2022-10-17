@@ -230,7 +230,7 @@ public class DataloaderTest {
             String sourceName = "SOURCE" + Math.addExact(sourceRepository.count(), 1);
             if (!StringUtils.contains(sourceName, " ") && sourceRepository.findById(sourceName).isEmpty()) {
 
-                source.setIdSource(sourceName);
+                source.setId(sourceName);
                 source.setLongWording("Long wording of " + sourceName + " ?");
                 source.setShortWording("Short wording of " + sourceName);
                 source.setPeriodicity("T");

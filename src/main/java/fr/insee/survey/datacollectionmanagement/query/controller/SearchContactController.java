@@ -117,7 +117,7 @@ public class SearchContactController {
             Questioning questioning = questioningAccreditation.getQuestioning();
             Partitioning part = partitioningService.findById(questioning.getIdPartitioning());
 
-            listAccreditations.add(new AccreditationDetailDto(part.getCampaign().getSurvey().getSource().getIdSource(),
+            listAccreditations.add(new AccreditationDetailDto(part.getCampaign().getSurvey().getSource().getId(),
                     part.getCampaign().getSurvey().getSource().getShortWording(),
                     part.getCampaign().getSurvey().getYear(), part.getCampaign().getPeriod(),
                     part.getId(), questioningAccreditation.getQuestioning().getSurveyUnit().getIdSu(),

@@ -1,5 +1,7 @@
 package fr.insee.survey.datacollectionmanagement.metadata.dto;
 
+import javax.validation.constraints.NotNull;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,6 +10,8 @@ import lombok.Setter;
 public class SurveyDto {
 
     private String id;
+    @NotNull
+    private String sourceId;
     private Integer year;
     private boolean isMandatory;
     private Integer sampleSize;

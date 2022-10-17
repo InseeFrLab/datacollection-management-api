@@ -7,7 +7,8 @@ import lombok.Setter;
 @Setter
 public class CampaignDto {
 
-    private String campaignId;
+    private String id;
+    private String surveyId;
     private int year;
     private String campaignWording;
     private String period;

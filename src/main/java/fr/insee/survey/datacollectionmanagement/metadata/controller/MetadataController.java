@@ -10,9 +10,11 @@ import org.springframework.web.bind.annotation.RestController;
 import fr.insee.survey.datacollectionmanagement.config.JSONCollectionWrapper;
 import fr.insee.survey.datacollectionmanagement.metadata.dto.CampaignMoogDto;
 import fr.insee.survey.datacollectionmanagement.metadata.service.CampaignService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @CrossOrigin
+@Tag(name = "3 - Metadata", description = "Enpoints to create, update, delete and find entities in metadata domain")
 public class MetadataController {
 
     static final Logger LOGGER = LoggerFactory.getLogger(MetadataController.class);

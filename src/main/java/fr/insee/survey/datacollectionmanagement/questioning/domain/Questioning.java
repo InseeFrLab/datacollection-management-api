@@ -34,7 +34,7 @@ public class Questioning {
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<QuestioningEvent> questioningEvents;
 
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER)
     private SurveyUnit surveyUnit;
 
 }

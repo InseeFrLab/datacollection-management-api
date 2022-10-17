@@ -23,4 +23,6 @@ public interface PartitioningService {
 
     Partitioning updatePartitioning(Partitioning partitioning);
 
+    void deletePartitioningById(String id);
+
 }

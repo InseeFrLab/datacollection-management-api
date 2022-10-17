@@ -18,12 +18,12 @@ public class SurveyServiceImpl implements SurveyService {
     private SurveyRepository surveyrepository;
 
     @Override
-    public List<Survey> findbyYear(int year) {
+    public List<Survey> findByYear(int year) {
         return surveyrepository.findByYear(year);
     }
 
     @Override
-    public Survey findbyId(String id) {
+    public Survey findById(String id) {
         return surveyrepository.findById(id).orElseThrow();
     }
 
@@ -35,6 +35,11 @@ public class SurveyServiceImpl implements SurveyService {
     @Override
     public Survey updateSurvey(Survey survey) {
         return surveyrepository.save(survey);
+    }
+
+    @Override
+    public void deleteSurveyById(String id) {
+        surveyrepository.deleteById(id);
     }
 
 }

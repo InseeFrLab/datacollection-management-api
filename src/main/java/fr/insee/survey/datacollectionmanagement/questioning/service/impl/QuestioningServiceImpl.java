@@ -1,5 +1,7 @@
 package fr.insee.survey.datacollectionmanagement.questioning.service.impl;
 
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +30,16 @@ public class QuestioningServiceImpl implements QuestioningService {
     @Override
     public Questioning saveQuestioning(Questioning questioning) {
         return questioningRepository.save(questioning);
+    }
+
+    @Override
+    public void deleteQuestioning(Long id) {
+        questioningRepository.deleteById(id);
+    }
+
+    @Override
+    public Set<Questioning> findByIdPartitioning(String idPartitioning) {
+        return questioningRepository.findByIdPartitioning(idPartitioning);
     }
 
 }

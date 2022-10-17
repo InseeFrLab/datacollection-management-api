@@ -27,4 +27,6 @@ public interface CampaignService {
 
     Campaign updateCampaign(Campaign campaign);
 
+    void deleteCampaignById(String id);
+
 }

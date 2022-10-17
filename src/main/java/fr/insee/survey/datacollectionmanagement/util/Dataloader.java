@@ -363,7 +363,7 @@ public class Dataloader {
             String animalName = StringUtils.trim(animal.name().toUpperCase());
             if ( !StringUtils.contains(animalName, " ") && sourceRepository.findById(animalName).isEmpty()) {
 
-                source.setIdSource(animalName);
+                source.setId(animalName);
                 source.setLongWording("Have you ever heard about " + animalName + " ?");
                 source.setShortWording("Source about " + animalName);
                 source.setPeriodicity("M");

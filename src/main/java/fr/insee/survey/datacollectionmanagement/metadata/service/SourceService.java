@@ -7,10 +7,12 @@ import fr.insee.survey.datacollectionmanagement.metadata.domain.Source;
 
 public interface SourceService {
 
-    Source findbyId(String source);
+    Source findById(String source);
 
     Page<Source> findAll(Pageable pageable);
 
     Source updateSource(Source source);
+
+    void deleteSourceById(String id);
 
 }

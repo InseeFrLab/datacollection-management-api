@@ -9,12 +9,14 @@ import fr.insee.survey.datacollectionmanagement.metadata.domain.Survey;
 
 public interface SurveyService {
 
-    List<Survey> findbyYear(int year);
+    List<Survey> findByYear(int year);
 
-    Survey findbyId(String id);
+    Survey findById(String id);
 
     Page<Survey> findAll(Pageable pageable);
 
     Survey updateSurvey(Survey survey);
+
+    void deleteSurveyById(String id);
 
 }

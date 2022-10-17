@@ -15,8 +15,8 @@ public class SourceServiceImpl implements SourceService {
     @Autowired
     private SourceRepository sourceRepository;
 
-    public Source findbyId(String source) {
-        return sourceRepository.findById(source).orElse(null);
+    public Source findById(String source) {
+        return sourceRepository.findById(source).orElseThrow();
     }
 
     @Override
@@ -27,6 +27,12 @@ public class SourceServiceImpl implements SourceService {
     @Override
     public Source updateSource(Source source) {
         return sourceRepository.save(source);
+    }
+
+    @Override
+    public void deleteSourceById(String id) {
+        sourceRepository.deleteById(id);
+
     }
 
 }

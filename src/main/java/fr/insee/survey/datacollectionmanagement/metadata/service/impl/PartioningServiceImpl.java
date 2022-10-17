@@ -1,7 +1,6 @@
 package fr.insee.survey.datacollectionmanagement.metadata.service.impl;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -53,6 +52,11 @@ public class PartioningServiceImpl implements PartitioningService {
     public Partitioning updatePartitioning(Partitioning partitioning) {
         return partitioningRepository.save(partitioning);
 
+    }
+
+    @Override
+    public void deletePartitioningById(String id) {
+        partitioningRepository.deleteById(id);
     }
 
 }

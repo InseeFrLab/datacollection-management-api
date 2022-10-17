@@ -21,8 +21,10 @@ import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningA
 import fr.insee.survey.datacollectionmanagement.questioning.service.SurveyUnitService;
 import fr.insee.survey.datacollectionmanagement.view.domain.View;
 import fr.insee.survey.datacollectionmanagement.view.service.ViewService;
+import lombok.EqualsAndHashCode;
 
 @Service
+@EqualsAndHashCode
 public class SearchContactServiceImpl implements SearchContactService {
 
     @Autowired
@@ -35,6 +37,7 @@ public class SearchContactServiceImpl implements SearchContactService {
     private CampaignService campaignService;
 
     @Autowired
+    @EqualsAndHashCode.Exclude
     private ViewService viewService;;
 
     @Autowired
