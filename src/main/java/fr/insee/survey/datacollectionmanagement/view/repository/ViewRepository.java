@@ -13,13 +13,15 @@ public interface ViewRepository extends PagingAndSortingRepository<View, Long> {
 
     static final String FIND_DISTNCT_VIEW_BY_IDENTIFIER = "select                                                           "
             + "    distinct on                                                                                              "
-            + "    (v.identifier) v.identifier,                                                                             "
-            + "    v.id_su,                                                                                                 "
-            + "    v.campaign_id                                                                                            "
+            + "    (v.identifier)                                                                                           "
+            + "    v.id as id,                                                                                              "
+            + "    v.identifier as identifier,                                                                              "
+            + "    v.campaign_id as campaign_id,                                                                            "
+            + "    v.id_su as id_su                                                                                         "
             + "from                                                                                                         "
             + "    \"view\" v                                                                                               "
             + "where                                                                                                        "
-            + "    campaign_id =?1;                                                                                         ";   
+            + "    campaign_id =?1                                                                                         ";   
 
     View findFirstByIdentifier(String identifier);
 
