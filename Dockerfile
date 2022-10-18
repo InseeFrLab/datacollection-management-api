@@ -1,4 +1,4 @@
-FROM maven:3.8.6-eclipse-temurin:17-jdk-alpine
+FROM 3.8.6-eclipse-temurin:17-jdk-alpine
 WORKDIR application
 RUN rm -rf /application
 ADD *.jar /application/app.jar
