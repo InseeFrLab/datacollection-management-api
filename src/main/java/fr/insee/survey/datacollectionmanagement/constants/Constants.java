@@ -16,10 +16,10 @@ public class Constants {
     public static final String API_CONTACTEVENTS = "/api/contacts/contact-events";
     public static final String API_CONTACTEVENTS_ID = "/api/contacts/contact-events/{id}";
 
-    // API QUESTIONING DOMAIN
-    public static final String API_QUESTIONINGS = "/api/questionings/";
+    //API QUESTIONING DOMAIN
+    public static final String API_QUESTIONINGS = "/api/questionings";
     public static final String API_QUESTIONINGS_ID = "/api/questionings/{id}";
-    public static final String API_SURVEY_UNITS = "/api/survey-units/";
+    public static final String API_SURVEY_UNITS ="/api/survey-units";
     public static final String API_SURVEY_UNITS_ID = "/api/survey-units/{id}";
     public static final String API_SURVEY_UNITS_ID_QUESTIONINGS = "/api/survey-units/{id}/questionings";
     public static final String API_QUESTIONING_ACCREDITATIONS = "/api/questioning-accreditations";
@@ -41,7 +41,6 @@ public class Constants {
     public static final String API_PARTITIONINGS = "/api/partitionings/";
     public static final String API_PARTITIONINGS_ID = "/api/partitionings/{id}";
 
-    // API METADATA DOMAIN
 
     // API CROSS DOMAIN
     public static final String API_CHECK_ACCREDITATIONS = "/api/check-accreditations";

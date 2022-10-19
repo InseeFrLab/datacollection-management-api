@@ -13,11 +13,9 @@ import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
 import fr.insee.survey.datacollectionmanagement.contact.service.ContactService;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Campaign;
 import fr.insee.survey.datacollectionmanagement.metadata.service.CampaignService;
-import fr.insee.survey.datacollectionmanagement.metadata.service.PartitioningService;
 import fr.insee.survey.datacollectionmanagement.query.dto.SearchContactDto;
 import fr.insee.survey.datacollectionmanagement.query.service.SearchContactService;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.SurveyUnit;
-import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningAccreditationService;
 import fr.insee.survey.datacollectionmanagement.questioning.service.SurveyUnitService;
 import fr.insee.survey.datacollectionmanagement.view.domain.View;
 import fr.insee.survey.datacollectionmanagement.view.service.ViewService;
@@ -40,12 +38,6 @@ public class SearchContactServiceImpl implements SearchContactService {
     @EqualsAndHashCode.Exclude
     private ViewService viewService;;
 
-    @Autowired
-    private QuestioningAccreditationService questioningAccreditationService;
-
-    @Autowired
-    private PartitioningService partitioningService;
-
     @Override
     public List<View> searchContactCrossDomain(
             String identifier,
@@ -65,7 +57,7 @@ public class SearchContactServiceImpl implements SearchContactService {
 
         if (!StringUtils.isEmpty(identifier)) {
             View contactView = viewService.findFirstViewByIdentifier(identifier);
-            if (contactView !=null)
+            if (contactView != null)
                 listView.add(contactView);
             alwaysEmpty = false;
         }
