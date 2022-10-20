@@ -5,6 +5,7 @@ import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import fr.insee.survey.datacollectionmanagement.metadata.domain.Partitioning;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
 
 public interface QuestioningService {
@@ -18,5 +19,12 @@ public interface QuestioningService {
     public void deleteQuestioning(Long id);
 
     public Set<Questioning> findByIdPartitioning(String idPartitioning);
+
+    /**
+     * Delete questionings attached to one partitioning
+     * @param partitioning
+     * @return nb questioning deleted
+     */
+    public int deleteQuestioningsOfOnePartitioning(Partitioning partitioning);
 
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import fr.insee.survey.datacollectionmanagement.metadata.domain.Campaign;
 import fr.insee.survey.datacollectionmanagement.view.domain.View;
 
 @Service
@@ -30,6 +31,8 @@ public interface ViewService {
     void deleteView(View view);
 
     void deleteViewByIdentifier(String identifier);
+
+    int deleteViewsOfOneCampaign(Campaign campaign);
 
    
 }

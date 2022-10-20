@@ -3,12 +3,11 @@ package fr.insee.survey.datacollectionmanagement.metadata.controller;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -42,13 +41,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.log4j.Log4j2;
 
 @RestController
 @CrossOrigin
+@Log4j2
 @Tag(name = "3 - Metadata", description = "Enpoints to create, update, delete and find entities in metadata domain")
 public class SurveyController {
-
-    static final Logger LOGGER = LoggerFactory.getLogger(SurveyController.class);
 
     @Autowired
     private SurveyService surveyService;
@@ -72,14 +71,15 @@ public class SurveyController {
             @ApiResponse(responseCode = "400", description = "Bad request")
     })
     public ResponseEntity<?> getSurveysBySource(@PathVariable("id") String id) {
-        Source source = null;
 
         try {
+            Optional<Source> source = sourceService.findById(id);
+            if (!source.isPresent()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("source does not exist");
+            }
             source = sourceService.findById(id);
             return ResponseEntity.ok()
-                    .body(source.getSurveys().stream().map(s -> convertToDto(s)).collect(Collectors.toList()));
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("source does not exist");
+                    .body(source.get().getSurveys().stream().map(s -> convertToDto(s)).collect(Collectors.toList()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
         }
@@ -94,12 +94,14 @@ public class SurveyController {
             @ApiResponse(responseCode = "400", description = "Bad request")
     })
     public ResponseEntity<?> getSurvey(@PathVariable("id") String id) {
-        Survey survey = null;
         try {
-            survey = surveyService.findById(StringUtils.upperCase(id));
-            return ResponseEntity.ok().body(convertToDto(survey));
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("survey does not exist");
+            Optional<Survey> survey = surveyService.findById(StringUtils.upperCase(id));
+            if (!survey.isPresent()) {
+                log.warn("Survey {} does not exist", id);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("survey does not exist");
+            }
+            return ResponseEntity.ok().body(convertToDto(survey.get()));
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
         }
@@ -125,17 +127,18 @@ public class SurveyController {
 
         try {
             surveyService.findById(id);
+            log.info("Update survey with the id {}", surveyDto.getId());
             httpStatus = HttpStatus.OK;
 
         } catch (NoSuchElementException e) {
-            LOGGER.info("Creating survey with the id {}", surveyDto.getId());
+            log.info("Creating survey with the id {}", surveyDto.getId());
             httpStatus = HttpStatus.CREATED;
         }
 
-        survey = surveyService.updateSurvey(convertToEntity(surveyDto));
+        survey = surveyService.insertOrUpdateSurvey(convertToEntity(surveyDto));
         Source source = survey.getSource();
         source.getSurveys().add(survey);
-        sourceService.updateSource(source);
+        sourceService.insertOrUpdateSource(source);
         return ResponseEntity.status(httpStatus).headers(responseHeaders).body(convertToDto(survey));
     }
 
@@ -148,17 +151,26 @@ public class SurveyController {
     })
     @Transactional
     public ResponseEntity<?> deleteSurvey(@PathVariable("id") String id) {
+
         try {
-            Survey survey = surveyService.findById(id);
-            Source source = survey.getSource();
-            source.getSurveys().remove(survey);
-            sourceService.updateSource(source);
+            Optional<Survey> survey = surveyService.findById(id);
+            if (!survey.isPresent()) {
+                log.warn("Survey {} does not exist", id);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Survey does not exist");
+            }
+
+            int nbQuestioningDeleted = 0;
+            int nbViewDeleted = 0;
+
+            Source source = survey.get().getSource();
+            source.getSurveys().remove(survey.get());
+            sourceService.insertOrUpdateSource(source);
             surveyService.deleteSurveyById(id);
             List<Partitioning> listPartitionings = new ArrayList<>();
 
-            survey.getCampaigns().stream().forEach(c -> listPartitionings.addAll(c.getPartitionings()));
+            survey.get().getCampaigns().stream().forEach(c -> listPartitionings.addAll(c.getPartitionings()));
 
-            for (Campaign campaign : survey.getCampaigns()) {
+            for (Campaign campaign : survey.get().getCampaigns()) {
                 viewService.findViewByCampaignId(campaign.getCampaignId()).stream()
                         .forEach(v -> viewService.deleteView(v));
             }
@@ -166,11 +178,17 @@ public class SurveyController {
                 questioningService.findByIdPartitioning(partitioning.getId()).stream()
                         .forEach(q -> questioningService.deleteQuestioning(q.getId()));
             }
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Survey deleted");
-        } catch (
 
-        NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Survey does not exist");
+            for (Campaign campaign : survey.get().getCampaigns()) {
+                nbViewDeleted += viewService.deleteViewsOfOneCampaign(campaign);
+            }
+            for (Partitioning partitioning : listPartitionings) {
+                nbQuestioningDeleted += questioningService.deleteQuestioningsOfOnePartitioning(partitioning);
+            }
+            log.info("Source {} deleted and all its metadata children - {} questioning deleted - {} view deleted", id,
+                    nbQuestioningDeleted, nbViewDeleted);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Survey deleted");
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
         }

@@ -3,6 +3,7 @@ package fr.insee.survey.datacollectionmanagement.query.controller;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -39,16 +40,16 @@ public class MySurveysController {
         for (QuestioningAccreditation questioningAccreditation : accreditations) {
             MySurveyDto surveyDto = new MySurveyDto();
             Questioning questioning = questioningAccreditation.getQuestioning();
-            Partitioning part = partitioningService.findById(questioning.getIdPartitioning());
-            if (part != null) {
-                Survey survey = part.getCampaign().getSurvey();
+            Optional<Partitioning> part = partitioningService.findById(questioning.getIdPartitioning());
+            if (part.isPresent() && !part.isEmpty()) {
+                Survey survey = part.get().getCampaign().getSurvey();
                 String identificationCode = questioning.getSurveyUnit().getIdentificationCode();
                 surveyDto.setSurveyWording(survey.getLongWording());
                 surveyDto.setSurveyObjectives(survey.getLongObjectives());
-                surveyDto.setMonitoringDate(new Timestamp(part.getReturnDate().getTime()));
-                surveyDto.setAccessUrl(STROMAE_URL + part.getCampaign().getCampaignId() + "/unite-enquetee/" + identificationCode);
+                surveyDto.setMonitoringDate(new Timestamp(part.get().getReturnDate().getTime()));
+                surveyDto.setAccessUrl(STROMAE_URL + part.get().getCampaign().getCampaignId() + "/unite-enquetee/" + identificationCode);
                 surveyDto.setIdentificationCode(identificationCode);
-                surveyDto.setMonitoringStatus(part.getStatus());
+                surveyDto.setMonitoringStatus(part.get().getStatus());
                 surveyDto.setMandatoryMySurveys(survey.getSource().isMandatoryMySurveys());
             }
 

@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -21,8 +20,10 @@ import fr.insee.survey.datacollectionmanagement.metadata.domain.Partitioning;
 import fr.insee.survey.datacollectionmanagement.metadata.dto.CampaignMoogDto;
 import fr.insee.survey.datacollectionmanagement.metadata.repository.CampaignRepository;
 import fr.insee.survey.datacollectionmanagement.metadata.service.CampaignService;
+import lombok.extern.log4j.Log4j2;
 
 @Service
+@Log4j2
 public class CampaignServiceImpl implements CampaignService {
 
     static final Logger LOGGER = LoggerFactory.getLogger(CampaignServiceImpl.class);
@@ -40,11 +41,11 @@ public class CampaignServiceImpl implements CampaignService {
             campaignMoogDto.setId(campaign.getCampaignId());
             campaignMoogDto.setLabel(campaign.getCampaignWording());
 
-            Optional<Date> dateMin =
-                campaign.getPartitionings().stream().map(Partitioning::getOpeningDate).collect(Collectors.toList()).stream()
+            Optional<Date> dateMin = campaign.getPartitionings().stream().map(Partitioning::getOpeningDate)
+                    .collect(Collectors.toList()).stream()
                     .min(Comparator.comparing(Date::getTime));
-            Optional<Date> dateMax =
-                campaign.getPartitionings().stream().map(Partitioning::getOpeningDate).collect(Collectors.toList()).stream()
+            Optional<Date> dateMax = campaign.getPartitionings().stream().map(Partitioning::getOpeningDate)
+                    .collect(Collectors.toList()).stream()
                     .max(Comparator.comparing(Date::getTime));
 
             campaignMoogDto.setCollectionStartDate(dateMin.get().getTime());
@@ -61,27 +62,34 @@ public class CampaignServiceImpl implements CampaignService {
     }
 
     @Override
-    public Campaign findById(String idCampaign) {
-        return campaignRepository.findById(idCampaign).orElseThrow(() -> new NoSuchElementException("Campaign not found"));
+    public Optional<Campaign> findById(String idCampaign) {
+        return campaignRepository.findById(idCampaign);
     }
 
     @Override
     public List<Campaign> findbySourceYearPeriod(String source, Integer year, String period) {
         return campaignRepository.findBySourceYearPeriod(source, year, period);
     }
-    
+
     @Override
     public List<Campaign> findbySourcePeriod(String source, String period) {
         return campaignRepository.findBySourcePeriod(source, period);
     }
-    
+
     @Override
     public Page<Campaign> findAll(Pageable pageable) {
         return campaignRepository.findAll(pageable);
     }
 
     @Override
-    public Campaign updateCampaign(Campaign campaign) {
+    public Campaign insertOrUpdateCampaign(Campaign campaign) {
+        Optional<Campaign> campaignBase = findById(campaign.getCampaignId());
+        if (!campaignBase.isPresent()) {
+            log.info("Create campaign with the id {}", campaign.getCampaignId());
+            return campaignRepository.save(campaign);
+        }
+        log.info("Update campaign with the id {}", campaign.getCampaignId());
+        campaign.setPartitionings(campaignBase.get().getPartitionings());
         return campaignRepository.save(campaign);
     }
 
@@ -89,5 +97,5 @@ public class CampaignServiceImpl implements CampaignService {
     public void deleteCampaignById(String id) {
         campaignRepository.deleteById(id);
     }
-    
+
 }

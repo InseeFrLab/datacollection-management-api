@@ -2,12 +2,11 @@ package fr.insee.survey.datacollectionmanagement.metadata.controller;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -38,13 +37,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.log4j.Log4j2;
 
 @RestController
 @CrossOrigin
+@Log4j2
 @Tag(name = "3 - Metadata", description = "Enpoints to create, update, delete and find entities in metadata domain")
 public class PartitioningController {
 
-    static final Logger LOGGER = LoggerFactory.getLogger(PartitioningController.class);
     @Autowired
     private PartitioningService partitioningService;
 
@@ -65,11 +65,14 @@ public class PartitioningController {
     })
     public ResponseEntity<?> getPartitioningsByCampaign(@PathVariable("id") String id) {
         try {
-            Campaign campaign = campaignService.findById(id);
+            Optional<Campaign> campaign = campaignService.findById(id);
+            if (!campaign.isPresent()) {
+                log.warn("Campaign {} does not exist", id);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("campaign does not exist");
+            }
             return ResponseEntity.ok()
-                    .body(campaign.getPartitionings().stream().map(s -> convertToDto(s)).collect(Collectors.toList()));
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("campaign does not exist");
+                    .body(campaign.get().getPartitionings().stream().map(s -> convertToDto(s))
+                            .collect(Collectors.toList()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
         }
@@ -84,12 +87,14 @@ public class PartitioningController {
             @ApiResponse(responseCode = "400", description = "Bad request")
     })
     public ResponseEntity<?> getPartitioning(@PathVariable("id") String id) {
-        Partitioning partitioning = null;
         try {
-            partitioning = partitioningService.findById(StringUtils.upperCase(id));
-            return ResponseEntity.ok().body(convertToDto(partitioning));
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("partitioning does not exist");
+            Optional<Partitioning> partitioning = partitioningService.findById(StringUtils.upperCase(id));
+            if (!partitioning.isPresent()) {
+                log.warn("Partitioning {} does not exist", id);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("partitioning does not exist");
+            }
+            return ResponseEntity.ok().body(convertToDto(partitioning.get()));
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
         }
@@ -120,18 +125,19 @@ public class PartitioningController {
         HttpStatus httpStatus;
 
         try {
+            log.info("Update partitioning with the id {}", partitioningDto.getId());
             partitioningService.findById(id);
             httpStatus = HttpStatus.OK;
 
         } catch (NoSuchElementException e) {
-            LOGGER.info("Creating partitioning with the id {}", partitioningDto.getId());
+            log.info("Create partitioning with the id {}", partitioningDto.getId());
             httpStatus = HttpStatus.CREATED;
         }
 
-        partitioning = partitioningService.updatePartitioning(convertToEntity(partitioningDto));
+        partitioning = partitioningService.insertOrUpdatePartitioning(convertToEntity(partitioningDto));
         Campaign campaign = partitioning.getCampaign();
         campaign.getPartitionings().add(partitioning);
-        campaignService.updateCampaign(campaign);
+        campaignService.insertOrUpdateCampaign(campaign);
         return ResponseEntity.status(httpStatus).headers(responseHeaders).body(convertToDto(partitioning));
     }
 
@@ -145,16 +151,19 @@ public class PartitioningController {
     @Transactional
     public ResponseEntity<?> deletePartitioning(@PathVariable("id") String id) {
         try {
-            Partitioning partitioning = partitioningService.findById(id);
-            Campaign campaign = partitioning.getCampaign();
-            campaign.getPartitionings().remove(partitioning);
-            campaignService.updateCampaign(campaign);
+            Optional<Partitioning> partitioning = partitioningService.findById(id);
+            if (!partitioning.isPresent()) {
+                log.warn("Partitioning {} does not exist", id);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Partitioning does not exist");
+            }
+            Campaign campaign = partitioning.get().getCampaign();
+            campaign.getPartitionings().remove(partitioning.get());
+            campaignService.insertOrUpdateCampaign(campaign);
             partitioningService.deletePartitioningById(id);
-            questioningService.findByIdPartitioning(partitioning.getId()).stream()
-                    .forEach(q -> questioningService.deleteQuestioning(q.getId()));
+
+            int nbQuestioningDeleted = questioningService.deleteQuestioningsOfOnePartitioning(partitioning.get());
+            log.info("Partitioning {} deleted - {} questionings deleted", id, nbQuestioningDeleted);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Partitioning deleted");
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Partitioning does not exist");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
         }

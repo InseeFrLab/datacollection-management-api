@@ -2,11 +2,9 @@ package fr.insee.survey.datacollectionmanagement.metadata.dto;
 
 import java.util.Date;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 public class CampaignEventDto {
 
     private Long id;

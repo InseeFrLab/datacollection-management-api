@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import fr.insee.survey.datacollectionmanagement.metadata.domain.Campaign;
 import fr.insee.survey.datacollectionmanagement.view.domain.View;
 import fr.insee.survey.datacollectionmanagement.view.repository.ViewRepository;
 import fr.insee.survey.datacollectionmanagement.view.service.ViewService;
@@ -77,6 +78,14 @@ public class ViewServiceImpl implements ViewService {
                 deleteView(v);
         });
         return saveView(view);
+    }
+
+    @Override
+    public int deleteViewsOfOneCampaign(Campaign campaign) {
+        List<View> listtView = findViewByCampaignId(campaign.getCampaignId());
+        listtView.stream()
+                .forEach(v -> deleteView(v));
+        return listtView.size();
     }
 
 }

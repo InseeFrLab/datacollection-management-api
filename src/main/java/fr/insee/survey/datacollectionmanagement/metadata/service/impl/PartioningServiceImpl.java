@@ -1,6 +1,7 @@
 package fr.insee.survey.datacollectionmanagement.metadata.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -10,16 +11,18 @@ import org.springframework.stereotype.Service;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Partitioning;
 import fr.insee.survey.datacollectionmanagement.metadata.repository.PartitioningRepository;
 import fr.insee.survey.datacollectionmanagement.metadata.service.PartitioningService;
+import lombok.extern.log4j.Log4j2;
 
 @Service
+@Log4j2
 public class PartioningServiceImpl implements PartitioningService {
 
     @Autowired
     private PartitioningRepository partitioningRepository;
 
     @Override
-    public Partitioning findById(String id) {
-        return partitioningRepository.findById(id).orElseThrow();
+    public Optional<Partitioning> findById(String id) {
+        return partitioningRepository.findById(id);
 
     }
 
@@ -49,7 +52,13 @@ public class PartioningServiceImpl implements PartitioningService {
     }
 
     @Override
-    public Partitioning updatePartitioning(Partitioning partitioning) {
+    public Partitioning insertOrUpdatePartitioning(Partitioning partitioning) {
+        Optional<Partitioning> campaignBase = findById(partitioning.getId());
+        if (!campaignBase.isPresent()) {
+            log.info("Create campaign with the id {}", partitioning.getId());
+            return partitioningRepository.save(partitioning);
+        }
+        log.info("Update campaign with the id {}", partitioning.getId());
         return partitioningRepository.save(partitioning);
 
     }

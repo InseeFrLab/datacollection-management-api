@@ -2,13 +2,12 @@ package fr.insee.survey.datacollectionmanagement.metadata.controller;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -41,13 +40,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.log4j.Log4j2;
 
 @RestController
 @CrossOrigin
+@Log4j2
 @Tag(name = "3 - Metadata", description = "Enpoints to create, update, delete and find entities in metadata domain")
 public class CampaignController {
-
-    static final Logger LOGGER = LoggerFactory.getLogger(CampaignController.class);
 
     @Autowired
     private CampaignService campaignService;
@@ -72,11 +71,13 @@ public class CampaignController {
     })
     public ResponseEntity<?> getCampaignsBySurvey(@PathVariable("id") String id) {
         try {
-            Survey survey = surveyService.findById(id);
+            Optional<Survey> survey = surveyService.findById(id);
+            if (!survey.isPresent()) {
+                log.warn("Survey {} does not exist", id);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("survey does not exist");
+            }
             return ResponseEntity.ok()
-                    .body(survey.getCampaigns().stream().map(s -> convertToDto(s)).collect(Collectors.toList()));
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("survey does not exist");
+                    .body(survey.get().getCampaigns().stream().map(s -> convertToDto(s)).collect(Collectors.toList()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
         }
@@ -91,12 +92,13 @@ public class CampaignController {
             @ApiResponse(responseCode = "400", description = "Bad request")
     })
     public ResponseEntity<?> getCampaign(@PathVariable("id") String id) {
-        Campaign campaign = null;
         try {
-            campaign = campaignService.findById(StringUtils.upperCase(id));
-            return ResponseEntity.ok().body(convertToDto(campaign));
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("campaign does not exist");
+            Optional<Campaign> campaign = campaignService.findById(StringUtils.upperCase(id));
+            if (!campaign.isPresent()) {
+                log.warn("campaign {} does not exist", id);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("campaign does not exist");
+            }
+            return ResponseEntity.ok().body(convertToDto(campaign.get()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
         }
@@ -126,18 +128,19 @@ public class CampaignController {
         HttpStatus httpStatus;
 
         try {
+            log.info("Update campaign with the id {}", campaignDto.getId());
             campaignService.findById(id);
             httpStatus = HttpStatus.OK;
 
         } catch (NoSuchElementException e) {
-            LOGGER.info("Creating campaign with the id {}", campaignDto.getId());
+            log.info("Create campaign with the id {}", campaignDto.getId());
             httpStatus = HttpStatus.CREATED;
         }
 
-        campaign = campaignService.updateCampaign(convertToEntity(campaignDto));
+        campaign = campaignService.insertOrUpdateCampaign(convertToEntity(campaignDto));
         Survey survey = campaign.getSurvey();
         survey.getCampaigns().add(campaign);
-        surveyService.updateSurvey(survey);
+        surveyService.insertOrUpdateSurvey(survey);
         return ResponseEntity.status(httpStatus).headers(responseHeaders).body(convertToDto(campaign));
     }
 
@@ -151,24 +154,27 @@ public class CampaignController {
     @Transactional
     public ResponseEntity<?> deleteCampaign(@PathVariable("id") String id) {
         try {
-            Campaign campaign = campaignService.findById(id);
-            Survey survey = campaign.getSurvey();
-            survey.getCampaigns().remove(campaign);
-            surveyService.updateSurvey(survey);
-            campaignService.deleteCampaignById(id);
-            Set<Partitioning> listPartitionings = campaign.getPartitionings();
+            Optional<Campaign> campaign = campaignService.findById(id);
+            if (!campaign.isPresent()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Campaign does not exist");
+            }
 
-            viewService.findViewByCampaignId(campaign.getCampaignId()).stream().forEach(v -> viewService.deleteView(v));
+            int nbQuestioningDeleted = 0;
+            Survey survey = campaign.get().getSurvey();
+            survey.getCampaigns().remove(campaign.get());
+            surveyService.insertOrUpdateSurvey(survey);
+            campaignService.deleteCampaignById(id);
+            Set<Partitioning> listPartitionings = campaign.get().getPartitionings();
+
+            int nbViewDeleted = viewService.deleteViewsOfOneCampaign(campaign.get());
 
             for (Partitioning partitioning : listPartitionings) {
-                questioningService.findByIdPartitioning(partitioning.getId()).stream()
-                        .forEach(q -> questioningService.deleteQuestioning(q.getId()));
+                nbQuestioningDeleted += questioningService.deleteQuestioningsOfOnePartitioning(partitioning);
             }
+            log.info("Campaign {} deleted with all its metadata children - {} questioning deleted - {} view deleted",
+                    id,
+                    nbQuestioningDeleted, nbViewDeleted);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Campaign deleted");
-        } catch (
-
-        NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Campaign does not exist");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
         }

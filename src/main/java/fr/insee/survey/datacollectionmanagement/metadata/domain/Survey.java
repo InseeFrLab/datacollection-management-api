@@ -11,7 +11,6 @@ import javax.persistence.Index;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 
 import lombok.Data;
 
@@ -44,7 +43,6 @@ public class Survey {
     private Set<Campaign> campaigns;
 
     @OneToOne
-    @NotNull
     private Source source;
 
 }

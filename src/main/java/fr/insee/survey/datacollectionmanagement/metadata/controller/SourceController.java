@@ -3,6 +3,7 @@ package fr.insee.survey.datacollectionmanagement.metadata.controller;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -35,6 +36,7 @@ import fr.insee.survey.datacollectionmanagement.metadata.domain.Partitioning;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Source;
 import fr.insee.survey.datacollectionmanagement.metadata.dto.SourceDto;
 import fr.insee.survey.datacollectionmanagement.metadata.service.SourceService;
+import fr.insee.survey.datacollectionmanagement.questioning.domain.SurveyUnit;
 import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningService;
 import fr.insee.survey.datacollectionmanagement.view.service.ViewService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,13 +45,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.log4j.Log4j2;
 
 @RestController
 @CrossOrigin
+@Log4j2
 @Tag(name = "3 - Metadata", description = "Enpoints to create, update, delete and find entities in metadata domain")
 public class SourceController {
-
-    static final Logger LOGGER = LoggerFactory.getLogger(SourceController.class);
 
     @Autowired
     private SourceService sourceService;
@@ -60,6 +62,7 @@ public class SourceController {
     @Autowired
     private ModelMapper modelmapper;
 
+    @Autowired
     private QuestioningService questioningService;
 
     @Operation(summary = "Search for sources, paginated")
@@ -85,15 +88,13 @@ public class SourceController {
             @ApiResponse(responseCode = "400", description = "Bad request")
     })
     public ResponseEntity<?> getSource(@PathVariable("id") String id) {
-        Source source = null;
-        try {
-            source = sourceService.findById(StringUtils.upperCase(id));
-            return ResponseEntity.ok().body(convertToDto(source));
-        } catch (NoSuchElementException e) {
+        Optional<Source> source = sourceService.findById(StringUtils.upperCase(id));
+        if (!source.isPresent()) {
+            log.warn("Source {} does not exist", id);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("source does not exist");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
         }
+        source = sourceService.findById(StringUtils.upperCase(id));
+        return ResponseEntity.ok().body(convertToDto(source.orElse(null)));
 
     }
 
@@ -116,15 +117,16 @@ public class SourceController {
         HttpStatus httpStatus;
 
         try {
+            log.warn("Update source with the id {}", sourceDto.getId());
             sourceService.findById(id);
             httpStatus = HttpStatus.OK;
 
         } catch (NoSuchElementException e) {
-            LOGGER.info("Creating source with the id {}", sourceDto.getId());
+            log.info("Create source with the id {}", sourceDto.getId());
             httpStatus = HttpStatus.CREATED;
         }
 
-        source = sourceService.updateSource(convertToEntity(sourceDto));
+        source = sourceService.insertOrUpdateSource(convertToEntity(sourceDto));
         return ResponseEntity.status(httpStatus).headers(responseHeaders).body(convertToDto(source));
     }
 
@@ -137,28 +139,31 @@ public class SourceController {
     })
     @Transactional
     public ResponseEntity<?> deleteSource(@PathVariable("id") String id) {
+        int nbQuestioningDeleted = 0, nbViewDeleted = 0;
         try {
-            Source source = sourceService.findById(id);
+            Optional<Source> source = sourceService.findById(id);
+            if (!source.isPresent()) {
+                log.warn("Source {} does not exist", id);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("source does not exist");
+            }
             sourceService.deleteSourceById(id);
             List<Campaign> listCampaigns = new ArrayList<>();
             List<Partitioning> listPartitionings = new ArrayList<>();
-            
-            source.getSurveys().stream().forEach(su -> listCampaigns.addAll(su.getCampaigns()));
-            source.getSurveys().stream().forEach(su -> su.getCampaigns().stream().forEach(c ->listPartitionings.addAll(c.getPartitionings())));
 
+            source.get().getSurveys().stream().forEach(su -> listCampaigns.addAll(su.getCampaigns()));
+            source.get().getSurveys().stream().forEach(
+                    su -> su.getCampaigns().stream().forEach(c -> listPartitionings.addAll(c.getPartitionings())));
 
             for (Campaign campaign : listCampaigns) {
-                viewService.findViewByCampaignId(campaign.getCampaignId()).stream().forEach(v -> viewService.deleteView(v));
+                nbViewDeleted += viewService.deleteViewsOfOneCampaign(campaign);
             }
             for (Partitioning partitioning : listPartitionings) {
-                questioningService.findByIdPartitioning(partitioning.getId()).stream()
-                .forEach(q -> questioningService.deleteQuestioning(q.getId()));
+                nbQuestioningDeleted += questioningService.deleteQuestioningsOfOnePartitioning(partitioning);
             }
+            log.info("Source {} deleted with all its metadata children - {} questioning deleted - {} view deleted", id,
+                    nbQuestioningDeleted, nbViewDeleted);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Source deleted");
-        } catch (
 
-        NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Source does not exist");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
         }

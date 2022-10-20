@@ -22,9 +22,6 @@ public class QuestioningAccreditationServiceImpl implements QuestioningAccredita
     @Autowired
     private QuestioningAccreditationRepository questioningAccreditationRepository;
 
-    @Autowired
-    private QuestioningService questioningService;
-
     public List<QuestioningAccreditation> findByContactIdentifier(String id) {
         return questioningAccreditationRepository.findByIdContact(id);
     }
@@ -84,9 +81,6 @@ public class QuestioningAccreditationServiceImpl implements QuestioningAccredita
 
     @Override
     public void deleteAccreditation(QuestioningAccreditation acc) {
-        Questioning questioning = questioningService.findbyId(acc.getQuestioning().getId());
-        questioning.getQuestioningAccreditations().remove(acc);
-        questioningService.saveQuestioning(questioning);
         questioningAccreditationRepository.delete(acc);
     }
 

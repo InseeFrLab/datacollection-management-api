@@ -40,6 +40,8 @@ public class Constants {
     public static final String API_CAMPAIGNS_ID_PARTITIONINGS = "/api/campaigns/{id}/partitionings";
     public static final String API_PARTITIONINGS = "/api/partitionings/";
     public static final String API_PARTITIONINGS_ID = "/api/partitionings/{id}";
+    public static final String API_METADATA_ID = "/api/metadata/{id}";
+
 
 
     // API CROSS DOMAIN
