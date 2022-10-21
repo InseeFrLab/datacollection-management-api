@@ -27,26 +27,6 @@ public class PartioningServiceImpl implements PartitioningService {
     }
 
     @Override
-    public List<String> findIdPartitioningsBySourceIdYearPeriod(String sourceId, String year, String period) {
-        return partitioningRepository.findIdPartitioningBySourceIdYearPeriod(sourceId, year, period);
-    }
-
-    @Override
-    public List<String> findIdPartitioningsBySourceId(String sourceId) {
-        return partitioningRepository.findIdPartitioningBySourceId(sourceId);
-    }
-
-    @Override
-    public List<String> findIdPartitioningsByYear(String year) {
-        return partitioningRepository.findIdPartitioningByYear(year);
-    }
-
-    @Override
-    public List<String> findIdPartitioningsByPeriod(String period) {
-        return partitioningRepository.findIdPartitioningByPeriod(period);
-    }
-
-    @Override
     public Page<Partitioning> findAll(Pageable pageable) {
         return partitioningRepository.findAll(pageable);
     }

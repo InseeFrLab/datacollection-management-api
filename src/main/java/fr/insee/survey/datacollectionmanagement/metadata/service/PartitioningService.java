@@ -12,14 +12,6 @@ public interface PartitioningService {
 
     Optional<Partitioning> findById(String id);
 
-    List<String> findIdPartitioningsBySourceIdYearPeriod(String sourceId, String year, String period);
-
-    List<String> findIdPartitioningsBySourceId(String sourceId);
-
-    List<String> findIdPartitioningsByYear(String year);
-
-    List<String> findIdPartitioningsByPeriod(String period);
-
     Page<Partitioning> findAll(Pageable pageable);
 
     Partitioning insertOrUpdatePartitioning(Partitioning partitioning);

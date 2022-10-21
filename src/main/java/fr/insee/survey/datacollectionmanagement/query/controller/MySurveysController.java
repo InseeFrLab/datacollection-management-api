@@ -47,7 +47,7 @@ public class MySurveysController {
                 surveyDto.setSurveyWording(survey.getLongWording());
                 surveyDto.setSurveyObjectives(survey.getLongObjectives());
                 surveyDto.setMonitoringDate(new Timestamp(part.get().getReturnDate().getTime()));
-                surveyDto.setAccessUrl(STROMAE_URL + part.get().getCampaign().getCampaignId() + "/unite-enquetee/" + identificationCode);
+                surveyDto.setAccessUrl(STROMAE_URL + part.get().getCampaign().getId() + "/unite-enquetee/" + identificationCode);
                 surveyDto.setIdentificationCode(identificationCode);
                 surveyDto.setMonitoringStatus(part.get().getStatus());
                 surveyDto.setMandatoryMySurveys(survey.getSource().isMandatoryMySurveys());

@@ -16,7 +16,7 @@ public interface PartitioningRepository extends JpaRepository<Partitioning, Stri
             + "        partitioning p                                                                                      "
             + "join campaign c                                                                                             "
             + "on                                                                                                          "
-            + "        c.campaign_id = p.campaign_campaign_id                                                              "
+            + "        c.id = p.campaign_id                                                              "
             + "join survey su on                                                                                           "
             + "        su.id = c.survey_id                                                                                 "
             + "join \"source\" s2 on                                                                                       "

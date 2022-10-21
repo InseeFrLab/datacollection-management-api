@@ -8,14 +8,12 @@ import javax.persistence.Index;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 @Entity
-@Getter
-@Setter
+@Data
 @Table(indexes = {
-        @Index(name = "campainId_index", columnList = "campaign_campaign_id")
+        @Index(name = "campainId_index", columnList = "campaign_id")
 })
 public class Partitioning {
 

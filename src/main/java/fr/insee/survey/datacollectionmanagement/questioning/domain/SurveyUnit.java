@@ -11,12 +11,10 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 @Entity
-@Getter
-@Setter
+@Data
 @Table(indexes = {
     @Index(name = "identificationName_index", columnList = "identificationName"), @Index(name = "identificationCode_index", columnList = "identificationCode")
 })

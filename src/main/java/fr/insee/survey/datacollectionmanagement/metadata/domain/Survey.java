@@ -11,8 +11,11 @@ import javax.persistence.Index;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Entity
 @Data
@@ -25,6 +28,7 @@ public class Survey {
     @Id
     private String id;
     @Column(name = "YEAR_VALUE")
+    @NotNull
     private Integer year;
     private boolean isMandatory;
     private Integer sampleSize;
@@ -40,6 +44,8 @@ public class Survey {
     private String communication;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Set<Campaign> campaigns;
 
     @OneToOne

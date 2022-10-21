@@ -11,8 +11,11 @@ import javax.persistence.Index;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Entity
 @Data
@@ -25,16 +28,24 @@ public class Questioning {
     @GeneratedValue
     private Long id;
 
+    @NotNull
     private String modelName;
+    @NotNull
     private String idPartitioning;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Set<QuestioningAccreditation> questioningAccreditations;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Set<QuestioningEvent> questioningEvents;
 
     @OneToOne(fetch = FetchType.EAGER)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private SurveyUnit surveyUnit;
 
 }

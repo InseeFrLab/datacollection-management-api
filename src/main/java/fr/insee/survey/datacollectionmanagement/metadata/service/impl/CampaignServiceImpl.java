@@ -38,7 +38,7 @@ public class CampaignServiceImpl implements CampaignService {
 
         for (Campaign campaign : campaigns) {
             CampaignMoogDto campaignMoogDto = new CampaignMoogDto();
-            campaignMoogDto.setId(campaign.getCampaignId());
+            campaignMoogDto.setId(campaign.getId());
             campaignMoogDto.setLabel(campaign.getCampaignWording());
 
             Optional<Date> dateMin = campaign.getPartitionings().stream().map(Partitioning::getOpeningDate)
@@ -83,12 +83,12 @@ public class CampaignServiceImpl implements CampaignService {
 
     @Override
     public Campaign insertOrUpdateCampaign(Campaign campaign) {
-        Optional<Campaign> campaignBase = findById(campaign.getCampaignId());
+        Optional<Campaign> campaignBase = findById(campaign.getId());
         if (!campaignBase.isPresent()) {
-            log.info("Create campaign with the id {}", campaign.getCampaignId());
+            log.info("Create campaign with the id {}", campaign.getId());
             return campaignRepository.save(campaign);
         }
-        log.info("Update campaign with the id {}", campaign.getCampaignId());
+        log.info("Update campaign with the id {}", campaign.getId());
         campaign.setPartitionings(campaignBase.get().getPartitionings());
         return campaignRepository.save(campaign);
     }

@@ -267,7 +267,7 @@ public class DataloaderTest {
                         String period = "T" + trimester;
                         campaign.setYear(year - j);
                         campaign.setPeriod(period);
-                        campaign.setCampaignId(sourceName + (year - j) + period);
+                        campaign.setId(sourceName + (year - j) + period);
                         campaign.setCampaignWording(
                                 "Campaign about " + sourceName + " in " + (year - j) + " and period " + period);
                         setCampaigns.add(campaign);
@@ -393,7 +393,7 @@ public class DataloaderTest {
                 Partitioning p = partitioningRepository.findById(a.getQuestioning().getIdPartitioning()).orElse(null);
                 View view = new View();
                 view.setIdentifier(contactRepository.findById(a.getIdContact()).orElse(null).getIdentifier());
-                view.setCampaignId(p.getCampaign().getCampaignId());
+                view.setCampaignId(p.getCampaign().getId());
                 view.setIdSu(a.getQuestioning().getSurveyUnit().getIdSu());
                 viewRepository.save(view);
             });

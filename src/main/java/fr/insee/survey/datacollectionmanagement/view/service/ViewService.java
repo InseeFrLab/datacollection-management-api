@@ -19,8 +19,8 @@ public interface ViewService {
     List<View> findViewByCampaignId(String campaignId);
 
     List<View> findViewByIdSu(String idSu);
-
-    List<View> findViewByIdentifierIdSuCampaignId(String identifier, String idSu, String campaignId);
+    
+    Long countViewByIdentifierIdSuCampaignId(String identifier, String idSu, String campaignId);
 
     List<View> findByIdentifierContainingAndIdSuNotNull(String identifier);
 
@@ -33,6 +33,7 @@ public interface ViewService {
     void deleteViewByIdentifier(String identifier);
 
     int deleteViewsOfOneCampaign(Campaign campaign);
+
 
    
 }

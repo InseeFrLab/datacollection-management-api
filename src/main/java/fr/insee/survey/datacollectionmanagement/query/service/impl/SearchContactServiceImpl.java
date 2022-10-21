@@ -77,7 +77,7 @@ public class SearchContactServiceImpl implements SearchContactService {
                 List<Campaign> listCampains = campaignService.findbySourceYearPeriod(source, Integer.parseInt(year),
                         period);
                 for (Campaign campain : listCampains) {
-                    listView.addAll(viewService.findViewByCampaignId(campain.getCampaignId()));
+                    listView.addAll(viewService.findViewByCampaignId(campain.getId()));
                 }
 
                 alwaysEmpty = false;
@@ -88,7 +88,7 @@ public class SearchContactServiceImpl implements SearchContactService {
                 for (Campaign c : listCampains) {
                     listViewC
                             .addAll(listView.stream()
-                                    .filter(v -> viewService.findViewByCampaignId(c.getCampaignId()).contains(v))
+                                    .filter(v -> viewService.findViewByCampaignId(c.getId()).contains(v))
                                     .collect(Collectors.toList()));
                 }
                 listView = listViewC;
@@ -98,7 +98,7 @@ public class SearchContactServiceImpl implements SearchContactService {
             if (listView.isEmpty() && alwaysEmpty) {
                 List<Campaign> listCampains = campaignService.findbySourcePeriod(source, period);
                 for (Campaign campain : listCampains) {
-                    listView.addAll(viewService.findViewByCampaignId(campain.getCampaignId()));
+                    listView.addAll(viewService.findViewByCampaignId(campain.getId()));
                 }
 
                 alwaysEmpty = false;
@@ -108,7 +108,7 @@ public class SearchContactServiceImpl implements SearchContactService {
                 for (Campaign c : listCampains) {
                     listViewC
                             .addAll(listView.stream()
-                                    .filter(v -> viewService.findViewByCampaignId(c.getCampaignId()).contains(v))
+                                    .filter(v -> viewService.findViewByCampaignId(c.getId()).contains(v))
                                     .collect(Collectors.toList()));
                 }
                 listView = listViewC;

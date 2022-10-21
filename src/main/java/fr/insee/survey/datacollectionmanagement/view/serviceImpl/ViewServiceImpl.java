@@ -45,10 +45,10 @@ public class ViewServiceImpl implements ViewService {
     public List<View> findViewByIdSuContaining(String field) {
         return viewRepository.findByIdSuContaining(field);
     }
-
+    
     @Override
-    public List<View> findViewByIdentifierIdSuCampaignId(String identifier, String idSu, String campaignId) {
-        return viewRepository.findViewByIdentifierAndIdSuAndCampaignId(identifier, idSu, campaignId);
+    public Long countViewByIdentifierIdSuCampaignId(String identifier, String idSu, String campaignId) {
+        return viewRepository.countViewByIdentifierAndIdSuAndCampaignId(identifier, idSu, campaignId);
     }
 
     @Override
@@ -82,7 +82,7 @@ public class ViewServiceImpl implements ViewService {
 
     @Override
     public int deleteViewsOfOneCampaign(Campaign campaign) {
-        List<View> listtView = findViewByCampaignId(campaign.getCampaignId());
+        List<View> listtView = findViewByCampaignId(campaign.getId());
         listtView.stream()
                 .forEach(v -> deleteView(v));
         return listtView.size();

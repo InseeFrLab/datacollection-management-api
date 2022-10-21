@@ -16,12 +16,10 @@ import org.hibernate.annotations.TypeDef;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 @Entity
-@Getter
-@Setter
+@Data
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class QuestioningEvent {
 

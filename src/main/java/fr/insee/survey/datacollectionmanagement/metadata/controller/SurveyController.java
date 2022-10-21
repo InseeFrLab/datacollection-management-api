@@ -171,7 +171,7 @@ public class SurveyController {
             survey.get().getCampaigns().stream().forEach(c -> listPartitionings.addAll(c.getPartitionings()));
 
             for (Campaign campaign : survey.get().getCampaigns()) {
-                viewService.findViewByCampaignId(campaign.getCampaignId()).stream()
+                viewService.findViewByCampaignId(campaign.getId()).stream()
                         .forEach(v -> viewService.deleteView(v));
             }
             for (Partitioning partitioning : listPartitionings) {

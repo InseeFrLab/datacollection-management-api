@@ -143,7 +143,7 @@ public class QuestioningAccreditationController {
 
             // create view
             viewService.createView(idContact, questioning.getSurveyUnit().getIdSu(),
-                    part.get().getCampaign().getCampaignId());
+                    part.get().getCampaign().getId());
 
             // location header
             responseHeaders.set(HttpHeaders.LOCATION,
