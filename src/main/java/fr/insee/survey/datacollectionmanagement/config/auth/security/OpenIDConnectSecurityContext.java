@@ -16,9 +16,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,8 +30,6 @@ public class OpenIDConnectSecurityContext  {
 
     private static final Logger logger = LoggerFactory.getLogger(OpenIDConnectSecurityContext.class);
 
-    @Value("${fr.insee.datacollectionmanagement.cors.allowedOrigin}")
-    private Optional<String> allowedOrigin;
 
     @Autowired
     ApplicationConfig config;
@@ -72,18 +67,5 @@ public class OpenIDConnectSecurityContext  {
         };
     }
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        logger.info("Allowed origins : {}", allowedOrigin);
-        String ao = allowedOrigin.isPresent() ? allowedOrigin.get() : allowedOrigin.orElse("*");
-        configuration.setAllowedOrigins(List.of(ao));
-        configuration.setAllowedMethods(List.of("\"GET\",\"POST\",\"PUT\",\"DELETE\""));
-        configuration.setAllowedHeaders(List.of("*"));
-        UrlBasedCorsConfigurationSource source = new
-                UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
 
 }
