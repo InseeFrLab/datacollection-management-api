@@ -1,15 +1,5 @@
 package fr.insee.survey.datacollectionmanagement.query.controller;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
-
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Partitioning;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Survey;
 import fr.insee.survey.datacollectionmanagement.metadata.service.PartitioningService;
@@ -17,9 +7,17 @@ import fr.insee.survey.datacollectionmanagement.query.dto.MySurveyDto;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningAccreditation;
 import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningAccreditationService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
-@CrossOrigin
 public class MySurveysController {
 
     private static final String STROMAE_URL = "https://dev.insee.io/questionnaire/";
@@ -31,6 +29,9 @@ public class MySurveysController {
     private PartitioningService partitioningService;
 
     @GetMapping(value = "mySurveys/{id}")
+    @PreAuthorize("@AuthorizeMethodDecider.isInternalUser() "
+            + "|| @AuthorizeMethodDecider.isWebClient() "
+            + "|| @AuthorizeMethodDecider.isRespondent()")
     public List<MySurveyDto> findById(@PathVariable("id") String id) {
 
         List<MySurveyDto> listSurveys = new ArrayList<>();
