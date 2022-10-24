@@ -64,7 +64,7 @@ public class QuestionningAccreditationControllerTest {
         QuestioningAccreditation accreditation = initAccreditation(idContact);
         String jsonAccreditation = createJson(accreditation);
         mockMvc.perform(
-                post(Constants.API_QUESTIONINGS + idQuestioning + "/questioning-accreditations")
+                post(Constants.API_QUESTIONINGS + "/" + idQuestioning + "/questioning-accreditations")
                         .content(jsonAccreditation).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -78,7 +78,7 @@ public class QuestionningAccreditationControllerTest {
         QuestioningAccreditation accreditation = initAccreditation(idContact);
         String jsonAccreditation = createJson(accreditation);
         mockMvc.perform(
-                post(Constants.API_QUESTIONINGS + idQuestioning + "/questioning-accreditations")
+                post(Constants.API_QUESTIONINGS + "/" + idQuestioning + "/questioning-accreditations")
                         .content(jsonAccreditation).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -92,7 +92,7 @@ public class QuestionningAccreditationControllerTest {
         QuestioningAccreditation accreditation = initAccreditation(idContact);
         String jsonAccreditation = createJson(accreditation);
         mockMvc.perform(
-                post(Constants.API_QUESTIONINGS + idQuestioning + "/questioning-accreditations")
+                post(Constants.API_QUESTIONINGS + "/" + idQuestioning + "/questioning-accreditations")
                         .content(jsonAccreditation).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(content().json(jsonAccreditation.toString(), false));
@@ -108,7 +108,7 @@ public class QuestionningAccreditationControllerTest {
         accreditation.setMain(true);
         String jsonAccreditationUpdate = createJson(accreditation);
         mockMvc.perform(
-                post(Constants.API_QUESTIONINGS + idQuestioning + "/questioning-accreditations")
+                post(Constants.API_QUESTIONINGS +"/"+ idQuestioning + "/questioning-accreditations")
                         .content(jsonAccreditationUpdate).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(jsonAccreditationUpdate.toString(), false));

@@ -17,9 +17,9 @@ public class Constants {
     public static final String API_CONTACTEVENTS_ID = "/api/contacts/contact-events/{id}";
 
     //API QUESTIONING DOMAIN
-    public static final String API_QUESTIONINGS = "/api/questionings/";
+    public static final String API_QUESTIONINGS = "/api/questionings";
     public static final String API_QUESTIONINGS_ID = "/api/questionings/{id}";
-    public static final String API_SURVEY_UNITS ="/api/survey-units/";
+    public static final String API_SURVEY_UNITS ="/api/survey-units";
     public static final String API_SURVEY_UNITS_ID = "/api/survey-units/{id}";
     public static final String API_SURVEY_UNITS_ID_QUESTIONINGS = "/api/survey-units/{id}/questionings";
     public static final String API_QUESTIONING_ACCREDITATIONS = "/api/questioning-accreditations";
@@ -27,9 +27,6 @@ public class Constants {
     public static final String API_QUESTIONING_QUESTIONING_EVENTS = "/api/questionings/questioning-events";
     public static final String API_QUESTIONING_ID_QUESTIONING_EVENTS = "/api/questionings/{id}/questioning-events";
     public static final String API_QUESTIONING_QUESTIONING_EVENTS_ID = "/api/questionings/questioning-events/{id}";
-
-
-
     
     // API METADATA DOMAIN
 

@@ -46,14 +46,14 @@ public class SurveyUnitControllerTest {
         String identifier = "100000000";
         SurveyUnit surveyUnit = surveyUnitService.findbyId(identifier);
         String json = createJson(surveyUnit);
-        this.mockMvc.perform(get(Constants.API_SURVEY_UNITS + identifier)).andDo(print()).andExpect(status().isOk())
+        this.mockMvc.perform(get(Constants.API_SURVEY_UNITS +"/"+ identifier)).andDo(print()).andExpect(status().isOk())
                 .andExpect(content().json(json, false));
     }
 
     @Test
     public void getSurveyUnitNotFound() throws Exception {
         String identifier = "900000000";
-        this.mockMvc.perform(get(Constants.API_SURVEY_UNITS + identifier)).andDo(print())
+        this.mockMvc.perform(get(Constants.API_SURVEY_UNITS +"/"+ identifier)).andDo(print())
                 .andExpect(status().is(HttpStatus.NOT_FOUND.value()));
 
     }
@@ -76,7 +76,7 @@ public class SurveyUnitControllerTest {
         SurveyUnit surveyUnit = initSurveyUnit(identifier);
         String jsonSurveyUnit = createJson(surveyUnit);
         mockMvc.perform(
-                put(Constants.API_SURVEY_UNITS + identifier).content(jsonSurveyUnit)
+                put(Constants.API_SURVEY_UNITS +"/"+ identifier).content(jsonSurveyUnit)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(content().json(jsonSurveyUnit.toString(), false));
@@ -88,7 +88,7 @@ public class SurveyUnitControllerTest {
         // update surveyUnit - status ok
         surveyUnit.setIdentificationName("identificationNameUpdate");
         String jsonSurveyUnitUpdate = createJson(surveyUnit);
-        mockMvc.perform(put(Constants.API_SURVEY_UNITS + identifier).content(jsonSurveyUnitUpdate)
+        mockMvc.perform(put(Constants.API_SURVEY_UNITS +"/"+ identifier).content(jsonSurveyUnitUpdate)
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
                 .andExpect(content().json(jsonSurveyUnitUpdate.toString(), false));
         SurveyUnit surveyUnitFoundAfterUpdate = surveyUnitService.findbyId(identifier);
@@ -112,7 +112,7 @@ public class SurveyUnitControllerTest {
         SurveyUnit surveyUnit = initSurveyUnitAddress(identifier);
         String jsonSurveyUnit = createJsonSurveyUnitAddress(surveyUnit);
         mockMvc.perform(
-                put(Constants.API_SURVEY_UNITS + identifier).content(jsonSurveyUnit)
+                put(Constants.API_SURVEY_UNITS +"/"+ identifier).content(jsonSurveyUnit)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(content().json(jsonSurveyUnit.toString(), false));
@@ -123,7 +123,7 @@ public class SurveyUnitControllerTest {
         String newCityName = "cityUpdate";
         surveyUnit.getSurveyUnitAddress().setCity(newCityName);
         String jsonSurveyUnitUpdate = createJsonSurveyUnitAddress(surveyUnit);
-        mockMvc.perform(put(Constants.API_SURVEY_UNITS + identifier).content(jsonSurveyUnitUpdate)
+        mockMvc.perform(put(Constants.API_SURVEY_UNITS +"/"+ identifier).content(jsonSurveyUnitUpdate)
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
                 .andExpect(content().json(jsonSurveyUnitUpdate.toString(), false));
         SurveyUnit countactFoundAfterUpdate = surveyUnitService.findbyId(identifier);
@@ -144,7 +144,7 @@ public class SurveyUnitControllerTest {
         String otherIdentifier = "WRONG";
         SurveyUnit surveyUnit = initSurveyUnit(identifier);
         String jsonSurveyUnit = createJson(surveyUnit);
-        mockMvc.perform(put(Constants.API_SURVEY_UNITS + otherIdentifier).content(jsonSurveyUnit)
+        mockMvc.perform(put(Constants.API_SURVEY_UNITS +"/"+ otherIdentifier).content(jsonSurveyUnit)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("id and idSu don't match"));

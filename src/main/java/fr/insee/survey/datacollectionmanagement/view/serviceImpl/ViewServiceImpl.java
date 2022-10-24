@@ -2,7 +2,6 @@ package fr.insee.survey.datacollectionmanagement.view.serviceImpl;
 
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,12 +19,11 @@ public class ViewServiceImpl implements ViewService {
     public List<View> findViewByIdentifier(String identifier) {
         return viewRepository.findByIdentifier(identifier);
     }
-    
+
     @Override
     public View findFirstViewByIdentifier(String identifier) {
         return viewRepository.findFirstByIdentifier(identifier);
     }
-
 
     @Override
     public List<View> findByIdentifierContainingAndIdSuNotNull(String identifier) {
@@ -34,7 +32,7 @@ public class ViewServiceImpl implements ViewService {
 
     @Override
     public List<View> findViewByCampaignId(String campaignId) {
-        return viewRepository.findByCampaignId(campaignId);
+        return viewRepository.findDistinctViewByCampaignId(campaignId);
     }
 
     @Override
@@ -61,7 +59,7 @@ public class ViewServiceImpl implements ViewService {
     public void deleteView(View view) {
         viewRepository.delete(view);
     }
-    
+
     @Override
     public void deleteViewByIdentifier(String identifier) {
         viewRepository.deleteByIdentifier(identifier);
@@ -73,12 +71,12 @@ public class ViewServiceImpl implements ViewService {
         view.setIdentifier(identifier);
         view.setCampaignId(campaignId);
         view.setIdSu(idSu);
-        View contactView = findFirstViewByIdentifier(identifier);
-        if (contactView !=null) {
-            deleteView(contactView);
-        }
+        List<View> listContactView = findViewByIdentifier(identifier);
+        listContactView.stream().forEach(v -> {
+            if (v.getIdSu() == null)
+                deleteView(v);
+        });
         return saveView(view);
     }
-
 
 }
