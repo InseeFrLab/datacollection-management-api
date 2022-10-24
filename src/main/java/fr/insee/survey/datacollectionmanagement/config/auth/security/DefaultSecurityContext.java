@@ -32,10 +32,10 @@ public class DefaultSecurityContext  {
 
     @Autowired
     ApplicationConfig config;
-    
+
     @Bean
     protected SecurityFilterChain configure(HttpSecurity http) throws Exception {
-        http.csrf().disable();
+        http.sessionManagement().disable();
         http.cors(withDefaults())
 
                 .authorizeRequests()
