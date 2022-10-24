@@ -8,8 +8,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -32,14 +30,18 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import fr.insee.survey.datacollectionmanagement.constants.Constants;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Campaign;
+import fr.insee.survey.datacollectionmanagement.metadata.domain.Owner;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Partitioning;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Source;
 import fr.insee.survey.datacollectionmanagement.metadata.dto.SourceDto;
+import fr.insee.survey.datacollectionmanagement.metadata.dto.SurveyDto;
+import fr.insee.survey.datacollectionmanagement.metadata.service.OwnerService;
 import fr.insee.survey.datacollectionmanagement.metadata.service.SourceService;
-import fr.insee.survey.datacollectionmanagement.questioning.domain.SurveyUnit;
+import fr.insee.survey.datacollectionmanagement.metadata.service.SupportService;
 import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningService;
 import fr.insee.survey.datacollectionmanagement.view.service.ViewService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -55,6 +57,12 @@ public class SourceController {
 
     @Autowired
     private SourceService sourceService;
+
+    @Autowired
+    private OwnerService ownerService;
+
+    @Autowired
+    private SupportService supportService;
 
     @Autowired
     private ViewService viewService;
@@ -146,6 +154,9 @@ public class SourceController {
                 log.warn("Source {} does not exist", id);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("source does not exist");
             }
+            ownerService.removeSourceFromOwner(source.get().getOwner(), source.get());
+            supportService.removeSourceFromSupport(source.get().getSupport(), source.get());
+
             sourceService.deleteSourceById(id);
             List<Campaign> listCampaigns = new ArrayList<>();
             List<Partitioning> listPartitionings = new ArrayList<>();
@@ -167,6 +178,29 @@ public class SourceController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
         }
+    }
+    
+    
+    @Operation(summary = "Search for surveys by the owner id")
+    @GetMapping(value = Constants.API_OWNERS_ID_SOURCES, produces = "application/json")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = SurveyDto.class)))),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "400", description = "Bad request")
+    })
+    public ResponseEntity<?> getSourcesByOwner(@PathVariable("id") Long id) {
+
+        try {
+            Optional<Owner> owner = ownerService.findById(id);
+            if (!owner.isPresent()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("owner does not exist");
+            }
+            return ResponseEntity.ok()
+                    .body(owner.get().getSources().stream().map(s -> convertToDto(s)).collect(Collectors.toList()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
+        }
+
     }
 
     private SourceDto convertToDto(Source source) {

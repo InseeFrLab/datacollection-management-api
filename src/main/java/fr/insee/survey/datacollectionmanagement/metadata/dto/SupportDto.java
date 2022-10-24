@@ -9,4 +9,12 @@ public class SupportDto {
 
     private Long id;
     private String label;
+    private String phoneNumber;
+    private String mail;
+    private String countryName;
+    private String streetNumber;
+    private String streetName;
+    private String city;
+    private String zipCode;
+
 }

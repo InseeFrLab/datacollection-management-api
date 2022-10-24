@@ -77,7 +77,6 @@ public class SurveyController {
             if (!source.isPresent()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("source does not exist");
             }
-            source = sourceService.findById(id);
             return ResponseEntity.ok()
                     .body(source.get().getSurveys().stream().map(s -> convertToDto(s)).collect(Collectors.toList()));
         } catch (Exception e) {

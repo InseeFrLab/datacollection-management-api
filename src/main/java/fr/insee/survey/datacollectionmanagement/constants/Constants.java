@@ -29,18 +29,24 @@ public class Constants {
     public static final String API_QUESTIONING_QUESTIONING_EVENTS_ID = "/api/questionings/questioning-events/{id}";
 
     // API METADATA DOMAIN
-    public static final String API_SOURCES = "/api/sources/";
+    public static final String API_SOURCES = "/api/sources";
     public static final String API_SOURCES_ID = "/api/sources/{id}";
     public static final String API_SOURCES_ID_SURVEYS = "/api/sources/{id}/surveys";
-    public static final String API_SURVEYS = "/api/surveys/";
+    public static final String API_SURVEYS = "/api/surveys";
     public static final String API_SURVEYS_ID = "/api/surveys/{id}";
     public static final String API_SURVEYS_ID_CAMPAIGNS = "/api/surveys/{id}/campaigns";
-    public static final String API_CAMPAIGNS = "/api/campaigns/";
+    public static final String API_CAMPAIGNS = "/api/campaigns";
     public static final String API_CAMPAIGNS_ID = "/api/campaigns/{id}";
     public static final String API_CAMPAIGNS_ID_PARTITIONINGS = "/api/campaigns/{id}/partitionings";
-    public static final String API_PARTITIONINGS = "/api/partitionings/";
+    public static final String API_PARTITIONINGS = "/api/partitionings";
     public static final String API_PARTITIONINGS_ID = "/api/partitionings/{id}";
     public static final String API_METADATA_ID = "/api/metadata/{id}";
+    public static final String API_OWNERS = "/api/owners";
+    public static final String API_OWNERS_ID = "/api/owners/{id}";
+    public static final String API_OWNERS_ID_SOURCES = "/api/owners/{id}/sources";
+    public static final String API_SUPPORTS = "/api/supports";
+    public static final String API_SUPPORTS_ID = "/api/supports/{id}";
+
 
 
 

@@ -37,8 +37,10 @@ import fr.insee.survey.datacollectionmanagement.metadata.dto.SourceDto;
 import fr.insee.survey.datacollectionmanagement.metadata.dto.SupportDto;
 import fr.insee.survey.datacollectionmanagement.metadata.dto.SurveyDto;
 import fr.insee.survey.datacollectionmanagement.metadata.service.CampaignService;
+import fr.insee.survey.datacollectionmanagement.metadata.service.OwnerService;
 import fr.insee.survey.datacollectionmanagement.metadata.service.PartitioningService;
 import fr.insee.survey.datacollectionmanagement.metadata.service.SourceService;
+import fr.insee.survey.datacollectionmanagement.metadata.service.SupportService;
 import fr.insee.survey.datacollectionmanagement.metadata.service.SurveyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -65,6 +67,12 @@ public class MetadataController {
 
     @Autowired
     PartitioningService partitioningService;
+
+    @Autowired
+    OwnerService ownerService;
+
+    @Autowired
+    SupportService supportService;
 
     @Autowired
     private ModelMapper modelmapper;
@@ -94,8 +102,8 @@ public class MetadataController {
             metadataDto.setCampaignDto(convertToDto(part.get().getCampaign()));
             metadataDto.setSurveyDto(convertToDto(part.get().getCampaign().getSurvey()));
             metadataDto.setSourceDto(convertToDto(part.get().getCampaign().getSurvey().getSource()));
-//            metadataDto.setOwnerDto(convertToDto(part.get().getCampaign().getSurvey().getSource().getOwner()));
-//            metadataDto.setSupportDto(convertToDto(part.get().getCampaign().getSurvey().getSource().getSupport()));
+            metadataDto.setOwnerDto(convertToDto(part.get().getCampaign().getSurvey().getSource().getOwner()));
+            metadataDto.setSupportDto(convertToDto(part.get().getCampaign().getSurvey().getSource().getSupport()));
             return ResponseEntity.ok().body(metadataDto);
 
         } catch (Exception e) {
@@ -115,65 +123,99 @@ public class MetadataController {
     public ResponseEntity<?> putMetadata(@PathVariable("id") String id,
             @RequestBody MetadataDto metadataDto) {
         try {
-        if (StringUtils.isBlank(metadataDto.getPartitioningDto().getId())
-                || !metadataDto.getPartitioningDto().getId().equalsIgnoreCase(id)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("id and idPartitioning don't match");
-        }
-        Partitioning partitioning;
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set(HttpHeaders.LOCATION,
-                ServletUriComponentsBuilder.fromCurrentRequest().buildAndExpand(id).toUriString());
-        HttpStatus httpStatus;
+            if (StringUtils.isBlank(metadataDto.getPartitioningDto().getId())
+                    || !metadataDto.getPartitioningDto().getId().equalsIgnoreCase(id)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("id and idPartitioning don't match");
+            }
+            MetadataDto metadataReturn = new MetadataDto();
 
-        try {
-            log.info("Update partitioning with the id {}", id);
-            partitioningService.findById(id);
-            httpStatus = HttpStatus.OK;
+            HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.set(HttpHeaders.LOCATION,
+                    ServletUriComponentsBuilder.fromCurrentRequest().buildAndExpand(id).toUriString());
+            HttpStatus httpStatus;
 
-        } catch (NoSuchElementException e) {
-            log.info("Create partitioning with the id {}", id);
-            httpStatus = HttpStatus.CREATED;
-        }
+            if (partitioningService.findById(id).isPresent()) {
+                log.info("Update partitioning with the id {}", id);
+                partitioningService.findById(id);
+                httpStatus = HttpStatus.OK;
 
-        Source source = sourceService.insertOrUpdateSource(convertToEntity(metadataDto.getSourceDto()));
+            } else {
+                log.info("Create partitioning with the id {}", id);
+                httpStatus = HttpStatus.CREATED;
+            }
 
-        Survey survey = convertToEntity(metadataDto.getSurveyDto());
-        survey.setSource(source);
-        survey = surveyService.insertOrUpdateSurvey(survey);
+            Owner owner = ownerService.insertOrUpdateOwner(convertToEntity(metadataDto.getOwnerDto()));
+            Support support = supportService.insertOrUpdateSupport(convertToEntity(metadataDto.getSupportDto()));
 
-        Campaign campaign = convertToEntity(metadataDto.getCampaignDto());
-        campaign.setSurvey(survey);
-        campaign = campaignService.insertOrUpdateCampaign(campaign);
+            Source source = sourceService.insertOrUpdateSource(convertToEntity(metadataDto.getSourceDto()));
 
-        partitioning = convertToEntity(metadataDto.getPartitioningDto());
-        partitioning.setCampaign(campaign);
-        partitioning = partitioningService.insertOrUpdatePartitioning(partitioning);
+            Survey survey = convertToEntity(metadataDto.getSurveyDto());
+            survey.setSource(source);
+            survey = surveyService.insertOrUpdateSurvey(survey);
 
-        Set<Partitioning> partitionings = (campaign.getPartitionings() == null) ? new HashSet<>()
-                : campaign.getPartitionings();
-        partitionings.add(partitioning);
-        campaign.setPartitionings(partitionings);
-        campaignService.insertOrUpdateCampaign(campaign);
+            Campaign campaign = convertToEntity(metadataDto.getCampaignDto());
+            campaign.setSurvey(survey);
+            campaign = campaignService.insertOrUpdateCampaign(campaign);
 
-        Set<Campaign> campaigns = (survey.getCampaigns() == null) ? new HashSet<>()
-                : survey.getCampaigns();
-        campaigns.add(campaign);
-        survey.setCampaigns(campaigns);
-        surveyService.insertOrUpdateSurvey(survey);
+            Partitioning partitioning = convertToEntity(metadataDto.getPartitioningDto());
+            partitioning.setCampaign(campaign);
+            partitioning = partitioningService.insertOrUpdatePartitioning(partitioning);
 
-        Set<Survey> surveys = (source.getSurveys() == null) ? new HashSet<>()
-                : source.getSurveys();
-        surveys.add(survey);
-        source.setSurveys(surveys);
-        sourceService.insertOrUpdateSource(source);
-        return ResponseEntity.status(httpStatus).headers(responseHeaders).body(metadataDto);
-        }
-        catch (Exception e) {
+            Set<Partitioning> partitionings = (campaign.getPartitionings() == null) ? new HashSet<>()
+                    : campaign.getPartitionings();
+            partitionings.add(partitioning);
+            campaign.setPartitionings(partitionings);
+            campaign = campaignService.insertOrUpdateCampaign(campaign);
+
+            Set<Campaign> campaigns = (survey.getCampaigns() == null) ? new HashSet<>()
+                    : survey.getCampaigns();
+            campaigns.add(campaign);
+            survey.setCampaigns(campaigns);
+            survey = surveyService.insertOrUpdateSurvey(survey);
+
+            Set<Survey> surveys = (source.getSurveys() == null) ? new HashSet<>()
+                    : source.getSurveys();
+            surveys.add(survey);
+            source.setSurveys(surveys);
+            source.setOwner(owner);
+            source.setSupport(support);
+
+            source = sourceService.insertOrUpdateSource(source);
+
+            Set<Source> sourcesOwner = (owner.getSources() == null) ? new HashSet<>()
+                    : owner.getSources();
+            sourcesOwner.add(source);
+            owner.setSources(sourcesOwner);
+            owner = ownerService.insertOrUpdateOwner(owner);
+
+            Set<Source> sourcesSupport = (support.getSources() == null) ? new HashSet<>()
+                    : support.getSources();
+            sourcesSupport.add(source);
+            support.setSources(sourcesSupport);
+            support = supportService.insertOrUpdateSupport(support);
+
+            metadataReturn.setOwnerDto(convertToDto(owner));
+            metadataReturn.setSupportDto(convertToDto(support));
+            metadataReturn.setSourceDto(convertToDto(source));
+            metadataReturn.setSurveyDto(convertToDto(survey));
+            metadataReturn.setCampaignDto(convertToDto(campaign));
+            metadataReturn.setPartitioningDto(convertToDto(partitioning));
+
+            return ResponseEntity.status(httpStatus).headers(responseHeaders).body(metadataReturn);
+        } catch (Exception e) {
             log.error("Error in put metadata {}", metadataDto.toString());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
 
         }
 
+    }
+
+    private Support convertToEntity(SupportDto supportDto) {
+        return modelmapper.map(supportDto, Support.class);
+    }
+
+    private Owner convertToEntity(OwnerDto ownerDto) {
+        return modelmapper.map(ownerDto, Owner.class);
     }
 
     private Source convertToEntity(SourceDto sourceDto) {

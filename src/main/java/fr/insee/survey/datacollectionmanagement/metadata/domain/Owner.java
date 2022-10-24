@@ -20,6 +20,8 @@ public class Owner {
     private Long id;
 
     private String label;
+    private String ministry;
+    private String logo;
 
     @OneToMany
     @EqualsAndHashCode.Exclude
