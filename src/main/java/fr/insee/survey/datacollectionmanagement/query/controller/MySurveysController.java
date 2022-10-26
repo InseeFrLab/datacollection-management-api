@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,7 +20,6 @@ import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningAc
 import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningAccreditationService;
 
 @RestController
-@CrossOrigin
 public class MySurveysController {
 
     private static final String STROMAE_URL = "https://dev.insee.io/questionnaire/";
@@ -32,6 +31,9 @@ public class MySurveysController {
     private PartitioningService partitioningService;
 
     @GetMapping(value = "mySurveys/{id}")
+    @PreAuthorize("@AuthorizeMethodDecider.isInternalUser() "
+            + "|| @AuthorizeMethodDecider.isWebClient() "
+            + "|| @AuthorizeMethodDecider.isRespondent()")
     public List<MySurveyDto> findById(@PathVariable("id") String id) {
 
         List<MySurveyDto> listSurveys = new ArrayList<>();
@@ -47,7 +49,8 @@ public class MySurveysController {
                 surveyDto.setSurveyWording(survey.getLongWording());
                 surveyDto.setSurveyObjectives(survey.getLongObjectives());
                 surveyDto.setMonitoringDate(new Timestamp(part.get().getReturnDate().getTime()));
-                surveyDto.setAccessUrl(STROMAE_URL + part.get().getCampaign().getId() + "/unite-enquetee/" + identificationCode);
+                surveyDto.setAccessUrl(
+                        STROMAE_URL + part.get().getCampaign().getId() + "/unite-enquetee/" + identificationCode);
                 surveyDto.setIdentificationCode(identificationCode);
                 surveyDto.setMonitoringStatus(part.get().getStatus());
                 surveyDto.setMandatoryMySurveys(survey.getSource().isMandatoryMySurveys());

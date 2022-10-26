@@ -1,10 +1,10 @@
 package fr.insee.survey.datacollectionmanagement.query.controller;
 
-import java.util.List;
-import java.util.Map;
-
-import fr.insee.survey.datacollectionmanagement.query.dto.AccreditationDetailDto;
+import fr.insee.survey.datacollectionmanagement.constants.Constants;
 import fr.insee.survey.datacollectionmanagement.query.dto.MoogQuestioningEventDto;
+import fr.insee.survey.datacollectionmanagement.query.dto.MoogSearchDto;
+import fr.insee.survey.datacollectionmanagement.query.service.MoogService;
+import fr.insee.survey.datacollectionmanagement.view.domain.View;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -20,15 +20,18 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import fr.insee.survey.datacollectionmanagement.constants.Constants;
-import fr.insee.survey.datacollectionmanagement.query.dto.MoogSearchDto;
-import fr.insee.survey.datacollectionmanagement.query.service.MoogService;
-import fr.insee.survey.datacollectionmanagement.view.domain.View;
+import java.util.List;
+import java.util.Map;
 
 @RestController
-@CrossOrigin
+@PreAuthorize("@AuthorizeMethodDecider.isInternalUser() "
+        + "|| @AuthorizeMethodDecider.isWebClient() ")
 public class MoogController {
 
     static final Logger LOGGER = LoggerFactory.getLogger(MoogController.class);

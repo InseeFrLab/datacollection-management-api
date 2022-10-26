@@ -9,7 +9,7 @@
 	</parent>
 	<groupId>fr.insee.survey</groupId>
 	<artifactId>datacollection-management</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.1.5</version>
 	<name>datacollection-management</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
@@ -20,7 +20,7 @@
 		<jeasy-version>4.0.0</jeasy-version>
 		<javafaker-version>1.0.2</javafaker-version>
 		<testcontainers-version>1.15.3</testcontainers-version>
-		<orgjson-version>20090211</orgjson-version>
+		<orgjson-version>20211205</orgjson-version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -71,7 +71,21 @@
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 		</dependency>
-
+		<!-- SECURITY -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		<!-- Manage JSONObject and JSONArray -->
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>${orgjson-version}</version>
+		</dependency>
 		<!-- Manage JSON OBJECT -->
 		<dependency>
 			<groupId>com.vladmihalcea</groupId>
@@ -114,12 +128,7 @@
 			<artifactId>h2</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.json</groupId>
-			<artifactId>json</artifactId>
-			<version>${orgjson-version}</version>
-			<scope>test</scope>
-		</dependency>
+
 		<!-- Actuator Metrics -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -138,6 +147,14 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>build-info</id>
+						<goals>
+							<goal>build-info</goal>
+						</goals>
+					</execution>
+				</executions>
 				<configuration>
 					<excludes>
 						<exclude>

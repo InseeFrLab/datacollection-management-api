@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -14,7 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,13 +35,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
-@CrossOrigin
+@PreAuthorize("@AuthorizeMethodDecider.isInternalUser() "
+        + "|| @AuthorizeMethodDecider.isWebClient() ")
 @Tag(name = "1 - Contacts", description = "Enpoints to create, update, delete and find contacts")
+@Slf4j
 public class SearchContactController {
-
-    static final Logger LOGGER = LoggerFactory.getLogger(SearchContactController.class);
 
     @Autowired
     private SearchContactService searchContactService;
@@ -74,7 +73,7 @@ public class SearchContactController {
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize) {
 
-        LOGGER.info(
+        log.info(
                 "Search contact: identifier = {}, lastName= {}, firstName= {}, email= {}, idSu= {}, identificationCode= {}, identificationName= {}, source= {}, year= {}, period= {}, pageNo= {}, pageSize= {} ",
                 identifier, lastName, firstName, email, idSu, identificationCode, identificationName, source, year,
                 period, pageNo, pageSize);
