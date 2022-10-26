@@ -13,6 +13,7 @@ public class CorsGlobalConfig {
 
     @Autowired
     ApplicationConfig applicationConfig;
+
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
@@ -21,8 +22,8 @@ public class CorsGlobalConfig {
                 String ao = applicationConfig.getAllowedOrigin().isPresent() ? applicationConfig.getAllowedOrigin().get() : applicationConfig.getAllowedOrigin().orElse("*");
                 registry.addMapping("/**")
                         .allowedOrigins(ao)
-                        .allowedMethods("POST, GET, PUT, OPTIONS, DELETE")
-                        .allowedHeaders("Authorization, Origin, X-Requested-With, Content-Type, Accept")
+                        .allowedMethods("POST", "GET", "PUT", "OPTIONS", "DELETE")
+                        .allowedHeaders("Authorization", "Origin", "X-Requested-With", "Content-Type", "Accept")
                         .maxAge(3600);
             }
         };
