@@ -17,8 +17,6 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -59,12 +57,12 @@ import fr.insee.survey.datacollectionmanagement.questioning.repository.Questioni
 import fr.insee.survey.datacollectionmanagement.questioning.repository.SurveyUnitRepository;
 import fr.insee.survey.datacollectionmanagement.view.domain.View;
 import fr.insee.survey.datacollectionmanagement.view.repository.ViewRepository;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Profile("test")
+@Slf4j
 public class DataloaderTest {
-
-    private static final Logger LOGGER = LogManager.getLogger(DataloaderTest.class);
 
     @Autowired
     private ContactRepository contactRepository;
@@ -130,7 +128,7 @@ public class DataloaderTest {
 
         if (nbExistingOrders == 0) {
             // Creating table order
-            LOGGER.info("loading eventorder data");
+            log.info("loading eventorder data");
             orderRepository.saveAndFlush(
                     new EventOrder(Long.parseLong("8"), TypeQuestioningEvent.REFUSAL.toString().toString(), 8));
             orderRepository
@@ -155,7 +153,7 @@ public class DataloaderTest {
         createContactAddressAndEvents(4);
         createContactAddressAndEvents(5);
 
-        LOGGER.info(contactRepository.count() + " contacts exist in database");
+        log.info(contactRepository.count() + " contacts exist in database");
 
     }
 
@@ -166,7 +164,7 @@ public class DataloaderTest {
         Contact contact = createContact(i);
         contact.setAddress(address);
         createContactEvent(contact);
-        LOGGER.info("Contact created : {}", contact.toString());
+        log.info("Contact created : {}", contact.toString());
         contactRepository.save(contact);
     }
 
@@ -183,7 +181,7 @@ public class DataloaderTest {
             JsonNode node = mapper.readTree(json);
             contactEvent.setPayload(node);
         } catch (JsonProcessingException e) {
-            LOGGER.error("json error");
+            log.error("json error");
         }
         contactEventRepository.save(contactEvent);
         Set<ContactEvent> setContactEvents = new HashSet<>();
@@ -279,7 +277,7 @@ public class DataloaderTest {
 
                             Partitioning part = new Partitioning();
                             part.setId(sourceName + (year - j) + "T" + trimester + "00" + l);
-                            LOGGER.info("Part created : {}", part.getId());
+                            log.info("Part created : {}", part.getId());
                             Date openingDate = sdf.parse("01/01/" + year);
                             Date closingDate = sdf.parse("31/12/" + year);
                             Date returnDate = sdf.parse("01/06/" + year);
@@ -304,6 +302,7 @@ public class DataloaderTest {
                 }
                 source.setSurveys(setSurveys);
                 sourceRepository.save(source);
+                log.info("Source created : " + source.toString());
                 ownerInsee.setSources(setSourcesInsee);
                 ownerRepository.saveAll(Arrays.asList(new Owner[] {
                         ownerInsee }));
@@ -380,7 +379,7 @@ public class DataloaderTest {
             qu.setQuestioningEvents(qeList.stream().collect(Collectors.toSet()));
             qu.setQuestioningAccreditations(questioningAccreditations);
             questioningRepository.save(qu);
-            LOGGER.info("Questioning created : {}", qu.toString());
+            log.info("Questioning created : {}", qu.toString());
 
         }
     }
