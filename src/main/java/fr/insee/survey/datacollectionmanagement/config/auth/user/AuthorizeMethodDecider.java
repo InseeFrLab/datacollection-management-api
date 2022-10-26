@@ -1,21 +1,18 @@
 package fr.insee.survey.datacollectionmanagement.config.auth.user;
 
-
-import fr.insee.survey.datacollectionmanagement.config.ApplicationConfig;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import fr.insee.survey.datacollectionmanagement.config.ApplicationConfig;
+import lombok.extern.slf4j.Slf4j;
 
 @Component("AuthorizeMethodDecider")
+@Slf4j
 public class AuthorizeMethodDecider {
-
-    private static final Logger logger = LoggerFactory.getLogger(AuthorizeMethodDecider.class);
 
     private User noAuthUser;
 
@@ -29,7 +26,7 @@ public class AuthorizeMethodDecider {
         if (config.getAuthType().equals("OIDC")) {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             User currentUser = userProvider.getUser(authentication);
-            logger.info("id and roles user {},{}",currentUser.getId(),currentUser.getRoles());
+            log.info("id and roles user {},{}", currentUser.getId(), currentUser.getRoles());
             return currentUser;
         }
         return noAuthUser();
@@ -44,9 +41,8 @@ public class AuthorizeMethodDecider {
         roles.put("ROLE_offline_access");
         roles.put(config.getRoleAdmin());
         roles.put("ROLE_uma_authorization");
-        return new User("GUEST",roles);
+        return new User("GUEST", roles);
     }
-
 
     public boolean isInternalUser() throws JSONException {
         User user = getUser();
@@ -54,8 +50,9 @@ public class AuthorizeMethodDecider {
     }
 
     public boolean isInternalUser(User user) throws JSONException {
-        logger.info("Check if user is internal (admin, manager, helpdesk)");
-        return (hasRole(user,config.getRoleAdmin()) || hasRole(user,config.getRoleManager())|| hasRole(user,config.getRoleHelpdesk()) );
+        log.info("Check if user is internal (admin, manager, helpdesk)");
+        return (hasRole(user, config.getRoleAdmin()) || hasRole(user, config.getRoleManager())
+                || hasRole(user, config.getRoleHelpdesk()));
     }
 
     public boolean isWebClient() throws JSONException {
@@ -64,8 +61,8 @@ public class AuthorizeMethodDecider {
     }
 
     public boolean isWebClient(User user) throws JSONException {
-        logger.info("Check if user is webclient");
-        return hasRole(user,config.getRoleWebClient());
+        log.info("Check if user is webclient");
+        return hasRole(user, config.getRoleWebClient());
     }
 
     public boolean isRespondent() throws JSONException {
@@ -74,8 +71,8 @@ public class AuthorizeMethodDecider {
     }
 
     public boolean isRespondent(User user) throws JSONException {
-        logger.info("Check if user is respondent");
-        return hasRole(user,config.getRoleRespondent());
+        log.info("Check if user is respondent");
+        return hasRole(user, config.getRoleRespondent());
     }
 
     private boolean hasRole(User user, String role) throws JSONException {
@@ -88,6 +85,5 @@ public class AuthorizeMethodDecider {
         }
         return hasRole;
     }
-
 
 }

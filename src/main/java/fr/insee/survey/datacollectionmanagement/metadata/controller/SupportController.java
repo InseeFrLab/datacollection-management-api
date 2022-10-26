@@ -25,22 +25,19 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import fr.insee.survey.datacollectionmanagement.constants.Constants;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Support;
-import fr.insee.survey.datacollectionmanagement.metadata.domain.Source;
 import fr.insee.survey.datacollectionmanagement.metadata.dto.SupportDto;
-import fr.insee.survey.datacollectionmanagement.metadata.dto.SurveyDto;
 import fr.insee.survey.datacollectionmanagement.metadata.service.SupportService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @CrossOrigin
-@Log4j2
+@Slf4j
 @Tag(name = "3 - Metadata", description = "Enpoints to create, update, delete and find entities in metadata domain")
 public class SupportController {
 
@@ -112,7 +109,6 @@ public class SupportController {
         Support support = supportService.insertOrUpdateSupport(convertToEntity(supportDto));
         return ResponseEntity.status(httpStatus).headers(responseHeaders).body(convertToDto(support));
     }
-    
 
     private SupportDto convertToDto(Support support) {
         return modelmapper.map(support, SupportDto.class);
