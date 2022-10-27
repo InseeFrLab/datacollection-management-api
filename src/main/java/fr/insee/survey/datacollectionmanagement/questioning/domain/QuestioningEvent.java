@@ -16,6 +16,7 @@ import org.hibernate.annotations.TypeDef;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 
+import fr.insee.survey.datacollectionmanagement.questioning.util.TypeQuestioningEvent;
 import lombok.Data;
 
 @Entity

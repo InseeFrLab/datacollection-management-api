@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class MySurveyDto {
-    
+
     private String identificationCode;
     private String surveyWording;
     private String surveyObjectives;
@@ -16,6 +16,7 @@ public class MySurveyDto {
     private String monitoringStatus;
     private String accessUrl;
     private boolean mandatoryMySurveys;
-
+    private Timestamp questioningDate;
+    private String questioningStatus;
 
 }
