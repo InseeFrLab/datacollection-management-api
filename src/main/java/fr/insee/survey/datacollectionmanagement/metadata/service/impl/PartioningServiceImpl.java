@@ -37,39 +37,6 @@ public class PartioningServiceImpl implements PartitioningService {
 
     }
 
-    @Override
-    public PartitioningStatusEnum calculatePartitioningStatus(Partitioning partitioning) {
-        Date openingDate = partitioning.getOpeningDate();
-        Date closingDate = partitioning.getClosingDate();
-        Date returnDate = partitioning.getReturnDate();
-        Date today = new Date();
-        if (returnDate == null || closingDate == null || openingDate == null)
-            return PartitioningStatusEnum.INCOMPLETE_DATES;
-        else {
-            if (today.compareTo(openingDate) > 0 && today.compareTo(closingDate) < 0)
-                return PartitioningStatusEnum.OPEN;
-            if (today.compareTo(closingDate) > 0)
-                return PartitioningStatusEnum.CLOSED;
-            if (today.compareTo(openingDate) < 0 && today.compareTo(closingDate) < 0)
-                return PartitioningStatusEnum.FORTHCOMING;
-            return PartitioningStatusEnum.INCOMPLETE_DATES;
-        }
-
-    }
-
-    @Override
-    public Date calculatePartitioningDate(Partitioning part, PartitioningStatusEnum partitioningStatusEnum) {
-        switch (partitioningStatusEnum) {
-            case OPEN:
-                return part.getReturnDate();
-            case CLOSED:
-                return part.getReturnDate();
-            case FORTHCOMING:
-                return part.getOpeningDate();
-            default:
-                return null;
-        }
-    }
 
     @Override
     public void deletePartitioningById(String id) {

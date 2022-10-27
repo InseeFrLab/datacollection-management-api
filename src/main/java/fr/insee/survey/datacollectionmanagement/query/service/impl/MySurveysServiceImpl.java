@@ -16,7 +16,7 @@ import fr.insee.survey.datacollectionmanagement.metadata.domain.Partitioning;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Survey;
 import fr.insee.survey.datacollectionmanagement.metadata.service.PartitioningService;
 import fr.insee.survey.datacollectionmanagement.metadata.util.PartitioningStatusEnum;
-import fr.insee.survey.datacollectionmanagement.query.dto.MySurveyDto;
+import fr.insee.survey.datacollectionmanagement.query.dto.MyQuestioningDto;
 import fr.insee.survey.datacollectionmanagement.query.service.MySurveysService;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningAccreditation;
@@ -41,12 +41,12 @@ public class MySurveysServiceImpl implements MySurveysService {
     private QuestioningEventService questioningEventService;
 
     @Override
-    public List<MySurveyDto> getListMySurveys(String id) {
-        List<MySurveyDto> listSurveys = new ArrayList<>();
+    public List<MyQuestioningDto> getListMySurveys(String id) {
+        List<MyQuestioningDto> listSurveys = new ArrayList<>();
         List<QuestioningAccreditation> accreditations = questioningAccreditationService.findByContactIdentifier(id);
 
         for (QuestioningAccreditation questioningAccreditation : accreditations) {
-            MySurveyDto surveyDto = new MySurveyDto();
+            MyQuestioningDto surveyDto = new MyQuestioningDto();
             Questioning questioning = questioningAccreditation.getQuestioning();
             Optional<Partitioning> part = partitioningService.findById(questioning.getIdPartitioning());
             if (part.isPresent()) {
@@ -57,11 +57,10 @@ public class MySurveysServiceImpl implements MySurveysService {
                 surveyDto.setAccessUrl(
                         STROMAE_URL + part.get().getCampaign().getId() + "/unite-enquetee/" + surveyUnitId);
                 surveyDto.setIdentificationCode(surveyUnitId);
-                PartitioningStatusEnum partitioningStatusEnum = partitioningService
-                        .calculatePartitioningStatus(part.get());
-                Date monitoringDate = partitioningService.calculatePartitioningDate(part.get(), partitioningStatusEnum);
-                surveyDto.setMonitoringStatus(partitioningStatusEnum.getValue());
-                surveyDto.setMonitoringDate(monitoringDate == null ? null : new Timestamp(monitoringDate.getTime()));
+                surveyDto.setOpeningDate(new Timestamp(part.get().getOpeningDate().getTime()));
+                surveyDto.setClosingDate(new Timestamp(part.get().getClosingDate().getTime()));
+                surveyDto.setReturnDate(new Timestamp(part.get().getReturnDate().getTime()));
+
 
                 QuestioningEvent questioningEvent;
                 try {
@@ -69,7 +68,7 @@ public class MySurveysServiceImpl implements MySurveysService {
                     surveyDto.setQuestioningStatus(questioningEvent.getType().name());
                     surveyDto.setQuestioningDate(new Timestamp(questioningEvent.getDate().getTime()));
                 } catch (NoSuchElementException e) {
-                    LOGGER.info("No questiongEvents PARTIELINT or VALINT found for questioning {} for identifier {}",
+                    LOGGER.info("No questioningEvents found for questioning {} for identifier {}",
                             questioning.getId(), id);
                 }
 

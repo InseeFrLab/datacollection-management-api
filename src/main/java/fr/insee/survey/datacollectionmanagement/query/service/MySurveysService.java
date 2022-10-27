@@ -4,11 +4,11 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import fr.insee.survey.datacollectionmanagement.query.dto.MySurveyDto;
+import fr.insee.survey.datacollectionmanagement.query.dto.MyQuestioningDto;
 
 @Service
 public interface MySurveysService {
 
-    List<MySurveyDto> getListMySurveys(String id);
+    List<MyQuestioningDto> getListMySurveys(String id);
 
 }

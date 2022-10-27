@@ -12,6 +12,7 @@ import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningEv
 import fr.insee.survey.datacollectionmanagement.questioning.repository.QuestioningEventRepository;
 import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningEventService;
 import fr.insee.survey.datacollectionmanagement.questioning.util.LastQuestioningEventComparator;
+import fr.insee.survey.datacollectionmanagement.questioning.util.TypeQuestioningEvent;
 
 @Service
 public class QuestioningEventServiceImpl implements QuestioningEventService {
@@ -41,6 +42,11 @@ public class QuestioningEventServiceImpl implements QuestioningEventService {
     @Override
     public QuestioningEvent getLastQuestioningEvent(Questioning questioning) {
         List<QuestioningEvent> listQuestioningEvent = questioning.getQuestioningEvents().stream()
+                .filter(qe -> qe.getType().equals(TypeQuestioningEvent.PARTIELINT)
+                        || qe.getType().equals(TypeQuestioningEvent.HC)
+                        || qe.getType().equals(TypeQuestioningEvent.VALPAP)
+                        || qe.getType().equals(TypeQuestioningEvent.VALINT)
+                        || qe.getType().equals(TypeQuestioningEvent.REFUSAL))
                 .collect(Collectors.toList());
         Collections.sort(listQuestioningEvent, lastQuestioningEventComparator);
         return listQuestioningEvent.stream().findFirst().orElseThrow();
