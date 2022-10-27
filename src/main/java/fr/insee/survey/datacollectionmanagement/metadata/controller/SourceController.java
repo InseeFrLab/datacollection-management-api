@@ -2,7 +2,6 @@ package fr.insee.survey.datacollectionmanagement.metadata.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -123,12 +122,11 @@ public class SourceController {
                 ServletUriComponentsBuilder.fromCurrentRequest().buildAndExpand(sourceDto.getId()).toUriString());
         HttpStatus httpStatus;
 
-        try {
+        if (sourceService.findById(id).isPresent()) {
             log.warn("Update source with the id {}", sourceDto.getId());
             sourceService.findById(id);
             httpStatus = HttpStatus.OK;
-
-        } catch (NoSuchElementException e) {
+        } else {
             log.info("Create source with the id {}", sourceDto.getId());
             httpStatus = HttpStatus.CREATED;
         }
@@ -178,8 +176,7 @@ public class SourceController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
         }
     }
-    
-    
+
     @Operation(summary = "Search for surveys by the owner id")
     @GetMapping(value = Constants.API_OWNERS_ID_SOURCES, produces = "application/json")
     @ApiResponses(value = {

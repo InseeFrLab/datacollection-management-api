@@ -1,7 +1,6 @@
 package fr.insee.survey.datacollectionmanagement.metadata.controller;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -113,9 +112,7 @@ public class PartitioningController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("id and idPartitioning don't match");
         }
         Partitioning partitioning;
-        try {
-            campaignService.findById(partitioningDto.getCampaignId());
-        } catch (NoSuchElementException e) {
+        if (!campaignService.findById(partitioningDto.getCampaignId()).isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Campaign does not exist");
         }
         HttpHeaders responseHeaders = new HttpHeaders();
@@ -123,12 +120,11 @@ public class PartitioningController {
                 ServletUriComponentsBuilder.fromCurrentRequest().buildAndExpand(partitioningDto.getId()).toUriString());
         HttpStatus httpStatus;
 
-        try {
+        if (partitioningService.findById(id).isPresent()) {
             log.info("Update partitioning with the id {}", partitioningDto.getId());
             partitioningService.findById(id);
             httpStatus = HttpStatus.OK;
-
-        } catch (NoSuchElementException e) {
+        } else {
             log.info("Create partitioning with the id {}", partitioningDto.getId());
             httpStatus = HttpStatus.CREATED;
         }

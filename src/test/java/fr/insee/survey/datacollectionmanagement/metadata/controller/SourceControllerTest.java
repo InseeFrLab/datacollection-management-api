@@ -3,7 +3,6 @@ package fr.insee.survey.datacollectionmanagement.metadata.controller;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -11,7 +10,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.json.JSONException;
@@ -112,7 +110,6 @@ public class SourceControllerTest {
 
     }
 
-
     @Test
     public void putSourcesErrorId() throws Exception {
         String identifier = "NEWONE";
@@ -121,12 +118,13 @@ public class SourceControllerTest {
         String jsonSource = createJson(source);
         mockMvc.perform(put(Constants.API_SOURCES + "/" + otherIdentifier).content(jsonSource)
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest()).andExpect(content().string("id and source identifier don't match"));
+                .andExpect(status().isBadRequest()).andExpect(content().string("id and source id don't match"));
 
     }
 
     private Source initSource(String identifier) {
         Source sourceMock = new Source();
+        sourceMock.setId(identifier);
         sourceMock.setLongWording("Long wording about " + identifier);
         sourceMock.setShortWording("Short wording about " + identifier);
         sourceMock.setPeriodicity("T");
@@ -136,6 +134,7 @@ public class SourceControllerTest {
 
     private String createJson(Source source) throws JSONException {
         JSONObject jo = new JSONObject();
+        jo.put("id", source.getId());
         jo.put("longWording", source.getLongWording());
         jo.put("shortWording", source.getShortWording());
         jo.put("periodicity", source.getPeriodicity());

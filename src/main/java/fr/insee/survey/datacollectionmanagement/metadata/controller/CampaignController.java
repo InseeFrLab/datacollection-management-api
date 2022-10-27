@@ -1,7 +1,6 @@
 package fr.insee.survey.datacollectionmanagement.metadata.controller;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -39,7 +38,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
@@ -117,9 +115,7 @@ public class CampaignController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("id and idCampaign don't match");
         }
         Campaign campaign;
-        try {
-            surveyService.findById(campaignDto.getSurveyId());
-        } catch (NoSuchElementException e) {
+        if (!surveyService.findById(campaignDto.getSurveyId()).isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Survey does not exist");
         }
         HttpHeaders responseHeaders = new HttpHeaders();
@@ -127,12 +123,11 @@ public class CampaignController {
                 ServletUriComponentsBuilder.fromCurrentRequest().buildAndExpand(campaignDto.getId()).toUriString());
         HttpStatus httpStatus;
 
-        try {
+        if (campaignService.findById(id).isPresent()) {
             log.info("Update campaign with the id {}", campaignDto.getId());
             campaignService.findById(id);
             httpStatus = HttpStatus.OK;
-
-        } catch (NoSuchElementException e) {
+        } else {
             log.info("Create campaign with the id {}", campaignDto.getId());
             httpStatus = HttpStatus.CREATED;
         }

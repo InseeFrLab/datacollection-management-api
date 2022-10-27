@@ -2,7 +2,6 @@ package fr.insee.survey.datacollectionmanagement.metadata.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -123,12 +122,11 @@ public class SurveyController {
                 ServletUriComponentsBuilder.fromCurrentRequest().buildAndExpand(surveyDto.getId()).toUriString());
         HttpStatus httpStatus;
 
-        try {
-            surveyService.findById(id);
+        if (surveyService.findById(id).isPresent()) {
             log.info("Update survey with the id {}", surveyDto.getId());
             httpStatus = HttpStatus.OK;
 
-        } catch (NoSuchElementException e) {
+        } else {
             log.info("Creating survey with the id {}", surveyDto.getId());
             httpStatus = HttpStatus.CREATED;
         }

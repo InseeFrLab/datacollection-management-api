@@ -109,12 +109,13 @@ public class SurveyControllerTest {
         String jsonSurvey = createJson(survey);
         mockMvc.perform(put(Constants.API_SURVEYS + "/" + otherIdentifier).content(jsonSurvey)
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest()).andExpect(content().string("id and survey identifier don't match"));
+                .andExpect(status().isBadRequest()).andExpect(content().string("id and idSurvey don't match"));
 
     }
 
     private Survey initSurvey(String identifier) {
         Survey surveyMock = new Survey();
+        surveyMock.setId(identifier);
         surveyMock.setLongWording("Long wording about " + identifier);
         surveyMock.setShortWording("Short wording about " + identifier);
         surveyMock.setSampleSize(1000);
@@ -123,6 +124,7 @@ public class SurveyControllerTest {
 
     private String createJson(Survey survey) throws JSONException {
         JSONObject jo = new JSONObject();
+        jo.put("id", survey.getId());
         jo.put("longWording", survey.getLongWording());
         jo.put("shortWording", survey.getShortWording());
         jo.put("sampleSize", survey.getSampleSize());
