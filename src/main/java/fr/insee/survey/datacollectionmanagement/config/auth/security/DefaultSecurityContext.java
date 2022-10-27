@@ -29,7 +29,7 @@ public class DefaultSecurityContext {
     protected SecurityFilterChain configure(HttpSecurity http) throws Exception {
         http.sessionManagement().disable();
         http.cors(withDefaults())
-
+                .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/csrf", "/", "/webjars/**", "/swagger-resources/**").permitAll()
                 .antMatchers("/environnement").permitAll()// PublicResources
