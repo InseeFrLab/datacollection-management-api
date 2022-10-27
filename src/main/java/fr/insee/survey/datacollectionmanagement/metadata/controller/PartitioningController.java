@@ -43,7 +43,6 @@ import lombok.extern.slf4j.Slf4j;
         + "|| @AuthorizeMethodDecider.isWebClient() ")
 @Tag(name = "3 - Metadata", description = "Enpoints to create, update, delete and find entities in metadata domain")
 @Slf4j
-@Tag(name = "3 - Metadata", description = "Enpoints to create, update, delete and find entities in metadata domain")
 public class PartitioningController {
 
     @Autowired
