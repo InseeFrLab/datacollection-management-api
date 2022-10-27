@@ -363,7 +363,7 @@ public class Dataloader {
             String animalName = StringUtils.trim(animal.name().toUpperCase());
             if ( !StringUtils.contains(animalName, " ") && sourceRepository.findById(animalName).isEmpty()) {
 
-                source.setIdSource(animalName);
+                source.setId(animalName);
                 source.setLongWording("Have you ever heard about " + animalName + " ?");
                 source.setShortWording("Source about " + animalName);
                 source.setPeriodicity("M");
@@ -404,7 +404,7 @@ public class Dataloader {
                         String period = "M" + month;
                         campaign.setYear(year - j);
                         campaign.setPeriod(period);
-                        campaign.setCampaignId(animalName + (year - j) + period);
+                        campaign.setId(animalName + (year - j) + period);
                         campaign.setCampaignWording("Campaign about " + animalName + " in " + (year - j) + " and period " + period);
                         setCampaigns.add(campaign);
                         campaignRepository.save(campaign);
@@ -638,7 +638,7 @@ public class Dataloader {
                 Partitioning p = partitioningRepository.findById(a.getQuestioning().getIdPartitioning()).orElse(null);
                 View view = new View();
                 view.setIdentifier(contactRepository.findById(a.getIdContact()).orElse(null).getIdentifier());
-                view.setCampaignId(p.getCampaign().getCampaignId());
+                view.setCampaignId(p.getCampaign().getId());
                 view.setIdSu(a.getQuestioning().getSurveyUnit().getIdSu());
                 viewRepository.save(view);
             });

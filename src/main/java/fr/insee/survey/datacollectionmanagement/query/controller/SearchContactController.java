@@ -1,5 +1,23 @@
 package fr.insee.survey.datacollectionmanagement.query.controller;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import fr.insee.survey.datacollectionmanagement.constants.Constants;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Partitioning;
 import fr.insee.survey.datacollectionmanagement.metadata.service.PartitioningService;
@@ -17,32 +35,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @PreAuthorize("@AuthorizeMethodDecider.isInternalUser() "
         + "|| @AuthorizeMethodDecider.isWebClient() ")
 @Tag(name = "1 - Contacts", description = "Enpoints to create, update, delete and find contacts")
+@Slf4j
 public class SearchContactController {
-
-    static final Logger LOGGER = LoggerFactory.getLogger(SearchContactController.class);
 
     @Autowired
     private SearchContactService searchContactService;
@@ -73,7 +73,7 @@ public class SearchContactController {
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize) {
 
-        LOGGER.info(
+        log.info(
                 "Search contact: identifier = {}, lastName= {}, firstName= {}, email= {}, idSu= {}, identificationCode= {}, identificationName= {}, source= {}, year= {}, period= {}, pageNo= {}, pageSize= {} ",
                 identifier, lastName, firstName, email, idSu, identificationCode, identificationName, source, year,
                 period, pageNo, pageSize);
@@ -115,12 +115,12 @@ public class SearchContactController {
         List<QuestioningAccreditation> accreditations = questioningAccreditationService.findByContactIdentifier(id);
         for (QuestioningAccreditation questioningAccreditation : accreditations) {
             Questioning questioning = questioningAccreditation.getQuestioning();
-            Partitioning part = partitioningService.findById(questioning.getIdPartitioning());
+            Optional<Partitioning> part = partitioningService.findById(questioning.getIdPartitioning());
 
-            listAccreditations.add(new AccreditationDetailDto(part.getCampaign().getSurvey().getSource().getIdSource(),
-                    part.getCampaign().getSurvey().getSource().getShortWording(),
-                    part.getCampaign().getSurvey().getYear(), part.getCampaign().getPeriod(),
-                    part.getId(), questioningAccreditation.getQuestioning().getSurveyUnit().getIdSu(),
+            listAccreditations.add(new AccreditationDetailDto(part.get().getCampaign().getSurvey().getSource().getId(),
+                    part.get().getCampaign().getSurvey().getSource().getShortWording(),
+                    part.get().getCampaign().getSurvey().getYear(), part.get().getCampaign().getPeriod(),
+                    part.get().getId(), questioningAccreditation.getQuestioning().getSurveyUnit().getIdSu(),
                     questioningAccreditation.getQuestioning().getSurveyUnit().getIdentificationName(),
                     questioningAccreditation.isMain()));
 

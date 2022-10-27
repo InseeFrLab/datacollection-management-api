@@ -30,9 +30,9 @@ public interface QuestioningAccreditationRepository extends JpaRepository<Questi
             +" join metadata_copy mc on mc.id_partitioning = q.id_partitioning                                                                          ";
 
 
-    static final String QUERY_SOURCE_YEAR_PERIOD = FIND_METADATA_COPY + " where mc.id_source = ?1 and mc.year_value = ?2 and mc.period_value = ?3 ";
+    static final String QUERY_SOURCE_YEAR_PERIOD = FIND_METADATA_COPY + " where mc.id = ?1 and mc.year_value = ?2 and mc.period_value = ?3 ";
 
-    static final String QUERY_SOURCE = FIND_METADATA_COPY + " where mc.id_source = ?1 ";
+    static final String QUERY_SOURCE = FIND_METADATA_COPY + " where mc.id = ?1 ";
 
     static final String QUERY_YEAR = FIND_METADATA_COPY + " where mc.year_value = ?1  ";
 

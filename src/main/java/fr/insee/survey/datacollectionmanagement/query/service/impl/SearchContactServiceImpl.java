@@ -19,8 +19,10 @@ import fr.insee.survey.datacollectionmanagement.questioning.domain.SurveyUnit;
 import fr.insee.survey.datacollectionmanagement.questioning.service.SurveyUnitService;
 import fr.insee.survey.datacollectionmanagement.view.domain.View;
 import fr.insee.survey.datacollectionmanagement.view.service.ViewService;
+import lombok.EqualsAndHashCode;
 
 @Service
+@EqualsAndHashCode
 public class SearchContactServiceImpl implements SearchContactService {
 
     @Autowired
@@ -33,6 +35,7 @@ public class SearchContactServiceImpl implements SearchContactService {
     private CampaignService campaignService;
 
     @Autowired
+    @EqualsAndHashCode.Exclude
     private ViewService viewService;;
 
     @Override
@@ -74,7 +77,7 @@ public class SearchContactServiceImpl implements SearchContactService {
                 List<Campaign> listCampains = campaignService.findbySourceYearPeriod(source, Integer.parseInt(year),
                         period);
                 for (Campaign campain : listCampains) {
-                    listView.addAll(viewService.findViewByCampaignId(campain.getCampaignId()));
+                    listView.addAll(viewService.findViewByCampaignId(campain.getId()));
                 }
 
                 alwaysEmpty = false;
@@ -85,7 +88,7 @@ public class SearchContactServiceImpl implements SearchContactService {
                 for (Campaign c : listCampains) {
                     listViewC
                             .addAll(listView.stream()
-                                    .filter(v -> viewService.findViewByCampaignId(c.getCampaignId()).contains(v))
+                                    .filter(v -> viewService.findViewByCampaignId(c.getId()).contains(v))
                                     .collect(Collectors.toList()));
                 }
                 listView = listViewC;
@@ -95,7 +98,7 @@ public class SearchContactServiceImpl implements SearchContactService {
             if (listView.isEmpty() && alwaysEmpty) {
                 List<Campaign> listCampains = campaignService.findbySourcePeriod(source, period);
                 for (Campaign campain : listCampains) {
-                    listView.addAll(viewService.findViewByCampaignId(campain.getCampaignId()));
+                    listView.addAll(viewService.findViewByCampaignId(campain.getId()));
                 }
 
                 alwaysEmpty = false;
@@ -105,7 +108,7 @@ public class SearchContactServiceImpl implements SearchContactService {
                 for (Campaign c : listCampains) {
                     listViewC
                             .addAll(listView.stream()
-                                    .filter(v -> viewService.findViewByCampaignId(c.getCampaignId()).contains(v))
+                                    .filter(v -> viewService.findViewByCampaignId(c.getId()).contains(v))
                                     .collect(Collectors.toList()));
                 }
                 listView = listViewC;

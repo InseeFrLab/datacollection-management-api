@@ -2,30 +2,43 @@ package fr.insee.survey.datacollectionmanagement.metadata.domain;
 
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Entity
-@Getter
-@Setter
+@Data
 public class Source {
-    
+
     @Id
-    private String idSource;
+    private String id;
     private String longWording;
     private String shortWording;
+    @NotNull
     private String periodicity;
-    private Boolean mandatoryMySurveys;
-    
-    @OneToMany
-    @JsonBackReference
+    @NotNull
+    private boolean mandatoryMySurveys;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Set<Survey> surveys;
-    
+
+    @OneToOne
+    @NotNull
+    private Owner owner;
+
+    @OneToOne
+    @NotNull
+    private Support support;
 
 }

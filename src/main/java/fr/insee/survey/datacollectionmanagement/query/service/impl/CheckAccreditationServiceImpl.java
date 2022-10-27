@@ -14,7 +14,7 @@ public class CheckAccreditationServiceImpl implements CheckAccreditationService 
 
     @Override
     public boolean checkAccreditation(String identifier, String idSu, String campaignId) {
-        return !viewService.findViewByIdentifierIdSuCampaignId(identifier, idSu, campaignId).isEmpty();
+        return viewService.countViewByIdentifierIdSuCampaignId(identifier, idSu, campaignId) != 0;
     }
 
 }

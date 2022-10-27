@@ -33,8 +33,8 @@ public interface ViewRepository extends PagingAndSortingRepository<View, Long> {
     List<View> findByIdSu(String idSu);
 
     List<View> findByIdSuContaining(String field);
-
-    List<View> findViewByIdentifierAndIdSuAndCampaignId(String identifier, String idSu, String campaignId);
+  
+    Long countViewByIdentifierAndIdSuAndCampaignId(String identifier, String idSu, String campaignId);
 
     List<View> findByIdentifierContainingAndIdSuNotNull(String identifier);
 

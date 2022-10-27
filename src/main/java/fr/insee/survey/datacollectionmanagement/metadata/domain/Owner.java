@@ -7,21 +7,25 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Entity
-@Getter
-@Setter
+@Data
 public class Owner {
-    
+
     @Id
     @GeneratedValue
     private Long id;
-    
+
     private String label;
-    
+    private String ministry;
+    private String logo;
+
     @OneToMany
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Set<Source> sources;
 
 }

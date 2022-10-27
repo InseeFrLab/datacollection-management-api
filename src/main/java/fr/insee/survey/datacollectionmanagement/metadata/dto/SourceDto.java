@@ -7,9 +7,10 @@ import lombok.Setter;
 @Setter
 public class SourceDto {
 
-    private String idSource;
+    private String id;
     private String longWording;
     private String shortWording;
     private String periodicity;
+    private boolean mandatoryMySurveys;
 
 }

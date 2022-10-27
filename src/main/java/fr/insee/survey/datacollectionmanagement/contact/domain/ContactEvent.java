@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -14,12 +15,12 @@ import org.hibernate.annotations.TypeDef;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Entity
-@Getter
-@Setter
+@Data
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class ContactEvent {
 
@@ -30,12 +31,16 @@ public class ContactEvent {
     @Id
     @GeneratedValue
     private Long id;
-
+    @NotNull
     private Date eventDate;
+    @NotNull
+    private ContactEventType type;
 
     @ManyToOne
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Contact contact;
-    private ContactEventType type;
+
     @Type(type = "jsonb")
     @Column(columnDefinition = "jsonb")
     private JsonNode payload;

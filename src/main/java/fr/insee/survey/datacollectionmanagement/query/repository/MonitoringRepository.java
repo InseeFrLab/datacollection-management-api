@@ -19,19 +19,19 @@ public class MonitoringRepository {
     JdbcTemplate jdbcTemplate;
 
     final String progressQuery = "SELECT COUNT(survey_unit_id_su) as total,status,batch_num FROM\n" +
-            "(SELECT DISTINCT ON (survey_unit_id_su) survey_unit_id_su,status,event_order,batch_num FROM (SELECT event_order, campaign_campaign_id, C.status, batch_num, survey_unit_id_su FROM (SELECT campaign_campaign_id, type as status, id_partitioning as batch_num, survey_unit_id_su  FROM\n" +
+            "(SELECT DISTINCT ON (survey_unit_id_su) survey_unit_id_su,status,event_order,batch_num FROM (SELECT event_order, campaign_id, C.status, batch_num, survey_unit_id_su FROM (SELECT campaign_id, type as status, id_partitioning as batch_num, survey_unit_id_su  FROM\n" +
             "(select survey_unit_id_su, id_partitioning, questioning_id, type from questioning_event JOIN questioning ON questioning_event.questioning_id=questioning.id) As A\n" +
             "JOIN partitioning ON partitioning.id=A.id_partitioning\n" +
-            "WHERE campaign_campaign_id=?) AS C JOIN event_order ON event_order.status = C.status\n" +
+            "WHERE campaign_id=?) AS C JOIN event_order ON event_order.status = C.status\n" +
             "ORDER BY survey_unit_id_su,event_order DESC) AS G) AS M\n" +
             "GROUP BY status,batch_num";
 
     final String followUpQuery = "SELECT COUNT(A.survey_unit_id_su) as nb, id_partitioning as batch_num, freq FROM\n" +
-            " (SELECT questioning.id, id_partitioning, survey_unit_id_su, campaign_campaign_id FROM questioning JOIN partitioning ON questioning.id_partitioning=partitioning.id\n" +
-            " WHERE campaign_campaign_id=?) AS A LEFT JOIN(SELECT COUNT(type) as freq, survey_unit_id_su FROM(SELECT survey_unit_id_su, id_partitioning, questioning_id, type, campaign_campaign_id FROM\n" +
+            " (SELECT questioning.id, id_partitioning, survey_unit_id_su, campaign_id FROM questioning JOIN partitioning ON questioning.id_partitioning=partitioning.id\n" +
+            " WHERE campaign_id=?) AS A LEFT JOIN(SELECT COUNT(type) as freq, survey_unit_id_su FROM(SELECT survey_unit_id_su, id_partitioning, questioning_id, type, campaign_id FROM\n" +
             " (select survey_unit_id_su, id_partitioning, questioning_id, type from questioning_event JOIN questioning ON questioning_event.questioning_id=questioning.id) As A\n" +
             " JOIN partitioning ON partitioning.id=A.id_partitioning\n" +
-            " WHERE type='FOLLOWUP' AND campaign_campaign_id=?) AS B\n" +
+            " WHERE type='FOLLOWUP' AND campaign_id=?) AS B\n" +
             " GROUP BY survey_unit_id_su) AS G ON G.survey_unit_id_su=A.survey_unit_id_su\n" +
             " GROUP BY batch_num, freq";
 

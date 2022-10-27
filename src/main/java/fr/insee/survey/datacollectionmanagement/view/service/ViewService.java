@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import fr.insee.survey.datacollectionmanagement.metadata.domain.Campaign;
 import fr.insee.survey.datacollectionmanagement.view.domain.View;
 
 @Service
@@ -18,8 +19,8 @@ public interface ViewService {
     List<View> findViewByCampaignId(String campaignId);
 
     List<View> findViewByIdSu(String idSu);
-
-    List<View> findViewByIdentifierIdSuCampaignId(String identifier, String idSu, String campaignId);
+    
+    Long countViewByIdentifierIdSuCampaignId(String identifier, String idSu, String campaignId);
 
     List<View> findByIdentifierContainingAndIdSuNotNull(String identifier);
 
@@ -30,6 +31,9 @@ public interface ViewService {
     void deleteView(View view);
 
     void deleteViewByIdentifier(String identifier);
+
+    int deleteViewsOfOneCampaign(Campaign campaign);
+
 
    
 }

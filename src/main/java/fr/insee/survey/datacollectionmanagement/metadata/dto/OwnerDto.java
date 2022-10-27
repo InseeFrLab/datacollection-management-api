@@ -9,5 +9,7 @@ public class OwnerDto {
 
     private Long id;
     private String label;
+    private String ministry;
+    private String logo;
 
 }

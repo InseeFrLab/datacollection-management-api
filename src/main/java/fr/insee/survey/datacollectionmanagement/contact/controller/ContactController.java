@@ -6,7 +6,9 @@ import fr.insee.survey.datacollectionmanagement.contact.domain.Contact.Gender;
 import fr.insee.survey.datacollectionmanagement.contact.dto.ContactDto;
 import fr.insee.survey.datacollectionmanagement.contact.service.AddressService;
 import fr.insee.survey.datacollectionmanagement.contact.service.ContactService;
+import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
 import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningAccreditationService;
+import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningService;
 import fr.insee.survey.datacollectionmanagement.view.service.ViewService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -51,6 +53,9 @@ public class ContactController {
     private ViewService viewService;
 
     @Autowired
+    private QuestioningService questioningService;
+
+    @Autowired
     private QuestioningAccreditationService questioningAccreditationService;
 
     @Autowired
@@ -59,16 +64,16 @@ public class ContactController {
     @Operation(summary = "Search for contacts, paginated")
     @GetMapping(value = Constants.API_CONTACTS_ALL, produces = "application/json")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ContactPage.class)))
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ContactPage.class)))
     })
     public ResponseEntity<?> getContacts(
-        @RequestParam(defaultValue = "0") Integer page,
-        @RequestParam(defaultValue = "20") Integer size,
-        @RequestParam(defaultValue = "identifier") String sort) {
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "20") Integer size,
+            @RequestParam(defaultValue = "identifier") String sort) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
         Page<Contact> pageC = contactService.findAll(pageable);
         List<ContactDto> listC = pageC.stream().map(c -> convertToDto(c)).collect(Collectors.toList());
-        return ResponseEntity.ok().body(new ContactPage(listC, pageable,pageC.getTotalElements()));
+        return ResponseEntity.ok().body(new ContactPage(listC, pageable, pageC.getTotalElements()));
     }
 
     @Operation(summary = "Search for a contact by its id")
@@ -77,19 +82,18 @@ public class ContactController {
             + "|| @AuthorizeMethodDecider.isWebClient() "
             + "|| @AuthorizeMethodDecider.isRespondent()")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ContactDto.class))),
-        @ApiResponse(responseCode = "404", description = "Not found"), @ApiResponse(responseCode = "400", description = "Bad Request")
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ContactDto.class))),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "400", description = "Bad Request")
     })
     public ResponseEntity<?> getContact(@PathVariable("id") String id) {
         Contact contact = null;
         try {
             contact = contactService.findByIdentifier(StringUtils.upperCase(id));
             return ResponseEntity.ok().body(convertToDto(contact));
-        }
-        catch (NoSuchElementException e) {
+        } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Contact does not exist");
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
         }
 
@@ -101,9 +105,9 @@ public class ContactController {
             + "|| @AuthorizeMethodDecider.isWebClient() "
             + "|| @AuthorizeMethodDecider.isRespondent()")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ContactDto.class))),
-        @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = ContactDto.class))),
-        @ApiResponse(responseCode = "400", description = "Bad request")
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ContactDto.class))),
+            @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = ContactDto.class))),
+            @ApiResponse(responseCode = "400", description = "Bad request")
     })
     public ResponseEntity<?> putContact(@PathVariable("id") String id, @RequestBody ContactDto contactDto) {
         if (StringUtils.isBlank(contactDto.getIdentifier()) || !contactDto.getIdentifier().equalsIgnoreCase(id)) {
@@ -111,25 +115,25 @@ public class ContactController {
         }
         Contact contact;
         HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set(HttpHeaders.LOCATION, ServletUriComponentsBuilder.fromCurrentRequest().buildAndExpand(contactDto.getIdentifier()).toUriString());
+        responseHeaders.set(HttpHeaders.LOCATION, ServletUriComponentsBuilder.fromCurrentRequest()
+                .buildAndExpand(contactDto.getIdentifier()).toUriString());
 
         try {
             contact = convertToEntity(contactDto);
-
-        }
-        catch (ParseException e) {
+        } catch (ParseException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Impossible to parse contact");
-        }
-        catch (NoSuchElementException e) {
+        } catch (NoSuchElementException e) {
             LOGGER.info("Creating contact with the identifier {}", contactDto.getIdentifier());
             contact = convertToEntityNewContact(contactDto);
-            if (contactDto.getAddress() != null) contact.setAddress(addressService.convertToEntity(contactDto.getAddress()));
+            if (contactDto.getAddress() != null)
+                contact.setAddress(addressService.convertToEntity(contactDto.getAddress()));
             Contact contactCreate = contactService.createContactAddressEvent(contact);
             viewService.createView(id, null, null);
             return ResponseEntity.status(HttpStatus.CREATED).headers(responseHeaders).body(convertToDto(contactCreate));
 
         }
-        if (contactDto.getAddress() != null) contact.setAddress(addressService.convertToEntity(contactDto.getAddress()));
+        if (contactDto.getAddress() != null)
+            contact.setAddress(addressService.convertToEntity(contactDto.getAddress()));
         Contact contactUpdate = contactService.updateContactAddressEvent(contact);
         return ResponseEntity.ok().headers(responseHeaders).body(convertToDto(contactUpdate));
     }
@@ -137,24 +141,29 @@ public class ContactController {
     @Operation(summary = "Delete a contact, its address, its contactEvents and its accreditations")
     @DeleteMapping(value = Constants.API_CONTACTS_ID)
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "204", description = "No Content"), @ApiResponse(responseCode = "404", description = "Not found"),
-        @ApiResponse(responseCode = "400", description = "Bad Request")
+            @ApiResponse(responseCode = "204", description = "No Content"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "400", description = "Bad Request")
     })
     @Transactional
     public ResponseEntity<?> deleteContact(@PathVariable("id") String id) {
         try {
             Contact contact = contactService.findByIdentifier(id);
             contactService.deleteContactAddressEvent(contact);
-            
-            viewService.findViewByIdentifier(id).stream().forEach(c-> viewService.deleteView(c));
-            questioningAccreditationService.findByContactIdentifier(id).stream().forEach(c-> questioningAccreditationService.deleteAccreditation(c));
+
+            viewService.findViewByIdentifier(id).stream().forEach(c -> viewService.deleteView(c));
+            questioningAccreditationService.findByContactIdentifier(id).stream().forEach(acc -> {
+                Questioning questioning = questioningService.findbyId(acc.getQuestioning().getId());
+                questioning.getQuestioningAccreditations().remove(acc);
+                questioningService.saveQuestioning(questioning);
+                questioningAccreditationService.deleteAccreditation(acc);
+
+            });
 
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Contact deleted");
-        }
-        catch (NoSuchElementException e) {
+        } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Contact does not exist");
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
         }
     }

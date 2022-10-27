@@ -8,6 +8,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Entity
 @Data
@@ -18,8 +20,17 @@ public class Support {
     private Long id;
 
     private String label;
+    private String phoneNumber;
+    private String mail;
+    private String countryName;
+    private String streetNumber;
+    private String streetName;
+    private String city;
+    private String zipCode; 
 
     @OneToMany
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Set<Source> sources;
 
 }

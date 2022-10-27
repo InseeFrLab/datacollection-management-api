@@ -2,6 +2,7 @@ package fr.insee.survey.datacollectionmanagement.metadata.service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +16,7 @@ public interface CampaignService {
     
     Collection<CampaignMoogDto> getCampaigns();
 
-    Campaign findById(String idCampaign);
+    Optional<Campaign> findById(String idCampaign);
 
     List<Campaign> findbyPeriod(String period);
 
@@ -25,6 +26,8 @@ public interface CampaignService {
 
     Page<Campaign> findAll(Pageable pageable);
 
-    Campaign updateCampaign(Campaign campaign);
+    Campaign insertOrUpdateCampaign(Campaign campaign);
+
+    void deleteCampaignById(String id);
 
 }

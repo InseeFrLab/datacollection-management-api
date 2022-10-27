@@ -3,6 +3,9 @@ package fr.insee.survey.datacollectionmanagement.config.auth.security;
 import fr.insee.survey.datacollectionmanagement.config.ApplicationConfig;
 import fr.insee.survey.datacollectionmanagement.config.auth.user.User;
 import fr.insee.survey.datacollectionmanagement.config.auth.user.UserProvider;
+import fr.insee.survey.datacollectionmanagement.metadata.controller.SourceController;
+import lombok.extern.slf4j.Slf4j;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +29,8 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled=true, prePostEnabled = true)
 @ConditionalOnProperty(name = "fr.insee.datacollectionmanagement.auth.mode", havingValue = "OIDC")
+@Slf4j
 public class OpenIDConnectSecurityContext  {
-
-    private static final Logger logger = LoggerFactory.getLogger(OpenIDConnectSecurityContext.class);
-
 
     @Autowired
     ApplicationConfig config;
@@ -63,7 +64,7 @@ public class OpenIDConnectSecurityContext  {
             final Jwt jwt = (Jwt) auth.getPrincipal();
             List<String> tryRoles = jwt.getClaimAsStringList(config.getRoleClaim());
             String tryId=jwt.getClaimAsString(config.getIdClaim());
-            logger.info("Current User is {},  with roles {}",tryId,tryRoles);
+            log.info("Current User is {},  with roles {}",tryId,tryRoles);
             return new User(tryId, tryRoles);
         };
     }

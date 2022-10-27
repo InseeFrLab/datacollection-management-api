@@ -1,5 +1,22 @@
 package fr.insee.survey.datacollectionmanagement.query.controller;
 
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
 import fr.insee.survey.datacollectionmanagement.constants.Constants;
 import fr.insee.survey.datacollectionmanagement.metadata.service.PartitioningService;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
@@ -14,28 +31,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.apache.commons.lang3.StringUtils;
-import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @PreAuthorize("@AuthorizeMethodDecider.isInternalUser() "
         + "|| @AuthorizeMethodDecider.isWebClient() ")
+@Slf4j
 @Tag(name = "2 - Questioning", description = "Enpoints to create, update, delete and find entities around the questionings")
 public class QuestioningController {
-
-    static final Logger LOGGER = LoggerFactory.getLogger(QuestioningController.class);
 
     @Autowired
     private QuestioningService questioningService;
@@ -63,6 +66,7 @@ public class QuestioningController {
             questioning = questioningService.findbyId(id);
             return new ResponseEntity<>(convertToDto(questioning), HttpStatus.OK);
         } catch (NoSuchElementException e) {
+            log.warn("Questioning {} does not exist", id);
             return new ResponseEntity<>("Not Found", HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<String>("Error", HttpStatus.BAD_REQUEST);
@@ -80,11 +84,11 @@ public class QuestioningController {
         try {
             su = surveyUnitService.findbyId(questioningDto.getSurveyUnitId());
         } catch (NoSuchElementException e) {
+            log.warn("survey unit {} does not exist", questioningDto.getSurveyUnitId());
             return new ResponseEntity<>("survey unit does not exist", HttpStatus.NOT_FOUND);
         }
-        try {
-            partitioningService.findById(questioningDto.getIdPartitioning());
-        } catch (NoSuchElementException e) {
+        if (!partitioningService.findById(questioningDto.getIdPartitioning()).isPresent()) {
+            log.warn("partitioning {} does not exist", questioningDto.getIdPartitioning());
             return new ResponseEntity<>("partitioning does not exist", HttpStatus.NOT_FOUND);
         }
         Questioning questioning = convertToEntity(questioningDto);
@@ -113,7 +117,8 @@ public class QuestioningController {
                     surveyUnit.getQuestionings().stream().map(q -> convertToDto(q)).collect(Collectors.toList()),
                     HttpStatus.OK);
         } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("survey unit not found");
+            log.warn("survey unit {} does not exist", id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("survey unit does not exist");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
         }

@@ -8,6 +8,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Entity
 @Data
@@ -20,5 +22,7 @@ public class OperatorService {
     private String mail;
 
     @OneToMany
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Set<Operator> operators;
 }

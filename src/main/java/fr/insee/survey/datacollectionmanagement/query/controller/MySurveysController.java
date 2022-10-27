@@ -1,5 +1,16 @@
 package fr.insee.survey.datacollectionmanagement.query.controller;
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Partitioning;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Survey;
 import fr.insee.survey.datacollectionmanagement.metadata.service.PartitioningService;
@@ -7,15 +18,6 @@ import fr.insee.survey.datacollectionmanagement.query.dto.MySurveyDto;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningAccreditation;
 import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningAccreditationService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 public class MySurveysController {
@@ -40,17 +42,18 @@ public class MySurveysController {
         for (QuestioningAccreditation questioningAccreditation : accreditations) {
             MySurveyDto surveyDto = new MySurveyDto();
             Questioning questioning = questioningAccreditation.getQuestioning();
-            Partitioning part = partitioningService.findById(questioning.getIdPartitioning());
-            if (part != null) {
-                Survey survey = part.getCampaign().getSurvey();
+            Optional<Partitioning> part = partitioningService.findById(questioning.getIdPartitioning());
+            if (part.isPresent() && !part.isEmpty()) {
+                Survey survey = part.get().getCampaign().getSurvey();
                 String identificationCode = questioning.getSurveyUnit().getIdentificationCode();
                 surveyDto.setSurveyWording(survey.getLongWording());
                 surveyDto.setSurveyObjectives(survey.getLongObjectives());
-                surveyDto.setMonitoringDate(new Timestamp(part.getReturnDate().getTime()));
-                surveyDto.setAccessUrl(STROMAE_URL + part.getCampaign().getCampaignId() + "/unite-enquetee/" + identificationCode);
+                surveyDto.setMonitoringDate(new Timestamp(part.get().getReturnDate().getTime()));
+                surveyDto.setAccessUrl(
+                        STROMAE_URL + part.get().getCampaign().getId() + "/unite-enquetee/" + identificationCode);
                 surveyDto.setIdentificationCode(identificationCode);
-                surveyDto.setMonitoringStatus(part.getStatus());
-                surveyDto.setMandatoryMySurveys(survey.getSource().getMandatoryMySurveys());
+                surveyDto.setMonitoringStatus(part.get().getStatus());
+                surveyDto.setMandatoryMySurveys(survey.getSource().isMandatoryMySurveys());
             }
 
             listSurveys.add(surveyDto);

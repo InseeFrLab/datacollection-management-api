@@ -14,11 +14,14 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Entity
 @Table(indexes = {
-    @Index(name = "fn_index", columnList = "firstName"), @Index(name = "ln_index", columnList = "lastName"),
-    @Index(name = "lnfn_index", columnList = "lastName, firstName"), @Index(name = "email_index", columnList = "email")
+        @Index(name = "fn_index", columnList = "firstName"), @Index(name = "ln_index", columnList = "lastName"),
+        @Index(name = "lnfn_index", columnList = "lastName, firstName"),
+        @Index(name = "email_index", columnList = "email")
 })
 @Data
 public class Contact {
@@ -38,9 +41,13 @@ public class Contact {
     private String comment;
 
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Address address;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Set<ContactEvent> contactEvents;
 
     @Enumerated(EnumType.STRING)

@@ -1,8 +1,29 @@
 package fr.insee.survey.datacollectionmanagement.query.controller;
 
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
 import fr.insee.survey.datacollectionmanagement.constants.Constants;
 import fr.insee.survey.datacollectionmanagement.contact.service.ContactService;
-import fr.insee.survey.datacollectionmanagement.metadata.domain.Campaign;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Partitioning;
 import fr.insee.survey.datacollectionmanagement.metadata.service.PartitioningService;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
@@ -18,22 +39,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @PreAuthorize("@AuthorizeMethodDecider.isInternalUser() "
@@ -119,13 +124,12 @@ public class QuestioningAccreditationController {
 
         // save new accreditation or update existing one
         Set<QuestioningAccreditation> setExistingAccreditations = questioning.getQuestioningAccreditations();
-        Partitioning part = partitioningService.findById(questioning.getIdPartitioning());
-        String idSu  = questioning.getSurveyUnit().getIdSu();
-
+        Optional<Partitioning> part = partitioningService.findById(questioning.getIdPartitioning());
+        String idSu = questioning.getSurveyUnit().getIdSu();
 
         List<QuestioningAccreditation> listContactAccreditations = setExistingAccreditations.stream()
                 .filter(acc -> acc.getIdContact().equals(idContact)
-                        && acc.getQuestioning().getIdPartitioning().equals(part.getId())
+                        && acc.getQuestioning().getIdPartitioning().equals(part.get().getId())
                         && acc.getQuestioning().getSurveyUnit().getIdSu().equals(idSu))
                 .collect(Collectors.toList());
 
@@ -139,7 +143,7 @@ public class QuestioningAccreditationController {
 
             // create view
             viewService.createView(idContact, questioning.getSurveyUnit().getIdSu(),
-                    part.getCampaign().getCampaignId());
+                    part.get().getCampaign().getId());
 
             // location header
             responseHeaders.set(HttpHeaders.LOCATION,

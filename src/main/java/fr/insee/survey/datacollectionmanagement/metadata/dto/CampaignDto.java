@@ -1,13 +1,12 @@
 package fr.insee.survey.datacollectionmanagement.metadata.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 public class CampaignDto {
 
-    private String campaignId;
+    private String id;
+    private String surveyId;
     private int year;
     private String campaignWording;
     private String period;
