@@ -1,10 +1,9 @@
 package fr.insee.survey.datacollectionmanagement.query.dto;
 
-import fr.insee.survey.datacollectionmanagement.questioning.domain.TypeQuestioningEvent;
+import java.io.Serializable;
+
 import lombok.Getter;
 import lombok.Setter;
-
-import java.io.Serializable;
 
 @Getter
 @Setter

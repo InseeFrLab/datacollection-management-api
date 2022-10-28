@@ -56,4 +56,5 @@ public class Constants {
     public static final String API_MOOG_EVENTS = "/api/moog/campaigns/{campaign}/survey-units/{id}/management-monitoring-infos";
     public static final String API_CONTACTS_SEARCH = "/api/contacts/search";
     public static final String API_CONTACTS_ACCREDITATIONS = "/api/contacts/{id}/accreditations";
+    public static final String API_MY_QUESTIONINGS_ID = "/api/my-questionings/{id}";
 }
