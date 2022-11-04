@@ -8,11 +8,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.servers.Server;
 
-@OpenAPIDefinition(
-        servers = {
-                @Server(url = "/", description = "Default Server URL")
-        }
-)
+
 @SpringBootApplication
 public class DatacollectionManagementApplication extends SpringBootServletInitializer {
 

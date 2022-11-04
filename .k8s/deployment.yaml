@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: dc-management-api
-          image: inseefrlab/datacollection-management-api:0.2.2
+          image: inseefrlab/datacollection-management-api:0.2.3
           ports:
             - containerPort: 8080
           resources: {}
@@ -28,4 +28,5 @@ spec:
                 secretKeyRef:
                   name: my-postgresql-cocorico
                   key: postgres-password
+            -name: FR_INSEE_DATAMANAGEMENTCOLLECTION_HOST=https://datacollection-management-api.dev.insee.io
       restartPolicy: Always

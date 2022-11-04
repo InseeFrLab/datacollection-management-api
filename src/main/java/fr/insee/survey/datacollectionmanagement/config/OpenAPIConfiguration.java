@@ -5,6 +5,7 @@ import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.*;
+import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -43,13 +44,16 @@ public class OpenAPIConfiguration {
                 flow.setScopes(scopes);
                 flows = flows.authorizationCode(flow);
 
-                return new OpenAPI().components(
+                return new OpenAPI()
+                        .addServersItem(new Server().url(applicationConfig.getHost()))
+                        .components(
                         new Components().addSecuritySchemes("oauth2", new SecurityScheme().type(SecurityScheme.Type.OAUTH2).flows(flows)))
                         .info(new Info().title(buildProperties.getName()).version(buildProperties.getVersion()))
                         .addSecurityItem(new SecurityRequirement().addList("oauth2", Arrays.asList("read", "write")));
 
             default:
                 return new OpenAPI()
+                        .addServersItem(new Server().url(applicationConfig.getHost()))
                         .info(new Info().title(buildProperties.getName()).version(buildProperties.getVersion()));
 
         }
