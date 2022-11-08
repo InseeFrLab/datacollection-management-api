@@ -446,8 +446,29 @@ public class ProtoolsController {
                 TypeQuestioningEvent.VALPAP, TypeQuestioningEvent.REFUSAL, TypeQuestioningEvent.WASTE, TypeQuestioningEvent.HC);
         
         return  ResponseEntity.status(HttpStatus.OK).body((questioningEvent.isPresent()?"false":"true"));
-
-
+    }
+    
+    @Operation(summary = "Indicates whether a questioning should be extract or not (VALINT and PARTIELINT)")
+    @GetMapping(value = Constants.API_PROTOOLS_EXTRACT, produces = "application/json")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = MetadataDto.class))),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "400", description = "Bad request")
+    })
+    public ResponseEntity<?> isToExtract(@RequestParam(required = true) String modelName,
+            @RequestParam(required = true) String idPartitioning,
+            @RequestParam(required = true) String idSurveyUnit) {
+        
+        Questioning questioning = questioningService.findByModelNameAndIdPartitioningAndSurveyUnitIdSu(modelName,
+                idPartitioning, idSurveyUnit);
+        if (questioning == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Questioning does not exist");
+        }
+        
+        Optional<QuestioningEvent> questioningEvent =  questioningEventService.getLastQuestioningEvent(questioning, TypeQuestioningEvent.VALINT,
+                TypeQuestioningEvent.PARTIELINT);
+        
+        return  ResponseEntity.status(HttpStatus.OK).body((questioningEvent.isPresent()?"true":"false"));
     }
 
     private Support convertToEntity(SupportDto supportDto) {
