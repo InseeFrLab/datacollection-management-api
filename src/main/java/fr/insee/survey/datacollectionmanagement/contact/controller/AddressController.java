@@ -104,7 +104,7 @@ public class AddressController {
                 httpStatus = HttpStatus.CREATED;
             }
 
-            ContactEvent contactEventUpdate = contactEventService.createContactEvent(contact, ContactEventType.update);
+            ContactEvent contactEventUpdate = contactEventService.createContactEvent(contact, ContactEventType.update, null);
             contactEventService.saveContactEvent(contactEventUpdate);
             return ResponseEntity.status(httpStatus).headers(responseHeaders)
                     .body(addressService.convertToDto(addressUpdate));

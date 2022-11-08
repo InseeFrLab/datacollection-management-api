@@ -34,6 +34,7 @@ public class QuestioningAccreditation {
     private String idContact;
 
     @OneToOne
+    @EqualsAndHashCode.Exclude
     private Questioning questioning;
 
     @Override

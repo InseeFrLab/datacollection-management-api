@@ -81,7 +81,7 @@ public class QuestioningAccreditationServiceImpl implements QuestioningAccredita
 
     @Override
     public void deleteAccreditation(QuestioningAccreditation acc) {
-        questioningAccreditationRepository.delete(acc);
+        questioningAccreditationRepository.deleteById(acc.getId());
     }
 
 }

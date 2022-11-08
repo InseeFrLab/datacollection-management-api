@@ -1,16 +1,8 @@
 package fr.insee.survey.datacollectionmanagement.query.controller;
 
-import fr.insee.survey.datacollectionmanagement.constants.Constants;
-import fr.insee.survey.datacollectionmanagement.query.dto.MoogQuestioningEventDto;
-import fr.insee.survey.datacollectionmanagement.query.dto.MoogSearchDto;
-import fr.insee.survey.datacollectionmanagement.query.service.MoogService;
-import fr.insee.survey.datacollectionmanagement.view.domain.View;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,12 +18,23 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.Map;
+import fr.insee.survey.datacollectionmanagement.constants.Constants;
+import fr.insee.survey.datacollectionmanagement.query.dto.MoogQuestioningEventDto;
+import fr.insee.survey.datacollectionmanagement.query.dto.MoogSearchDto;
+import fr.insee.survey.datacollectionmanagement.query.service.MoogService;
+import fr.insee.survey.datacollectionmanagement.view.domain.View;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @PreAuthorize("@AuthorizeMethodDecider.isInternalUser() "
         + "|| @AuthorizeMethodDecider.isWebClient() ")
+@Tag(name = "5 - Moog", description = "Enpoints for moog")
 public class MoogController {
 
     static final Logger LOGGER = LoggerFactory.getLogger(MoogController.class);
@@ -66,19 +69,13 @@ public class MoogController {
     @GetMapping(path = Constants.API_MOOG_EVENTS, produces = "application/json")
     @Operation(summary = "Get Moog questioning events by campaign and idSu")
     @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "OK",
-                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = MoogQuestioningEventDto.class)))),
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = MoogQuestioningEventDto.class)))),
             @ApiResponse(responseCode = "400", description = "Bad Request")
     })
     public ResponseEntity<?> getMoogQuestioningEvents(@PathVariable("campaign") String campaignId,
-                                        @PathVariable("id") String idSu) {
+            @PathVariable("id") String idSu) {
 
-
-        return new ResponseEntity<>(Map.of("datas",moogService.getMoogEvents(campaignId, idSu)), HttpStatus.OK);
-
-
+        return new ResponseEntity<>(Map.of("datas", moogService.getMoogEvents(campaignId, idSu)), HttpStatus.OK);
 
     }
 

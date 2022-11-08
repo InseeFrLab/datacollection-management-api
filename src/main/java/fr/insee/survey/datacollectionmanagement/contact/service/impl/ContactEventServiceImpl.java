@@ -8,6 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
 import fr.insee.survey.datacollectionmanagement.contact.domain.ContactEvent;
 import fr.insee.survey.datacollectionmanagement.contact.domain.ContactEvent.ContactEventType;
@@ -46,10 +48,11 @@ public class ContactEventServiceImpl implements ContactEventService {
     }
 
     @Override
-    public ContactEvent createContactEvent(Contact contact, ContactEventType type) {
+    public ContactEvent createContactEvent(Contact contact, ContactEventType type, JsonNode payload) {
         ContactEvent contactEventCreate = new ContactEvent();
         contactEventCreate.setContact(contact);
         contactEventCreate.setType(type);
+        contactEventCreate.setPayload(payload);
         contactEventCreate.setEventDate(new Date());
         return contactEventCreate;
     }

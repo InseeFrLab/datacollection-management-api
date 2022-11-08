@@ -111,7 +111,7 @@ public class SurveyUnitController {
             LOGGER.info("Creating survey with the id {}", surveyUnitDto.getIdSu());
             responseStatus = HttpStatus.CREATED;
         }
-        return ResponseEntity.status(responseStatus).body(convertToDto(surveyUnitService.saveSurveyUnit(surveyUnit)));
+        return ResponseEntity.status(responseStatus).body(convertToDto(surveyUnitService.saveSurveyUnitAndAddress(surveyUnit)));
 
     }
 

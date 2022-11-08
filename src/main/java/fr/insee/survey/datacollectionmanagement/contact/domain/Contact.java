@@ -32,7 +32,8 @@ public class Contact {
 
     @Id
     private String identifier;
-
+    
+    private String externalId;
     private String lastName;
     private String firstName;
     private String email;

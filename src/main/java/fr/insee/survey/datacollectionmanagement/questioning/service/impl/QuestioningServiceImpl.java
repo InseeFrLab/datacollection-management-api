@@ -73,4 +73,11 @@ public class QuestioningServiceImpl implements QuestioningService {
         return nbQuestioningDeleted;
     }
 
+    @Override
+    public Questioning findByModelNameAndIdPartitioningAndSurveyUnitIdSu(String modelName, String idPartitioning,
+            String surveyUnitIdSu) {
+        return questioningRepository.findByModelNameAndIdPartitioningAndSurveyUnitIdSu(modelName, idPartitioning,
+                surveyUnitIdSu);
+    }
+
 }
