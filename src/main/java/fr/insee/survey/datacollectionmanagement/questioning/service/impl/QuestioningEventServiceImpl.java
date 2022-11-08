@@ -1,7 +1,9 @@
 package fr.insee.survey.datacollectionmanagement.questioning.service.impl;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,18 +40,19 @@ public class QuestioningEventServiceImpl implements QuestioningEventService {
         questioningEventRepository.deleteById(id);
 
     }
+    
+    
 
     @Override
-    public QuestioningEvent getLastQuestioningEvent(Questioning questioning) {
+    public Optional<QuestioningEvent> getLastQuestioningEvent(Questioning questioning, TypeQuestioningEvent... events) {
+        
+        List<TypeQuestioningEvent> listEvents = Arrays.asList(events);
+        
         List<QuestioningEvent> listQuestioningEvent = questioning.getQuestioningEvents().stream()
-                .filter(qe -> qe.getType().equals(TypeQuestioningEvent.PARTIELINT)
-                        || qe.getType().equals(TypeQuestioningEvent.HC)
-                        || qe.getType().equals(TypeQuestioningEvent.VALPAP)
-                        || qe.getType().equals(TypeQuestioningEvent.VALINT)
-                        || qe.getType().equals(TypeQuestioningEvent.REFUSAL))
+                .filter(qe -> listEvents.contains(qe.getType()))
                 .collect(Collectors.toList());
         Collections.sort(listQuestioningEvent, lastQuestioningEventComparator);
-        return listQuestioningEvent.stream().findFirst().orElseThrow();
+        return listQuestioningEvent.stream().findFirst();
     }
 
 }

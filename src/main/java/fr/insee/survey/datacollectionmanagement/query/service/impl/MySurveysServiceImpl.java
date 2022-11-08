@@ -23,6 +23,7 @@ import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningAc
 import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningEvent;
 import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningAccreditationService;
 import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningEventService;
+import fr.insee.survey.datacollectionmanagement.questioning.util.TypeQuestioningEvent;
 
 @Service
 public class MySurveysServiceImpl implements MySurveysService {
@@ -61,13 +62,14 @@ public class MySurveysServiceImpl implements MySurveysService {
                 surveyDto.setClosingDate(new Timestamp(part.get().getClosingDate().getTime()));
                 surveyDto.setReturnDate(new Timestamp(part.get().getReturnDate().getTime()));
 
-
-                QuestioningEvent questioningEvent;
-                try {
-                    questioningEvent = questioningEventService.getLastQuestioningEvent(questioning);
-                    surveyDto.setQuestioningStatus(questioningEvent.getType().name());
-                    surveyDto.setQuestioningDate(new Timestamp(questioningEvent.getDate().getTime()));
-                } catch (NoSuchElementException e) {
+                Optional<QuestioningEvent> questioningEvent = questioningEventService.getLastQuestioningEvent(
+                        questioning,
+                        TypeQuestioningEvent.PARTIELINT, TypeQuestioningEvent.HC, TypeQuestioningEvent.VALPAP,
+                        TypeQuestioningEvent.VALINT, TypeQuestioningEvent.REFUSAL);
+                if (questioningEvent.isPresent()) {
+                    surveyDto.setQuestioningStatus(questioningEvent.get().getType().name());
+                    surveyDto.setQuestioningDate(new Timestamp(questioningEvent.get().getDate().getTime()));
+                } else {
                     LOGGER.info("No questioningEvents found for questioning {} for identifier {}",
                             questioning.getId(), id);
                 }

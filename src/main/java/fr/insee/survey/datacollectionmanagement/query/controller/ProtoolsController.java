@@ -1,5 +1,6 @@
 package fr.insee.survey.datacollectionmanagement.query.controller;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -126,7 +127,7 @@ public class ProtoolsController {
     private ModelMapper modelMapper;
 
     @Operation(summary = "Create or update questioning for protools")
-    @PutMapping(value = Constants.API_QUESTIONINGS, produces = "application/json", consumes = "application/json")
+    @PutMapping(value = Constants.API_PROTOOLS_QUESTIONINGS, produces = "application/json", consumes = "application/json")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = QuestioningProtoolsDto.class))),
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = QuestioningProtoolsDto.class))),
@@ -263,7 +264,7 @@ public class ProtoolsController {
     }
 
     @Operation(summary = "Get questioning for protools")
-    @GetMapping(value = "/api/protools/questioning", produces = "application/json")
+    @GetMapping(value = Constants.API_PROTOOLS_QUESTIONINGS, produces = "application/json")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = QuestioningProtoolsDto.class))),
             @ApiResponse(responseCode = "404", description = "Not found"),
@@ -296,7 +297,7 @@ public class ProtoolsController {
     }
 
     @Operation(summary = "Search for a partitiong and metadata by partitioning id")
-    @GetMapping(value = Constants.API_METADATA_ID, produces = "application/json")
+    @GetMapping(value = Constants.API_PROTOOLS_METADATA_ID, produces = "application/json")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = MetadataDto.class))),
             @ApiResponse(responseCode = "404", description = "Not found"),
@@ -325,7 +326,7 @@ public class ProtoolsController {
     }
 
     @Operation(summary = "Insert or update a partitiong and metadata by partitioning id")
-    @PutMapping(value = Constants.API_METADATA_ID, produces = "application/json", consumes = "application/json")
+    @PutMapping(value = Constants.API_PROTOOLS_METADATA_ID, produces = "application/json", consumes = "application/json")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = MetadataDto.class))),
             @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = MetadataDto.class))),
@@ -419,6 +420,33 @@ public class ProtoolsController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
 
         }
+
+    }
+    
+    
+    
+    @Operation(summary = "Indicates whether a questioning should be follow up or not")
+    @GetMapping(value = Constants.API_PROTOOLS_FOLLOWUP, produces = "application/json")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = MetadataDto.class))),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "400", description = "Bad request")
+    })
+    public ResponseEntity<?> isToFollwUp(@RequestParam(required = true) String modelName,
+            @RequestParam(required = true) String idPartitioning,
+            @RequestParam(required = true) String idSurveyUnit) {
+        
+        Questioning questioning = questioningService.findByModelNameAndIdPartitioningAndSurveyUnitIdSu(modelName,
+                idPartitioning, idSurveyUnit);
+        if (questioning == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Questioning does not exist");
+        }
+        
+        Optional<QuestioningEvent> questioningEvent =  questioningEventService.getLastQuestioningEvent(questioning, TypeQuestioningEvent.VALINT,
+                TypeQuestioningEvent.VALPAP, TypeQuestioningEvent.REFUSAL, TypeQuestioningEvent.WASTE, TypeQuestioningEvent.HC);
+        
+        return  ResponseEntity.status(HttpStatus.OK).body((questioningEvent.isPresent()?"false":"true"));
+
 
     }
 

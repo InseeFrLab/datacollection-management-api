@@ -1,13 +1,15 @@
 package fr.insee.survey.datacollectionmanagement.questioning.service;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 
 import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningEvent;
+import fr.insee.survey.datacollectionmanagement.questioning.util.TypeQuestioningEvent;
 
 @Service
 public interface QuestioningEventService {
-    
 
     public QuestioningEvent findbyId(Long id);
 
@@ -15,5 +17,11 @@ public interface QuestioningEventService {
 
     public void deleteQuestioningEvent(Long id);
 
-    QuestioningEvent getLastQuestioningEvent(Questioning questioning);
+    /**
+     * Get the last event sorted by order of importance among the event types (TypeQuestioningEvent) passed in parameter
+     * @param questioning
+     * @param events list of events to be considered
+     * @return optional last Questioning event in order of importance
+     */
+    Optional<QuestioningEvent> getLastQuestioningEvent(Questioning questioning, TypeQuestioningEvent... events);
 }
