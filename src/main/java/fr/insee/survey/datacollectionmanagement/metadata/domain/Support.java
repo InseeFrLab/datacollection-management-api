@@ -16,8 +16,7 @@ import lombok.ToString;
 public class Support {
 
     @Id
-    @GeneratedValue
-    private Long id;
+    private String id;
 
     private String label;
     private String phoneNumber;

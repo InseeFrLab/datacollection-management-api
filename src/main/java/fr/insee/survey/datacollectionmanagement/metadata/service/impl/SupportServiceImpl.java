@@ -20,7 +20,7 @@ public class SupportServiceImpl implements SupportService {
     @Autowired
     private SupportRepository supportRepository;
 
-    public Optional<Support> findById(Long support) {
+    public Optional<Support> findById(String support) {
         return supportRepository.findById(support);
     }
 
@@ -42,7 +42,7 @@ public class SupportServiceImpl implements SupportService {
     }
 
     @Override
-    public void deleteSupportById(Long id) {
+    public void deleteSupportById(String id) {
         supportRepository.deleteById(id);
 
     }

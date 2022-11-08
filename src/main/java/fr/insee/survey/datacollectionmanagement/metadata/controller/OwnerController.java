@@ -76,7 +76,7 @@ public class OwnerController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "400", description = "Bad request")
     })
-    public ResponseEntity<?> getOwner(@PathVariable("id") Long id) {
+    public ResponseEntity<?> getOwner(@PathVariable("id") String id) {
         Optional<Owner> owner = ownerService.findById(id);
         if (!owner.isPresent()) {
             log.warn("Owner {} does not exist", id);
@@ -94,7 +94,7 @@ public class OwnerController {
             @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = OwnerDto.class))),
             @ApiResponse(responseCode = "400", description = "Bad request")
     })
-    public ResponseEntity<?> putOwner(@PathVariable("id") Long id, @RequestBody OwnerDto ownerDto) {
+    public ResponseEntity<?> putOwner(@PathVariable("id") String id, @RequestBody OwnerDto ownerDto) {
         if (!ownerDto.getId().equals(id)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("id and owner id don't match");
         }

@@ -186,7 +186,7 @@ public class SourceController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "400", description = "Bad request")
     })
-    public ResponseEntity<?> getSourcesByOwner(@PathVariable("id") Long id) {
+    public ResponseEntity<?> getSourcesByOwner(@PathVariable("id") String id) {
 
         try {
             Optional<Owner> owner = ownerService.findById(id);

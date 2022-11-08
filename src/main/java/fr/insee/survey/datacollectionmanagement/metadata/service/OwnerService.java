@@ -10,13 +10,13 @@ import fr.insee.survey.datacollectionmanagement.metadata.domain.Source;
 
 public interface OwnerService {
 
-    Optional<Owner> findById(Long owner);
+    Optional<Owner> findById(String owner);
 
     Page<Owner> findAll(Pageable pageable);
 
     Owner insertOrUpdateOwner(Owner owner);
 
-    void deleteOwnerById(Long id);
+    void deleteOwnerById(String id);
 
     void removeSourceFromOwner(Owner owner, Source source);
 

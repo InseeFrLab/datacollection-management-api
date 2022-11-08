@@ -72,7 +72,7 @@ public class SupportController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "400", description = "Bad request")
     })
-    public ResponseEntity<?> getSupport(@PathVariable("id") Long id) {
+    public ResponseEntity<?> getSupport(@PathVariable("id") String id) {
         Optional<Support> support = supportService.findById(id);
         if (!support.isPresent()) {
             log.warn("Support {} does not exist", id);
@@ -90,7 +90,7 @@ public class SupportController {
             @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = SupportDto.class))),
             @ApiResponse(responseCode = "400", description = "Bad request")
     })
-    public ResponseEntity<?> putSupport(@PathVariable("id") Long id, @RequestBody SupportDto supportDto) {
+    public ResponseEntity<?> putSupport(@PathVariable("id") String id, @RequestBody SupportDto supportDto) {
         if (!supportDto.getId().equals(id)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("id and support id don't match");
         }

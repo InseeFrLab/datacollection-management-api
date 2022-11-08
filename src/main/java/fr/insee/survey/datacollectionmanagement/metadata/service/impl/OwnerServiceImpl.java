@@ -20,7 +20,7 @@ public class OwnerServiceImpl implements OwnerService {
     @Autowired
     private OwnerRepository ownerRepository;
 
-    public Optional<Owner> findById(Long owner) {
+    public Optional<Owner> findById(String owner) {
         return ownerRepository.findById(owner);
     }
 
@@ -42,7 +42,7 @@ public class OwnerServiceImpl implements OwnerService {
     }
 
     @Override
-    public void deleteOwnerById(Long id) {
+    public void deleteOwnerById(String id) {
         ownerRepository.deleteById(id);
 
     }
