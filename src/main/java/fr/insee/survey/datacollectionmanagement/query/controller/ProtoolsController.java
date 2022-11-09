@@ -1,6 +1,5 @@
 package fr.insee.survey.datacollectionmanagement.query.controller;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;

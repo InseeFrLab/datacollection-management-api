@@ -3,7 +3,6 @@ package fr.insee.survey.datacollectionmanagement.metadata.domain;
 import java.util.Set;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 

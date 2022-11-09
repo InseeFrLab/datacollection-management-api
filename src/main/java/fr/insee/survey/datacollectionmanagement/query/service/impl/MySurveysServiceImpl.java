@@ -2,9 +2,7 @@ package fr.insee.survey.datacollectionmanagement.query.service.impl;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
@@ -15,7 +13,6 @@ import org.springframework.stereotype.Service;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Partitioning;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Survey;
 import fr.insee.survey.datacollectionmanagement.metadata.service.PartitioningService;
-import fr.insee.survey.datacollectionmanagement.metadata.util.PartitioningStatusEnum;
 import fr.insee.survey.datacollectionmanagement.query.dto.MyQuestioningDto;
 import fr.insee.survey.datacollectionmanagement.query.service.MySurveysService;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
