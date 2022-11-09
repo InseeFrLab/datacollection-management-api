@@ -20,7 +20,7 @@ public interface QuestioningService {
 
     public Set<Questioning> findByIdPartitioning(String idPartitioning);
 
-    public Questioning findByModelNameAndIdPartitioningAndSurveyUnitIdSu(String modelName, String idPartitioning, String surveyUnitIdSu);
+    public Questioning findByIdPartitioningAndSurveyUnitIdSu(String idPartitioning, String surveyUnitIdSu);
 
     /**
      * Delete questionings attached to one partitioning

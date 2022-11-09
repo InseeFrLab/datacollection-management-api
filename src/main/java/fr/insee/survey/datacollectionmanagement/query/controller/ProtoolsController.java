@@ -133,24 +133,23 @@ public class ProtoolsController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "400", description = "Bad request")
 
-
     })
     @Transactional
     public ResponseEntity<?> putQuestioning(@RequestBody QuestioningProtoolsDto questioningProtoolsDto)
             throws JsonMappingException, JsonProcessingException {
-        
+
         log.info("Put questioning for protools {}", questioningProtoolsDto.toString());
         String modelName = questioningProtoolsDto.getModelName();
         String idSu = questioningProtoolsDto.getSurveyUnit().getIdSu();
         String idPartitioning = questioningProtoolsDto.getIdPartitioning();
-        
-        if(idPartitioning.isBlank()|| modelName.isBlank()||
+
+        if (idPartitioning.isBlank() || modelName.isBlank() ||
                 idSu.isBlank()) {
             log.warn("Partitioning {} does not exist", idPartitioning);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing fields");
         }
 
-        if (!partitioningService.findById(idPartitioning).isPresent()){
+        if (!partitioningService.findById(idPartitioning).isPresent()) {
             log.warn("Partitioning {} does not exist", idPartitioning);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Partitioning does not exist");
         }
@@ -166,20 +165,17 @@ public class ProtoolsController {
         } catch (NoSuchElementException e) {
             log.warn("survey unit {} does not exist - Creation of the survey unit",
                     idSu);
-            
+
             su.setQuestionings(new HashSet<>());
         }
         surveyUnitService.saveSurveyUnitAndAddress(su);
-        
-
 
         // Create questioning if not exists
-        Questioning questioning = questioningService.findByModelNameAndIdPartitioningAndSurveyUnitIdSu(
-                modelName,
-                idPartitioning, idSu);
+        Questioning questioning = questioningService.findByIdPartitioningAndSurveyUnitIdSu(idPartitioning, idSu);
         if (questioning == null) {
             httpStatus = HttpStatus.CREATED;
-            log.info("Create questioning for partitioning={} model={}  surveyunit={} ", idPartitioning, modelName, idSu);
+            log.info("Create questioning for partitioning={} model={}  surveyunit={} ", idPartitioning, modelName,
+                    idSu);
             questioning = new Questioning();
             questioning.setIdPartitioning(idPartitioning);
             questioning.setSurveyUnit(su);
@@ -240,9 +236,8 @@ public class ProtoolsController {
                         part.get().getCampaign().getId());
 
                 questioning.getQuestioningAccreditations().add(questioningAccreditation);
-            }
-            else {
-                //update accreditation
+            } else {
+                // update accreditation
                 QuestioningAccreditation questioningAccreditation = listContactAccreditations.get(0);
                 questioningAccreditation.setMain(contactAccreditationDto.isMain());
                 questioningAccreditationService.saveQuestioningAccreditation(questioningAccreditation);
@@ -277,8 +272,8 @@ public class ProtoolsController {
 
         HttpStatus httpStatus = HttpStatus.OK;
 
-        Questioning questioning = questioningService.findByModelNameAndIdPartitioningAndSurveyUnitIdSu(modelName,
-                idPartitioning, idSurveyUnit);
+        Questioning questioning = questioningService.findByIdPartitioningAndSurveyUnitIdSu(idPartitioning,
+                idSurveyUnit);
         if (questioning == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Questioning does not exist");
         }
@@ -421,9 +416,7 @@ public class ProtoolsController {
         }
 
     }
-    
-    
-    
+
     @Operation(summary = "Indicates whether a questioning should be follow up or not")
     @GetMapping(value = Constants.API_PROTOOLS_FOLLOWUP, produces = "application/json")
     @ApiResponses(value = {
@@ -431,22 +424,26 @@ public class ProtoolsController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "400", description = "Bad request")
     })
-    public ResponseEntity<?> isToFollwUp(@RequestParam(required = true) String modelName,
-            @RequestParam(required = true) String idPartitioning,
-            @RequestParam(required = true) String idSurveyUnit) {
-        
-        Questioning questioning = questioningService.findByModelNameAndIdPartitioningAndSurveyUnitIdSu(modelName,
-                idPartitioning, idSurveyUnit);
+    public ResponseEntity<?> isToFollwUp(
+            @PathVariable("idPartitioning") String idPartitioning,
+            @PathVariable("idSu") String idSu) {
+
+        Questioning questioning = questioningService.findByIdPartitioningAndSurveyUnitIdSu(
+                idPartitioning, idSu);
         if (questioning == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Questioning does not exist");
         }
-        
-        Optional<QuestioningEvent> questioningEvent =  questioningEventService.getLastQuestioningEvent(questioning, TypeQuestioningEvent.VALINT,
-                TypeQuestioningEvent.VALPAP, TypeQuestioningEvent.REFUSAL, TypeQuestioningEvent.WASTE, TypeQuestioningEvent.HC);
-        
-        return  ResponseEntity.status(HttpStatus.OK).body((questioningEvent.isPresent()?"false":"true"));
+
+        Optional<QuestioningEvent> questioningEvent = questioningEventService.getLastQuestioningEvent(questioning,
+                TypeQuestioningEvent.VALINT,
+                TypeQuestioningEvent.VALPAP,
+                TypeQuestioningEvent.REFUSAL,
+                TypeQuestioningEvent.WASTE,
+                TypeQuestioningEvent.HC);
+
+        return ResponseEntity.status(HttpStatus.OK).body((questioningEvent.isPresent() ? "false" : "true"));
     }
-    
+
     @Operation(summary = "Indicates whether a questioning should be extract or not (VALINT and PARTIELINT)")
     @GetMapping(value = Constants.API_PROTOOLS_EXTRACT, produces = "application/json")
     @ApiResponses(value = {
@@ -454,20 +451,20 @@ public class ProtoolsController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "400", description = "Bad request")
     })
-    public ResponseEntity<?> isToExtract(@RequestParam(required = true) String modelName,
-            @RequestParam(required = true) String idPartitioning,
-            @RequestParam(required = true) String idSurveyUnit) {
-        
-        Questioning questioning = questioningService.findByModelNameAndIdPartitioningAndSurveyUnitIdSu(modelName,
-                idPartitioning, idSurveyUnit);
+    public ResponseEntity<?> isToExtract(@PathVariable("idPartitioning") String idPartitioning,
+            @PathVariable("idSu") String idSu) {
+
+        Questioning questioning = questioningService.findByIdPartitioningAndSurveyUnitIdSu(
+                idPartitioning, idSu);
         if (questioning == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Questioning does not exist");
         }
-        
-        Optional<QuestioningEvent> questioningEvent =  questioningEventService.getLastQuestioningEvent(questioning, TypeQuestioningEvent.VALINT,
+
+        Optional<QuestioningEvent> questioningEvent = questioningEventService.getLastQuestioningEvent(questioning,
+                TypeQuestioningEvent.VALINT,
                 TypeQuestioningEvent.PARTIELINT);
-        
-        return  ResponseEntity.status(HttpStatus.OK).body((questioningEvent.isPresent()?"true":"false"));
+
+        return ResponseEntity.status(HttpStatus.OK).body((questioningEvent.isPresent() ? "true" : "false"));
     }
 
     private Support convertToEntity(SupportDto supportDto) {

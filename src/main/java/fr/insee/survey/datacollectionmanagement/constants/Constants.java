@@ -59,8 +59,8 @@ public class Constants {
     public static final String API_MY_QUESTIONINGS_ID = "/api/my-questionings/{id}";
     
     // API PROTOOLS
-    public static final String API_PROTOOLS_FOLLOWUP = "/api/questionings/follow-up";
-    public static final String API_PROTOOLS_EXTRACT = "/api/questionings/extract";
+    public static final String API_PROTOOLS_FOLLOWUP = "/api/partitionings/{idPartitioning}/survey-units/{idSu}/follow-up";
+    public static final String API_PROTOOLS_EXTRACT = "/api/partitionings/{idPartitioning}/survey-units/{idSu}/extract";
     public static final String API_PROTOOLS_METADATA = "/api/metadata";
     public static final String API_PROTOOLS_METADATA_ID = "/api/metadata/{id}";
     public static final String API_PROTOOLS_QUESTIONINGS = "/api/questionings";
