@@ -27,6 +27,8 @@ public class Constants {
     public static final String API_QUESTIONING_QUESTIONING_EVENTS = "/api/questionings/questioning-events";
     public static final String API_QUESTIONING_ID_QUESTIONING_EVENTS = "/api/questionings/{id}/questioning-events";
     public static final String API_QUESTIONING_QUESTIONING_EVENTS_ID = "/api/questionings/questioning-events/{id}";
+    public static final String API_MAIN_CONTACT = "/api/main-contact";
+
 
     // API METADATA DOMAIN
     public static final String API_SOURCES = "/api/sources";
@@ -46,6 +48,9 @@ public class Constants {
     public static final String API_OWNERS_ID_SOURCES = "/api/owners/{id}/sources";
     public static final String API_SUPPORTS = "/api/supports";
     public static final String API_SUPPORTS_ID = "/api/supports/{id}";
+    public static final String API_PERIODICITIES = "/api/periodicities";
+    public static final String API_PERIODS = "/api/periods";
+
 
 
 
@@ -61,6 +66,7 @@ public class Constants {
     // API PROTOOLS
     public static final String API_PROTOOLS_FOLLOWUP = "/api/partitionings/{idPartitioning}/survey-units/{idSu}/follow-up";
     public static final String API_PROTOOLS_EXTRACT = "/api/partitionings/{idPartitioning}/survey-units/{idSu}/extract";
+    public static final String API_PROTOOLS_STATE = "/api/partitionings/{idPartitioning}/survey-units/{idSu}/state";
     public static final String API_PROTOOLS_METADATA = "/api/metadata";
     public static final String API_PROTOOLS_METADATA_ID = "/api/metadata/{id}";
     public static final String API_PROTOOLS_QUESTIONINGS = "/api/questionings";

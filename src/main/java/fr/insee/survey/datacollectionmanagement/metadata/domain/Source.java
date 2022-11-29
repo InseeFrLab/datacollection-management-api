@@ -4,12 +4,15 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
+import fr.insee.survey.datacollectionmanagement.metadata.util.PeriodicityEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -23,7 +26,8 @@ public class Source {
     private String longWording;
     private String shortWording;
     @NotNull
-    private String periodicity;
+    @Enumerated(EnumType.STRING)
+    private PeriodicityEnum periodicity;
     @NotNull
     private boolean mandatoryMySurveys;
 

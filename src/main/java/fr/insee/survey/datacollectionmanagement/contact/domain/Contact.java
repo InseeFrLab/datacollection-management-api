@@ -3,6 +3,7 @@ package fr.insee.survey.datacollectionmanagement.contact.domain;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -40,6 +41,10 @@ public class Contact {
     private String function;
     private String phone;
     private String comment;
+    @Column(columnDefinition = "boolean default false")
+    private boolean emailVerify;
+    @Column(columnDefinition = "boolean default false")
+    private boolean firstLogin;
 
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @EqualsAndHashCode.Exclude

@@ -37,6 +37,7 @@ import fr.insee.survey.datacollectionmanagement.metadata.dto.SurveyDto;
 import fr.insee.survey.datacollectionmanagement.metadata.service.OwnerService;
 import fr.insee.survey.datacollectionmanagement.metadata.service.SourceService;
 import fr.insee.survey.datacollectionmanagement.metadata.service.SupportService;
+import fr.insee.survey.datacollectionmanagement.metadata.util.PeriodicityEnum;
 import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningService;
 import fr.insee.survey.datacollectionmanagement.view.service.ViewService;
 import io.swagger.v3.oas.annotations.Operation;

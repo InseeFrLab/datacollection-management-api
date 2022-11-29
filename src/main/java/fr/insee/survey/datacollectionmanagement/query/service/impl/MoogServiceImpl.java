@@ -61,7 +61,7 @@ public class MoogServiceImpl implements MoogService {
             moogCampaign
                     .setCollectionStartDate(camp.get().getPartitionings().iterator().next().getOpeningDate().getTime());
             moogSearchDto.setIdContact(view.getIdentifier());
-            moogSearchDto.setAddress(c.getAddress().getZipCode().concat(" ").concat(c.getAddress().getCity()));
+            moogSearchDto.setAddress(c.getAddress().getZipCode().concat(" ").concat(c.getAddress().getCityName()));
             moogSearchDto.setIdSu(view.getIdSu());
             moogSearchDto.setCampaign(moogCampaign);
             moogSearchDto.setFirstName(c.getFirstName());

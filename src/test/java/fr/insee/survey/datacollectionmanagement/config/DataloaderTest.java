@@ -44,6 +44,8 @@ import fr.insee.survey.datacollectionmanagement.metadata.repository.Partitioning
 import fr.insee.survey.datacollectionmanagement.metadata.repository.SourceRepository;
 import fr.insee.survey.datacollectionmanagement.metadata.repository.SupportRepository;
 import fr.insee.survey.datacollectionmanagement.metadata.repository.SurveyRepository;
+import fr.insee.survey.datacollectionmanagement.metadata.util.PeriodEnum;
+import fr.insee.survey.datacollectionmanagement.metadata.util.PeriodicityEnum;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.EventOrder;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningAccreditation;
@@ -195,7 +197,7 @@ public class DataloaderTest {
         address.setStreetNumber(Integer.toString(i));
         address.setStreetName("street name" + i);
         address.setZipCode(Integer.toString(1000 * i));
-        address.setCity("city" + i);
+        address.setCityName("city" + i);
         addressRepository.save(address);
         return address;
 
@@ -231,7 +233,7 @@ public class DataloaderTest {
                 source.setId(sourceName);
                 source.setLongWording("Long wording of " + sourceName + " ?");
                 source.setShortWording("Short wording of " + sourceName);
-                source.setPeriodicity("T");
+                source.setPeriodicity(PeriodicityEnum.T);
                 sourceRepository.save(source);
                 Set<Survey> setSurveys = new HashSet<>();
                 setSourcesInsee.add(source);
@@ -262,9 +264,9 @@ public class DataloaderTest {
                     for (int k = 0; k < 4; k++) {
                         Campaign campaign = new Campaign();
                         int trimester = k + 1;
-                        String period = "T" + trimester;
+                        String period = "T0" + trimester;
                         campaign.setYear(year - j);
-                        campaign.setPeriod(period);
+                        campaign.setPeriod(PeriodEnum.fromValue(period));
                         campaign.setId(sourceName + (year - j) + period);
                         campaign.setCampaignWording(
                                 "Campaign about " + sourceName + " in " + (year - j) + " and period " + period);

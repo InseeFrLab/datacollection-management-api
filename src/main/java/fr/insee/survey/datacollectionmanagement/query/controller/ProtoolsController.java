@@ -20,6 +20,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,6 +35,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.survey.datacollectionmanagement.constants.Constants;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact.Gender;
+import fr.insee.survey.datacollectionmanagement.contact.dto.ContactDto;
 import fr.insee.survey.datacollectionmanagement.contact.service.AddressService;
 import fr.insee.survey.datacollectionmanagement.contact.service.ContactService;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Campaign;
@@ -56,7 +58,9 @@ import fr.insee.survey.datacollectionmanagement.metadata.service.SourceService;
 import fr.insee.survey.datacollectionmanagement.metadata.service.SupportService;
 import fr.insee.survey.datacollectionmanagement.metadata.service.SurveyService;
 import fr.insee.survey.datacollectionmanagement.query.dto.ContactAccreditationDto;
+import fr.insee.survey.datacollectionmanagement.query.dto.EligibleDto;
 import fr.insee.survey.datacollectionmanagement.query.dto.QuestioningProtoolsDto;
+import fr.insee.survey.datacollectionmanagement.query.dto.StateDto;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningAccreditation;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningEvent;
@@ -69,6 +73,7 @@ import fr.insee.survey.datacollectionmanagement.questioning.service.SurveyUnitSe
 import fr.insee.survey.datacollectionmanagement.questioning.util.TypeQuestioningEvent;
 import fr.insee.survey.datacollectionmanagement.view.service.ViewService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -189,9 +194,8 @@ public class ProtoolsController {
             questioning.setQuestioningAccreditations(new HashSet<>());
         }
 
-        String json = "{\"author\":\"protools" + "\"}";
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode node = mapper.readTree(json);
+        JsonNode node = addProtoolsAuthorNode();
+
         for (ContactAccreditationDto contactAccreditationDto : questioningProtoolsDto.getContacts()) {
             // Create contact if not exists or update
             Contact contact;
@@ -417,10 +421,67 @@ public class ProtoolsController {
 
     }
 
+    @Operation(summary = "Search for questioning accreditations by questioning id")
+    @GetMapping(value = Constants.API_MAIN_CONTACT, produces = "application/json")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ContactDto.class)))),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "400", description = "Bad Request")
+    })
+    public ResponseEntity<?> getMainContact(
+            @RequestParam(value = "partitioning", required = true) String partitioningId,
+            @RequestParam(value = "survey-unit", required = true) String surveyUnitId) {
+
+        try {
+            List<Contact> listContacts = new ArrayList<>();
+            Questioning questioning = questioningService.findByIdPartitioningAndSurveyUnitIdSu(partitioningId,
+                    surveyUnitId);
+            questioning.getQuestioningAccreditations().stream().filter(qa -> qa.isMain())
+                    .forEach(qa -> listContacts.add(contactService.findByIdentifier(qa.getIdContact())));
+            return new ResponseEntity<>(listContacts,
+                    HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>("Questioning does not exist", HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<String>("Error", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Operation(summary = "Get state of the last questioningEvent")
+    @GetMapping(value = Constants.API_PROTOOLS_STATE, produces = "application/json")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = StateDto.class))),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "400", description = "Bad request")
+    })
+    public ResponseEntity<?> getState(@PathVariable("idPartitioning") String idPartitioning,
+            @PathVariable("idSu") String idSu) {
+
+        Questioning questioning = questioningService.findByIdPartitioningAndSurveyUnitIdSu(
+                idPartitioning, idSu);
+        if (questioning == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Questioning does not exist");
+        }
+
+        Optional<QuestioningEvent> questioningEvent = questioningEventService.getLastQuestioningEvent(questioning,
+                TypeQuestioningEvent.VALINT,
+                TypeQuestioningEvent.VALPAP,
+                TypeQuestioningEvent.REFUSAL,
+                TypeQuestioningEvent.WASTE,
+                TypeQuestioningEvent.HC,
+                TypeQuestioningEvent.INITLA,
+                TypeQuestioningEvent.PARTIELINT,
+                TypeQuestioningEvent.PND,
+                TypeQuestioningEvent.FOLLOWUP);
+        StateDto result = new StateDto();
+        result.setState(questioningEvent.isPresent() ? questioningEvent.get().getType().name() : "null");
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
+
     @Operation(summary = "Indicates whether a questioning should be follow up or not")
     @GetMapping(value = Constants.API_PROTOOLS_FOLLOWUP, produces = "application/json")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = MetadataDto.class))),
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = EligibleDto.class))),
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "400", description = "Bad request")
     })
@@ -441,13 +502,56 @@ public class ProtoolsController {
                 TypeQuestioningEvent.WASTE,
                 TypeQuestioningEvent.HC);
 
-        return ResponseEntity.status(HttpStatus.OK).body((questioningEvent.isPresent() ? "false" : "true"));
+        EligibleDto result = new EligibleDto();
+        result.setEligible(questioningEvent.isPresent() ? "false" : "true");
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
+    
+    @Operation(summary = "Add a FOLLWUP state to a questioning")
+    @PostMapping(value = Constants.API_PROTOOLS_FOLLOWUP, produces = "application/json")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = StateDto.class))),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "400", description = "Bad request")
+    })
+    @Transactional
+    public ResponseEntity<?> postFollwUp(
+            @PathVariable("idPartitioning") String idPartitioning,
+            @PathVariable("idSu") String idSu) throws JsonMappingException, JsonProcessingException {
+
+        Questioning questioning = questioningService.findByIdPartitioningAndSurveyUnitIdSu(
+                idPartitioning, idSu);
+        if (questioning == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Questioning does not exist");
+        }
+        
+        JsonNode node = addProtoolsAuthorNode();
+        QuestioningEvent questioningEvent = new QuestioningEvent();
+        questioningEvent.setQuestioning(questioning);
+        questioningEvent.setDate(new Date());
+        questioningEvent.setType(TypeQuestioningEvent.FOLLOWUP);   
+        questioningEvent.setPayload(node);
+        questioningEventService.saveQuestioningEvent(questioningEvent);
+        
+        questioning.getQuestioningEvents().add(questioningEvent);
+        questioningService.saveQuestioning(questioning);
+
+        StateDto result = new StateDto();
+        result.setState(questioningEvent.getType().name());
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
+
+    private JsonNode addProtoolsAuthorNode() throws JsonProcessingException, JsonMappingException {
+        String json = "{\"author\":\"protools" + "\"}";
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode node = mapper.readTree(json);
+        return node;
     }
 
     @Operation(summary = "Indicates whether a questioning should be extract or not (VALINT and PARTIELINT)")
     @GetMapping(value = Constants.API_PROTOOLS_EXTRACT, produces = "application/json")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = MetadataDto.class))),
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = EligibleDto.class))),
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "400", description = "Bad request")
     })
@@ -463,8 +567,9 @@ public class ProtoolsController {
         Optional<QuestioningEvent> questioningEvent = questioningEventService.getLastQuestioningEvent(questioning,
                 TypeQuestioningEvent.VALINT,
                 TypeQuestioningEvent.PARTIELINT);
-
-        return ResponseEntity.status(HttpStatus.OK).body((questioningEvent.isPresent() ? "true" : "false"));
+        EligibleDto result = new EligibleDto();
+        result.setEligible(questioningEvent.isPresent() ? "true" : "false");
+        return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
     private Support convertToEntity(SupportDto supportDto) {

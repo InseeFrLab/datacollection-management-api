@@ -15,6 +15,8 @@ public class ContactDto{
     private String function;
     private String email;
     private String phone;
+    private boolean firstLogin;
+    private boolean emailVerify;
     private AddressDto address;
 
 }
