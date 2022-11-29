@@ -74,7 +74,7 @@ public class AddressControllerTest {
         this.mockMvc.perform(put(Constants.API_CONTACTS + identifier + "/address").content(jsonCreate).contentType(MediaType.APPLICATION_JSON)).andDo(print())
             .andExpect(status().isCreated()).andExpect(content().json(jsonCreate.toString(), false));
         Contact contactAfterCreate = contactService.findByIdentifier(identifier);
-        assertEquals(contactAfterCreate.getAddress().getCity(), addressCreated.getCity());
+        assertEquals(contactAfterCreate.getAddress().getCityName(), addressCreated.getCityName());
         assertEquals(contactAfterCreate.getAddress().getStreetName(), addressCreated.getStreetName());
         assertEquals(contactAfterCreate.getAddress().getCountryName(), addressCreated.getCountryName());
         
@@ -85,7 +85,7 @@ public class AddressControllerTest {
         this.mockMvc.perform(put(Constants.API_CONTACTS + identifier + "/address").content(jsonUpdate).contentType(MediaType.APPLICATION_JSON)).andDo(print())
             .andExpect(status().isOk()).andExpect(content().json(jsonUpdate.toString(), false));
         Contact contactAfterUpdate = contactService.findByIdentifier(identifier);
-        assertEquals(contactAfterUpdate.getAddress().getCity(), addressUpdated.getCity());
+        assertEquals(contactAfterUpdate.getAddress().getCityName(), addressUpdated.getCityName());
         assertEquals(contactAfterUpdate.getAddress().getStreetName(), addressUpdated.getStreetName());
         assertEquals(contactAfterUpdate.getAddress().getCountryName(), addressUpdated.getCountryName());
         
@@ -93,7 +93,7 @@ public class AddressControllerTest {
         contact.setAddress(addressBefore);
         addressService.saveAddress(addressBefore);
         contactService.saveContact(contact);
-        assertEquals(contact.getAddress().getCity(), addressBefore.getCity());
+        assertEquals(contact.getAddress().getCityName(), addressBefore.getCityName());
         assertEquals(contact.getAddress().getStreetName(), addressBefore.getStreetName());
         assertEquals(contact.getAddress().getCountryName(), addressBefore.getCountryName());
         
@@ -101,7 +101,7 @@ public class AddressControllerTest {
 
     private Address initAddressMock(String identifier) {
         Address address = new Address();
-        address.setCity("city " + identifier);
+        address.setCityName("city " + identifier);
         address.setStreetName("street name " + identifier);
         address.setStreetNumber(Integer.toString(identifier.length()));
         address.setCountryName("country " + identifier);
@@ -110,7 +110,7 @@ public class AddressControllerTest {
 
     private String createJsonAddress(Contact contact) throws JSONException {
         JSONObject jo = new JSONObject();
-        jo.put("city", contact.getAddress().getCity());
+        jo.put("city", contact.getAddress().getCityName());
         jo.put("streetName", contact.getAddress().getStreetName());
         jo.put("countryName", contact.getAddress().getCountryName());
         return jo.toString();
