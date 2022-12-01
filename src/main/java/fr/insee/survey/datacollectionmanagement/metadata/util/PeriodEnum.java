@@ -25,9 +25,11 @@ public enum PeriodEnum {
     M11(PeriodicityEnum.M, "november"),
     M12(PeriodicityEnum.M, "december"),
     B01(PeriodicityEnum.B, "1st bimester"),
-    B02(PeriodicityEnum.B, "1st bimester"),
-    B03(PeriodicityEnum.B, "1st bimester"),
-    B04(PeriodicityEnum.B, "1st bimester"),
+    B02(PeriodicityEnum.B, "2nd bimester"),
+    B03(PeriodicityEnum.B, "3rd bimester"),
+    B04(PeriodicityEnum.B, "4th bimester"),
+    B05(PeriodicityEnum.B, "5th bimester"),
+    B06(PeriodicityEnum.B, "6th bimester"),
 
     ;
 
