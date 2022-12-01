@@ -341,7 +341,7 @@ List of support ids =
 - `GET /api/contacts/{id}/accreditations` : Get contact accreditations by the contact id
 - `GET /api/my-questionings/{id}` : Get contact questionings by the contact identifier
 
-### Protools
+### Webclients
 
 - `GET /api/metadata/{id}` : Search for a partitiong and metadata by partitioning id
 - `PUT /api/metadata/{id}` : Insert or update a partitiong and metadata by partitioning id
@@ -407,8 +407,8 @@ List of support ids =
 }
 ```
 
-- `GET /api/questionings` : Get questioning for protools
-- `PUT /api/questionings` : Create or update questioning for protools
+- `GET /api/questionings` : Get questioning for webclients
+- `PUT /api/questionings` : Create or update questioning for webclients
 
 ```json
 {

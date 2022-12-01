@@ -59,7 +59,7 @@ import fr.insee.survey.datacollectionmanagement.metadata.service.SupportService;
 import fr.insee.survey.datacollectionmanagement.metadata.service.SurveyService;
 import fr.insee.survey.datacollectionmanagement.query.dto.ContactAccreditationDto;
 import fr.insee.survey.datacollectionmanagement.query.dto.EligibleDto;
-import fr.insee.survey.datacollectionmanagement.query.dto.QuestioningProtoolsDto;
+import fr.insee.survey.datacollectionmanagement.query.dto.QuestioningWebclientDto;
 import fr.insee.survey.datacollectionmanagement.query.dto.StateDto;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningAccreditation;
@@ -85,8 +85,8 @@ import lombok.extern.slf4j.Slf4j;
 @PreAuthorize("@AuthorizeMethodDecider.isInternalUser() "
         + "|| @AuthorizeMethodDecider.isWebClient() ")
 @Slf4j
-@Tag(name = "6 - Protools", description = "Enpoints for protools")
-public class ProtoolsController {
+@Tag(name = "6 - Webclients", description = "Enpoints for webclients")
+public class WebclientController {
 
     @Autowired
     QuestioningService questioningService;
@@ -130,23 +130,23 @@ public class ProtoolsController {
     @Autowired
     private ModelMapper modelMapper;
 
-    @Operation(summary = "Create or update questioning for protools")
-    @PutMapping(value = Constants.API_PROTOOLS_QUESTIONINGS, produces = "application/json", consumes = "application/json")
+    @Operation(summary = "Create or update questioning for webclients")
+    @PutMapping(value = Constants.API_WEBCLIENT_QUESTIONINGS, produces = "application/json", consumes = "application/json")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = QuestioningProtoolsDto.class))),
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = QuestioningProtoolsDto.class))),
+            @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = QuestioningWebclientDto.class))),
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = QuestioningWebclientDto.class))),
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "400", description = "Bad request")
 
     })
     @Transactional
-    public ResponseEntity<?> putQuestioning(@RequestBody QuestioningProtoolsDto questioningProtoolsDto)
+    public ResponseEntity<?> putQuestioning(@RequestBody QuestioningWebclientDto questioningWebclientDto)
             throws JsonMappingException, JsonProcessingException {
 
-        log.info("Put questioning for protools {}", questioningProtoolsDto.toString());
-        String modelName = questioningProtoolsDto.getModelName();
-        String idSu = questioningProtoolsDto.getSurveyUnit().getIdSu();
-        String idPartitioning = questioningProtoolsDto.getIdPartitioning();
+        log.info("Put questioning for webclients {}", questioningWebclientDto.toString());
+        String modelName = questioningWebclientDto.getModelName();
+        String idSu = questioningWebclientDto.getSurveyUnit().getIdSu();
+        String idPartitioning = questioningWebclientDto.getIdPartitioning();
 
         if (idPartitioning.isBlank() || modelName.isBlank() ||
                 idSu.isBlank()) {
@@ -161,7 +161,7 @@ public class ProtoolsController {
         SurveyUnit su;
 
         HttpStatus httpStatus = HttpStatus.OK;
-        su = convertToEntity(questioningProtoolsDto.getSurveyUnit());
+        su = convertToEntity(questioningWebclientDto.getSurveyUnit());
 
         // Create su if not exists or update
         try {
@@ -194,9 +194,9 @@ public class ProtoolsController {
             questioning.setQuestioningAccreditations(new HashSet<>());
         }
 
-        JsonNode node = addProtoolsAuthorNode();
+        JsonNode node = addWebclientAuthorNode();
 
-        for (ContactAccreditationDto contactAccreditationDto : questioningProtoolsDto.getContacts()) {
+        for (ContactAccreditationDto contactAccreditationDto : questioningWebclientDto.getContacts()) {
             // Create contact if not exists or update
             Contact contact;
             try {
@@ -256,15 +256,15 @@ public class ProtoolsController {
 
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set(HttpHeaders.LOCATION, ServletUriComponentsBuilder.fromCurrentRequest().toUriString());
-        log.info("Put questioning for protools ok");
-        return ResponseEntity.status(httpStatus).headers(responseHeaders).body(questioningProtoolsDto);
+        log.info("Put questioning for webclients ok");
+        return ResponseEntity.status(httpStatus).headers(responseHeaders).body(questioningWebclientDto);
 
     }
 
-    @Operation(summary = "Get questioning for protools")
-    @GetMapping(value = Constants.API_PROTOOLS_QUESTIONINGS, produces = "application/json")
+    @Operation(summary = "Get questioning for webclients")
+    @GetMapping(value = Constants.API_WEBCLIENT_QUESTIONINGS, produces = "application/json")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = QuestioningProtoolsDto.class))),
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = QuestioningWebclientDto.class))),
             @ApiResponse(responseCode = "404", description = "Not found"),
     })
     public ResponseEntity<?> getQuestioning(@RequestParam(required = true) String modelName,
@@ -272,7 +272,7 @@ public class ProtoolsController {
             @RequestParam(required = true) String idSurveyUnit)
             throws JsonMappingException, JsonProcessingException {
 
-        QuestioningProtoolsDto questioningProtoolsDto = new QuestioningProtoolsDto();
+        QuestioningWebclientDto questioningWebclientDto = new QuestioningWebclientDto();
 
         HttpStatus httpStatus = HttpStatus.OK;
 
@@ -281,21 +281,21 @@ public class ProtoolsController {
         if (questioning == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Questioning does not exist");
         }
-        questioningProtoolsDto.setIdPartitioning(idPartitioning);
-        questioningProtoolsDto.setIdPartitioning(idPartitioning);
-        questioningProtoolsDto.setModelName(modelName);
-        questioningProtoolsDto.setSurveyUnit(convertToDto(questioning.getSurveyUnit()));
+        questioningWebclientDto.setIdPartitioning(idPartitioning);
+        questioningWebclientDto.setIdPartitioning(idPartitioning);
+        questioningWebclientDto.setModelName(modelName);
+        questioningWebclientDto.setSurveyUnit(convertToDto(questioning.getSurveyUnit()));
         List<ContactAccreditationDto> listContactAccreditationDto = new ArrayList<>();
         questioning.getQuestioningAccreditations().stream()
                 .forEach(acc -> listContactAccreditationDto
                         .add(convertToDto(contactService.findByIdentifier(acc.getIdContact()), acc.isMain())));
-        questioningProtoolsDto.setContacts(listContactAccreditationDto);
-        return ResponseEntity.status(httpStatus).body(questioningProtoolsDto);
+        questioningWebclientDto.setContacts(listContactAccreditationDto);
+        return ResponseEntity.status(httpStatus).body(questioningWebclientDto);
 
     }
 
     @Operation(summary = "Search for a partitiong and metadata by partitioning id")
-    @GetMapping(value = Constants.API_PROTOOLS_METADATA_ID, produces = "application/json")
+    @GetMapping(value = Constants.API_WEBCLIENT_METADATA_ID, produces = "application/json")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = MetadataDto.class))),
             @ApiResponse(responseCode = "404", description = "Not found"),
@@ -324,7 +324,7 @@ public class ProtoolsController {
     }
 
     @Operation(summary = "Insert or update a partitiong and metadata by partitioning id")
-    @PutMapping(value = Constants.API_PROTOOLS_METADATA_ID, produces = "application/json", consumes = "application/json")
+    @PutMapping(value = Constants.API_WEBCLIENT_METADATA_ID, produces = "application/json", consumes = "application/json")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = MetadataDto.class))),
             @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = MetadataDto.class))),
@@ -448,7 +448,7 @@ public class ProtoolsController {
     }
 
     @Operation(summary = "Get state of the last questioningEvent")
-    @GetMapping(value = Constants.API_PROTOOLS_STATE, produces = "application/json")
+    @GetMapping(value = Constants.API_WEBCLIENT_STATE, produces = "application/json")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = StateDto.class))),
             @ApiResponse(responseCode = "404", description = "Not found"),
@@ -479,7 +479,7 @@ public class ProtoolsController {
     }
 
     @Operation(summary = "Indicates whether a questioning should be follow up or not")
-    @GetMapping(value = Constants.API_PROTOOLS_FOLLOWUP, produces = "application/json")
+    @GetMapping(value = Constants.API_WEBCLIENT_FOLLOWUP, produces = "application/json")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = EligibleDto.class))),
             @ApiResponse(responseCode = "404", description = "Not found"),
@@ -508,7 +508,7 @@ public class ProtoolsController {
     }
     
     @Operation(summary = "Add a FOLLWUP state to a questioning")
-    @PostMapping(value = Constants.API_PROTOOLS_FOLLOWUP, produces = "application/json")
+    @PostMapping(value = Constants.API_WEBCLIENT_FOLLOWUP, produces = "application/json")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = StateDto.class))),
             @ApiResponse(responseCode = "404", description = "Not found"),
@@ -525,7 +525,7 @@ public class ProtoolsController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Questioning does not exist");
         }
         
-        JsonNode node = addProtoolsAuthorNode();
+        JsonNode node = addWebclientAuthorNode();
         QuestioningEvent questioningEvent = new QuestioningEvent();
         questioningEvent.setQuestioning(questioning);
         questioningEvent.setDate(new Date());
@@ -541,15 +541,15 @@ public class ProtoolsController {
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
-    private JsonNode addProtoolsAuthorNode() throws JsonProcessingException, JsonMappingException {
-        String json = "{\"author\":\"protools" + "\"}";
+    private JsonNode addWebclientAuthorNode() throws JsonProcessingException, JsonMappingException {
+        String json = "{\"author\":\"webclient" + "\"}";
         ObjectMapper mapper = new ObjectMapper();
         JsonNode node = mapper.readTree(json);
         return node;
     }
 
     @Operation(summary = "Indicates whether a questioning should be extract or not (VALINT and PARTIELINT)")
-    @GetMapping(value = Constants.API_PROTOOLS_EXTRACT, produces = "application/json")
+    @GetMapping(value = Constants.API_WEBCLIENT_EXTRACT, produces = "application/json")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = EligibleDto.class))),
             @ApiResponse(responseCode = "404", description = "Not found"),

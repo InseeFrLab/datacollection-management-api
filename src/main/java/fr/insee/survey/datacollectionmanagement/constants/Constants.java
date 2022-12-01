@@ -63,12 +63,12 @@ public class Constants {
     public static final String API_CONTACTS_ACCREDITATIONS = "/api/contacts/{id}/accreditations";
     public static final String API_MY_QUESTIONINGS_ID = "/api/my-questionings/{id}";
     
-    // API PROTOOLS
-    public static final String API_PROTOOLS_FOLLOWUP = "/api/partitionings/{idPartitioning}/survey-units/{idSu}/follow-up";
-    public static final String API_PROTOOLS_EXTRACT = "/api/partitionings/{idPartitioning}/survey-units/{idSu}/extract";
-    public static final String API_PROTOOLS_STATE = "/api/partitionings/{idPartitioning}/survey-units/{idSu}/state";
-    public static final String API_PROTOOLS_METADATA = "/api/metadata";
-    public static final String API_PROTOOLS_METADATA_ID = "/api/metadata/{id}";
-    public static final String API_PROTOOLS_QUESTIONINGS = "/api/questionings";
+    // API WEBCLIENT
+    public static final String API_WEBCLIENT_FOLLOWUP = "/api/partitionings/{idPartitioning}/survey-units/{idSu}/follow-up";
+    public static final String API_WEBCLIENT_EXTRACT = "/api/partitionings/{idPartitioning}/survey-units/{idSu}/extract";
+    public static final String API_WEBCLIENT_STATE = "/api/partitionings/{idPartitioning}/survey-units/{idSu}/state";
+    public static final String API_WEBCLIENT_METADATA = "/api/metadata";
+    public static final String API_WEBCLIENT_METADATA_ID = "/api/metadata/{id}";
+    public static final String API_WEBCLIENT_QUESTIONINGS = "/api/questionings";
 
 }

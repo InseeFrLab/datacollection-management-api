@@ -221,6 +221,7 @@ public class DataloaderTest {
         int year = Year.now().getValue();
 
         Owner ownerInsee = new Owner();
+        ownerInsee.setId("Insee");
         ownerInsee.setLabel("Insee");
         Set<Source> setSourcesInsee = new HashSet<>();
 
@@ -266,7 +267,7 @@ public class DataloaderTest {
                         int trimester = k + 1;
                         String period = "T0" + trimester;
                         campaign.setYear(year - j);
-                        campaign.setPeriod(PeriodEnum.fromValue(period));
+                        campaign.setPeriod(PeriodEnum.valueOf(period));
                         campaign.setId(sourceName + (year - j) + period);
                         campaign.setCampaignWording(
                                 "Campaign about " + sourceName + " in " + (year - j) + " and period " + period);
