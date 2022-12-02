@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -81,7 +80,7 @@ public class SearchContactController {
 
         Pageable pageable = PageRequest.of(pageNo, pageSize);
 
-        List<View> listView = searchContactService.searchContactCrossDomain(StringUtils.upperCase(identifier), lastName, firstName, email,
+        List<View> listView = searchContactService.searchContactCrossDomain(identifier, lastName, firstName, email,
                 idSu, identificationCode, identificationName, source, year, period,
                 pageable);
         int start = (int) pageable.getOffset();
