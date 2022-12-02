@@ -1,5 +1,6 @@
 package fr.insee.survey.datacollectionmanagement.questioning.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -23,5 +24,5 @@ public interface QuestioningEventService {
      * @param events list of events to be considered
      * @return optional last Questioning event in order of importance
      */
-    Optional<QuestioningEvent> getLastQuestioningEvent(Questioning questioning, TypeQuestioningEvent... events);
+    Optional<QuestioningEvent> getLastQuestioningEvent(Questioning questioning, List<TypeQuestioningEvent> events);
 }

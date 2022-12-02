@@ -55,19 +55,15 @@ public class SurveyUnitServiceImpl implements SurveyUnitService {
         if (surveyUnit.getSurveyUnitAddress() != null) {
             try {
                 SurveyUnit existingSurveyUnit = findbyId(surveyUnit.getIdSu());
-                if (surveyUnit.getSurveyUnitAddress() != null) {
-                    if (existingSurveyUnit.getSurveyUnitAddress() != null) {
-                        surveyUnit.getSurveyUnitAddress().setId(existingSurveyUnit.getSurveyUnitAddress().getId());
-                    }
+                if (existingSurveyUnit.getSurveyUnitAddress() != null) {
+                    surveyUnit.getSurveyUnitAddress().setId(existingSurveyUnit.getSurveyUnitAddress().getId());
                 }
             } catch (NoSuchElementException e) {
-                log.debug("Survey unit does not exist");
+                log.info("Survey unit does not exist");
             }
             surveyUnitAddressRepository.save(surveyUnit.getSurveyUnitAddress());
         }
-
         return surveyUnitRepository.save(surveyUnit);
-
     }
 
     @Override

@@ -44,12 +44,10 @@ public class QuestioningEventServiceImpl implements QuestioningEventService {
     
 
     @Override
-    public Optional<QuestioningEvent> getLastQuestioningEvent(Questioning questioning, TypeQuestioningEvent... events) {
-        
-        List<TypeQuestioningEvent> listEvents = Arrays.asList(events);
-        
+    public Optional<QuestioningEvent> getLastQuestioningEvent(Questioning questioning, List<TypeQuestioningEvent> events) {
+                
         List<QuestioningEvent> listQuestioningEvent = questioning.getQuestioningEvents().stream()
-                .filter(qe -> listEvents.contains(qe.getType()))
+                .filter(qe -> events.contains(qe.getType()))
                 .collect(Collectors.toList());
         Collections.sort(listQuestioningEvent, lastQuestioningEventComparator);
         return listQuestioningEvent.stream().findFirst();

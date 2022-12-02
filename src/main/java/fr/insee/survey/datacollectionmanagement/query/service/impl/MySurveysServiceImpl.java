@@ -2,6 +2,7 @@ package fr.insee.survey.datacollectionmanagement.query.service.impl;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +29,7 @@ public class MySurveysServiceImpl implements MySurveysService {
     private static final Logger LOGGER = LogManager.getLogger(MySurveysServiceImpl.class);
 
     private static final String STROMAE_URL = "https://dev.insee.io/questionnaire/";
+    
 
     @Autowired
     private QuestioningAccreditationService questioningAccreditationService;
@@ -37,6 +39,7 @@ public class MySurveysServiceImpl implements MySurveysService {
 
     @Autowired
     private QuestioningEventService questioningEventService;
+
 
     @Override
     public List<MyQuestioningDto> getListMySurveys(String id) {
@@ -60,9 +63,7 @@ public class MySurveysServiceImpl implements MySurveysService {
                 surveyDto.setReturnDate(new Timestamp(part.get().getReturnDate().getTime()));
 
                 Optional<QuestioningEvent> questioningEvent = questioningEventService.getLastQuestioningEvent(
-                        questioning,
-                        TypeQuestioningEvent.PARTIELINT, TypeQuestioningEvent.HC, TypeQuestioningEvent.VALPAP,
-                        TypeQuestioningEvent.VALINT, TypeQuestioningEvent.REFUSAL);
+                        questioning, TypeQuestioningEvent.MY_QUESTIONINGS_EVENTS);
                 if (questioningEvent.isPresent()) {
                     surveyDto.setQuestioningStatus(questioningEvent.get().getType().name());
                     surveyDto.setQuestioningDate(new Timestamp(questioningEvent.get().getDate().getTime()));

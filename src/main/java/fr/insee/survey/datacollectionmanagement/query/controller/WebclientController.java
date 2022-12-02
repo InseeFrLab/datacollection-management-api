@@ -130,6 +130,8 @@ public class WebclientController {
     @Autowired
     private ModelMapper modelMapper;
 
+
+
     @Operation(summary = "Create or update questioning for webclients")
     @PutMapping(value = Constants.API_WEBCLIENT_QUESTIONINGS, produces = "application/json", consumes = "application/json")
     @ApiResponses(value = {
@@ -433,11 +435,10 @@ public class WebclientController {
             @RequestParam(value = "survey-unit", required = true) String surveyUnitId) {
 
         try {
-            List<Contact> listContacts = new ArrayList<>();
-            Questioning questioning = questioningService.findByIdPartitioningAndSurveyUnitIdSu(partitioningId,
-                    surveyUnitId);
-            questioning.getQuestioningAccreditations().stream().filter(qa -> qa.isMain())
-                    .forEach(qa -> listContacts.add(contactService.findByIdentifier(qa.getIdContact())));
+            List<Contact> listContacts = questioningService.findByIdPartitioningAndSurveyUnitIdSu(partitioningId,
+                    surveyUnitId).getQuestioningAccreditations().stream().filter(qa -> qa.isMain())
+                    .map(qa -> contactService.findByIdentifier(qa.getIdContact()))
+                    .collect(Collectors.toList());
             return new ResponseEntity<>(listContacts,
                     HttpStatus.OK);
         } catch (NoSuchElementException e) {
@@ -462,17 +463,8 @@ public class WebclientController {
         if (questioning == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Questioning does not exist");
         }
-
         Optional<QuestioningEvent> questioningEvent = questioningEventService.getLastQuestioningEvent(questioning,
-                TypeQuestioningEvent.VALINT,
-                TypeQuestioningEvent.VALPAP,
-                TypeQuestioningEvent.REFUSAL,
-                TypeQuestioningEvent.WASTE,
-                TypeQuestioningEvent.HC,
-                TypeQuestioningEvent.INITLA,
-                TypeQuestioningEvent.PARTIELINT,
-                TypeQuestioningEvent.PND,
-                TypeQuestioningEvent.FOLLOWUP);
+                TypeQuestioningEvent.STATE_EVENTS);
         StateDto result = new StateDto();
         result.setState(questioningEvent.isPresent() ? questioningEvent.get().getType().name() : "null");
         return ResponseEntity.status(HttpStatus.OK).body(result);
@@ -496,17 +488,13 @@ public class WebclientController {
         }
 
         Optional<QuestioningEvent> questioningEvent = questioningEventService.getLastQuestioningEvent(questioning,
-                TypeQuestioningEvent.VALINT,
-                TypeQuestioningEvent.VALPAP,
-                TypeQuestioningEvent.REFUSAL,
-                TypeQuestioningEvent.WASTE,
-                TypeQuestioningEvent.HC);
+                TypeQuestioningEvent.FOLLOWUP_EVENTS);
 
         EligibleDto result = new EligibleDto();
         result.setEligible(questioningEvent.isPresent() ? "false" : "true");
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
-    
+
     @Operation(summary = "Add a FOLLWUP state to a questioning")
     @PostMapping(value = Constants.API_WEBCLIENT_FOLLOWUP, produces = "application/json")
     @ApiResponses(value = {
@@ -524,15 +512,15 @@ public class WebclientController {
         if (questioning == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Questioning does not exist");
         }
-        
+
         JsonNode node = addWebclientAuthorNode();
         QuestioningEvent questioningEvent = new QuestioningEvent();
         questioningEvent.setQuestioning(questioning);
         questioningEvent.setDate(new Date());
-        questioningEvent.setType(TypeQuestioningEvent.FOLLOWUP);   
+        questioningEvent.setType(TypeQuestioningEvent.FOLLOWUP);
         questioningEvent.setPayload(node);
         questioningEventService.saveQuestioningEvent(questioningEvent);
-        
+
         questioning.getQuestioningEvents().add(questioningEvent);
         questioningService.saveQuestioning(questioning);
 
@@ -542,7 +530,7 @@ public class WebclientController {
     }
 
     private JsonNode addWebclientAuthorNode() throws JsonProcessingException, JsonMappingException {
-        String json = "{\"author\":\"webclient" + "\"}";
+        String json = "{\"author\":\"webclient\"}";
         ObjectMapper mapper = new ObjectMapper();
         JsonNode node = mapper.readTree(json);
         return node;
@@ -565,8 +553,7 @@ public class WebclientController {
         }
 
         Optional<QuestioningEvent> questioningEvent = questioningEventService.getLastQuestioningEvent(questioning,
-                TypeQuestioningEvent.VALINT,
-                TypeQuestioningEvent.PARTIELINT);
+                TypeQuestioningEvent.EXTRACT_EVENTS);
         EligibleDto result = new EligibleDto();
         result.setEligible(questioningEvent.isPresent() ? "true" : "false");
         return ResponseEntity.status(HttpStatus.OK).body(result);
