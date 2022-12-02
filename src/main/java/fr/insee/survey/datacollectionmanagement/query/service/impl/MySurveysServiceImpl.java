@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,7 @@ public class MySurveysServiceImpl implements MySurveysService {
     @Override
     public List<MyQuestioningDto> getListMySurveys(String id) {
         List<MyQuestioningDto> listSurveys = new ArrayList<>();
-        List<QuestioningAccreditation> accreditations = questioningAccreditationService.findByContactIdentifier(id);
+        List<QuestioningAccreditation> accreditations = questioningAccreditationService.findByContactIdentifier(StringUtils.upperCase(id));
 
         for (QuestioningAccreditation questioningAccreditation : accreditations) {
             MyQuestioningDto surveyDto = new MyQuestioningDto();
