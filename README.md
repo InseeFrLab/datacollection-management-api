@@ -85,11 +85,18 @@ Before committing code please ensure,
   "email": "shaunte.powlowski@cocorico.fr",
   "phone": "994.107.2000",
   "address": {
-    "streetNumber": "30451",
-    "streetName": "Fadel River",
-    "city": "Tamouth",
-    "zipCode": "43059-2000",
-    "countryName": "Falkland Islands (Malvinas)"
+      "streetNumber": "string",
+      "repetitionIndex": "string",
+      "streetType": "string",
+      "streetName": "string",
+      "addressSupplement": "string",
+      "cityName": "string",
+      "zipCode": "string",
+      "cedexCode": "string",
+      "cedexName": "string",
+      "specialDistribution": "string",
+      "countryCode": "string",
+      "countryName": "string"
   }
 }
 or
@@ -112,11 +119,18 @@ or
 
 ```json
   "address": {
-    "streetNumber": "30451",
-    "streetName": "Fadel River",
-    "city": "Tamouth",
-    "zipCode": "43059-2000",
-    "countryName": "Falkland Islands (Malvinas)"
+      "streetNumber": "string",
+      "repetitionIndex": "string",
+      "streetType": "string",
+      "streetName": "string",
+      "addressSupplement": "string",
+      "cityName": "string",
+      "zipCode": "string",
+      "cedexCode": "string",
+      "cedexName": "string",
+      "specialDistribution": "string",
+      "countryCode": "string",
+      "countryName": "string"
   }
 ```
 
@@ -419,11 +433,18 @@ List of support ids =
     "identificationCode": "999999999",
     "identificationName": "cocorico team",
     "address": {
-      "streetNumber": "130",
-      "streetName": "avenue Kennedy",
-      "city": "Lille",
-      "zipCode": "59000",
-      "countryName": "France"
+      "streetNumber": "string",
+      "repetitionIndex": "string",
+      "streetType": "string",
+      "streetName": "string",
+      "addressSupplement": "string",
+      "cityName": "string",
+      "zipCode": "string",
+      "cedexCode": "string",
+      "cedexName": "string",
+      "specialDistribution": "string",
+      "countryCode": "string",
+      "countryName": "string"
     }
   },
   "contacts": [
@@ -439,11 +460,18 @@ List of support ids =
       "email": "charley.jacobi@cocorico.fr",
       "phone": "493-039-9455 x2852",
       "address": {
-        "streetNumber": "8214",
-        "streetName": "Gustavo Ranch",
-        "city": "East Denice",
-        "zipCode": "59000",
-        "countryName": "France"
+        "streetNumber": "string",
+        "repetitionIndex": "string",
+        "streetType": "string",
+        "streetName": "string",
+        "addressSupplement": "string",
+        "cityName": "string",
+        "zipCode": "string",
+        "cedexCode": "string",
+        "cedexName": "string",
+        "specialDistribution": "string",
+        "countryCode": "string",
+        "countryName": "string"
       }
     },
     {
@@ -457,11 +485,18 @@ List of support ids =
       "email": "charley.jacobi@cocorico.fr",
       "phone": "493-039-9455 x2852",
       "address": {
-        "streetNumber": "8214",
-        "streetName": "Gustavo Ranch",
-        "city": "East Denice",
-        "zipCode": "59000",
-        "countryName": "France"
+        "streetNumber": "string",
+        "repetitionIndex": "string",
+        "streetType": "string",
+        "streetName": "string",
+        "addressSupplement": "string",
+        "cityName": "string",
+        "zipCode": "string",
+        "cedexCode": "string",
+        "cedexName": "string",
+        "specialDistribution": "string",
+        "countryCode": "string",
+        "countryName": "string"
       }
     },
     {
@@ -475,11 +510,18 @@ List of support ids =
       "email": "charley.jacobi@cocorico.fr",
       "phone": "493-039-9455 x2852",
       "address": {
-        "streetNumber": "8214",
-        "streetName": "Gustavo Ranch",
-        "city": "East Denice",
-        "zipCode": "59000",
-        "countryName": "France"
+        "streetNumber": "string",
+        "repetitionIndex": "string",
+        "streetType": "string",
+        "streetName": "string",
+        "addressSupplement": "string",
+        "cityName": "string",
+        "zipCode": "string",
+        "cedexCode": "string",
+        "cedexName": "string",
+        "specialDistribution": "string",
+        "countryCode": "string",
+        "countryName": "string"
       }
     }
   ]
