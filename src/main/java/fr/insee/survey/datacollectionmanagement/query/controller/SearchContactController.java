@@ -40,7 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @PreAuthorize("@AuthorizeMethodDecider.isInternalUser() "
         + "|| @AuthorizeMethodDecider.isWebClient() ")
-@Tag(name = "1 - Contacts", description = "Enpoints to create, update, delete and find contacts")
+@Tag(name = "4 - Cross domain")
 @Slf4j
 public class SearchContactController {
 

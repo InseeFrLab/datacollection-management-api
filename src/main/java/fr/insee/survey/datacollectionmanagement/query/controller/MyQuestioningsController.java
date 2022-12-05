@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 import fr.insee.survey.datacollectionmanagement.constants.Constants;
 import fr.insee.survey.datacollectionmanagement.query.dto.MyQuestioningDto;
 import fr.insee.survey.datacollectionmanagement.query.service.MySurveysService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
+@Tag(name = "4 - Cross domain")
 public class MyQuestioningsController {
 
     @Autowired

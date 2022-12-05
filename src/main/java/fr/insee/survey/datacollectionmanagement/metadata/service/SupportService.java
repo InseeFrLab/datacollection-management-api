@@ -10,13 +10,13 @@ import fr.insee.survey.datacollectionmanagement.metadata.domain.Support;
 
 public interface SupportService {
 
-    Optional<Support> findById(Long support);
+    Optional<Support> findById(String support);
 
     Page<Support> findAll(Pageable pageable);
 
     Support insertOrUpdateSupport(Support support);
 
-    void deleteSupportById(Long id);
+    void deleteSupportById(String id);
 
     void removeSourceFromSupport(Support support, Source source);
 

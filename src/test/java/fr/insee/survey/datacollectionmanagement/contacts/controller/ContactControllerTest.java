@@ -129,16 +129,16 @@ public class ContactControllerTest {
         mockMvc.perform(put(Constants.API_CONTACTS + identifier).content(jsonContact).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isCreated())
             .andExpect(content().json(jsonContact.toString(), false));
         Contact countactFound = contactService.findByIdentifier(identifier);
-        assertEquals(contact.getAddress().getCity(), countactFound.getAddress().getCity());
+        assertEquals(contact.getAddress().getCityName(), countactFound.getAddress().getCityName());
 
         // update contact - status ok
         String newCityName = "cityUpdate";
-        contact.getAddress().setCity(newCityName);
+        contact.getAddress().setCityName(newCityName);
         String jsonContactUpdate = createJsonContactAddress(contact);
         mockMvc.perform(put(Constants.API_CONTACTS + identifier).content(jsonContactUpdate).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
             .andExpect(content().json(jsonContactUpdate.toString(), false));
         Contact countactFoundAfterUpdate = contactService.findByIdentifier(identifier);
-        assertEquals(contact.getAddress().getCity(), countactFoundAfterUpdate.getAddress().getCity());
+        assertEquals(contact.getAddress().getCityName(), countactFoundAfterUpdate.getAddress().getCityName());
 
         // delete contact
         mockMvc.perform(delete(Constants.API_CONTACTS + identifier).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent());
@@ -179,7 +179,7 @@ public class ContactControllerTest {
 
     private Address initAddress(String identifier) {
         Address address = new Address();
-        address.setCity("city " + identifier);
+        address.setCityName("city " + identifier);
         address.setCountryName("country " + identifier);
         address.setStreetName("steet " + identifier);
         address.setStreetNumber(identifier);
@@ -210,7 +210,7 @@ public class ContactControllerTest {
 
     private JSONObject createJsonAddress(Contact contact) throws JSONException {
         JSONObject jo = new JSONObject();
-        jo.put("city", contact.getAddress().getCity());
+        jo.put("city", contact.getAddress().getCityName());
         jo.put("streetName", contact.getAddress().getStreetName());
         jo.put("countryName", contact.getAddress().getCountryName());
         return jo;

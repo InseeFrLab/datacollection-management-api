@@ -27,6 +27,7 @@ import fr.insee.survey.datacollectionmanagement.constants.Constants;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Source;
 import fr.insee.survey.datacollectionmanagement.metadata.repository.SourceRepository;
 import fr.insee.survey.datacollectionmanagement.metadata.service.SourceService;
+import fr.insee.survey.datacollectionmanagement.metadata.util.PeriodicityEnum;
 
 @AutoConfigureMockMvc
 @SpringBootTest
@@ -127,7 +128,7 @@ public class SourceControllerTest {
         sourceMock.setId(identifier);
         sourceMock.setLongWording("Long wording about " + identifier);
         sourceMock.setShortWording("Short wording about " + identifier);
-        sourceMock.setPeriodicity("T");
+        sourceMock.setPeriodicity(PeriodicityEnum.T);
         sourceMock.setMandatoryMySurveys(true);
         return sourceMock;
     }

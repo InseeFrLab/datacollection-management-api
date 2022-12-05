@@ -12,7 +12,6 @@ import javax.validation.constraints.NotNull;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 @Entity
 @Data
@@ -34,6 +33,7 @@ public class QuestioningAccreditation {
     private String idContact;
 
     @OneToOne
+    @EqualsAndHashCode.Exclude
     private Questioning questioning;
 
     @Override

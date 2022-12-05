@@ -12,7 +12,7 @@ import lombok.Setter;
 public class QuestioningEventDto {
 
     private Long id;
-    private String questioningId;
+    private Long questioningId;
     private Date eventDate;
     private String type;
     private JsonNode payload;

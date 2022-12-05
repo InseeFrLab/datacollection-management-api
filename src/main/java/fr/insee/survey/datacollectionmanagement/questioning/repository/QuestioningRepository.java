@@ -10,4 +10,7 @@ public interface QuestioningRepository extends JpaRepository<Questioning, Long> 
 
     public Set<Questioning> findByIdPartitioning(String idPartitioning);
 
+    public Questioning findByIdPartitioningAndSurveyUnitIdSu(String idPartitioning,
+            String surveyUnitIdSu);
+
 }

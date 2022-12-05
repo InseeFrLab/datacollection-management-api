@@ -46,6 +46,8 @@ import fr.insee.survey.datacollectionmanagement.metadata.repository.Partitioning
 import fr.insee.survey.datacollectionmanagement.metadata.repository.SourceRepository;
 import fr.insee.survey.datacollectionmanagement.metadata.repository.SupportRepository;
 import fr.insee.survey.datacollectionmanagement.metadata.repository.SurveyRepository;
+import fr.insee.survey.datacollectionmanagement.metadata.util.PeriodEnum;
+import fr.insee.survey.datacollectionmanagement.metadata.util.PeriodicityEnum;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.EventOrder;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.Operator;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.OperatorService;
@@ -151,7 +153,7 @@ public class Dataloader {
                 a.setStreetNumber(fakeAddress.buildingNumber());
                 a.setStreetName(fakeAddress.streetName());
                 a.setZipCode(fakeAddress.zipCode());
-                a.setCity(fakeAddress.cityName());
+                a.setCityName(fakeAddress.cityName());
                 su.setSurveyUnitAddress(a);
                 surveyUnitRepository.save(su);
             }
@@ -211,7 +213,7 @@ public class Dataloader {
                 a.setStreetNumber(fakeAddress.buildingNumber());
                 a.setStreetName(fakeAddress.streetName());
                 a.setZipCode(fakeAddress.zipCode());
-                a.setCity(fakeAddress.cityName());
+                a.setCityName(fakeAddress.cityName());
                 su.setSurveyUnitAddress(a);
                 surveyUnitRepository.save(su);
             }
@@ -279,7 +281,7 @@ public class Dataloader {
             a.setStreetNumber(fakeAddress.buildingNumber());
             a.setStreetName(fakeAddress.streetName());
             a.setZipCode(fakeAddress.zipCode());
-            a.setCity(fakeAddress.cityName());
+            a.setCityName(fakeAddress.cityName());
             // addressRepository.save(a);
             listAddresses.add(a);
 
@@ -374,7 +376,7 @@ public class Dataloader {
                 source.setId(animalName);
                 source.setLongWording("Have you ever heard about " + animalName + " ?");
                 source.setShortWording("Source about " + animalName);
-                source.setPeriodicity("M");
+                source.setPeriodicity(PeriodicityEnum.M);
                 sourceRepository.save(source);
                 Set<Survey> setSurveys = new HashSet<>();
                 Integer i = new Random().nextInt();
@@ -410,9 +412,9 @@ public class Dataloader {
                     for (int k = 0; k < 12; k++) {
                         Campaign campaign = new Campaign();
                         int month = k + 1;
-                        String period = "M" + month;
+                        String period = month<10? "M0" + month:"M"+month;
                         campaign.setYear(year - j);
-                        campaign.setPeriod(period);
+                        campaign.setPeriod(PeriodEnum.fromValue(period));
                         campaign.setId(animalName + (year - j) + period);
                         campaign.setCampaignWording(
                                 "Campaign about " + animalName + " in " + (year - j) + " and period " + period);

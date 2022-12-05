@@ -1,6 +1,5 @@
 package fr.insee.survey.datacollectionmanagement.questioning.service;
 
-import java.util.List;
 import java.util.Set;
 
 import org.springframework.data.domain.Page;
@@ -21,8 +20,11 @@ public interface QuestioningService {
 
     public Set<Questioning> findByIdPartitioning(String idPartitioning);
 
+    public Questioning findByIdPartitioningAndSurveyUnitIdSu(String idPartitioning, String surveyUnitIdSu);
+
     /**
      * Delete questionings attached to one partitioning
+     * 
      * @param partitioning
      * @return nb questioning deleted
      */

@@ -1,22 +1,20 @@
-package fr.insee.survey.datacollectionmanagement.contact.dto;
+package fr.insee.survey.datacollectionmanagement.query.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import fr.insee.survey.datacollectionmanagement.contact.dto.AddressDto;
+import lombok.Data;
 
-@Getter
-@Setter
-public class ContactDto{
+@Data
+public class ContactAccreditationDto {
 
     private String identifier;
     private String externalId;
+    private boolean isMain;
     private String civility;
     private String lastName;
     private String firstName;
     private String function;
     private String email;
     private String phone;
-    private boolean firstLogin;
-    private boolean emailVerify;
     private AddressDto address;
 
 }

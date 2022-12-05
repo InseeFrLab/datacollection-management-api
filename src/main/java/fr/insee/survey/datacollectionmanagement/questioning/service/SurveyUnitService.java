@@ -18,6 +18,8 @@ public interface SurveyUnitService {
     public Page<SurveyUnit> findAll(Pageable pageable);
 
     public SurveyUnit saveSurveyUnit(SurveyUnit surveyUnit);
+    
+    public SurveyUnit saveSurveyUnitAndAddress(SurveyUnit surveyUnit);
 
     public void deleteSurveyUnit(String id);
 

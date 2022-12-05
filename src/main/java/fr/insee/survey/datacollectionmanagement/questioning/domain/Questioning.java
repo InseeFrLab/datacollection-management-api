@@ -46,7 +46,7 @@ public class Questioning {
     @OneToOne(fetch = FetchType.EAGER)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-
+    @NotNull
     private SurveyUnit surveyUnit;
 
 }

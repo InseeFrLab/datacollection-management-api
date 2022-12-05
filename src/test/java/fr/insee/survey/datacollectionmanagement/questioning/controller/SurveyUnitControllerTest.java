@@ -117,18 +117,18 @@ public class SurveyUnitControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(content().json(jsonSurveyUnit.toString(), false));
         SurveyUnit suFound = surveyUnitService.findbyId(identifier);
-        assertEquals(surveyUnit.getSurveyUnitAddress().getCity(), suFound.getSurveyUnitAddress().getCity());
+        assertEquals(surveyUnit.getSurveyUnitAddress().getCityName(), suFound.getSurveyUnitAddress().getCityName());
 
         // update surveyUnit - status ok
         String newCityName = "cityUpdate";
-        surveyUnit.getSurveyUnitAddress().setCity(newCityName);
+        surveyUnit.getSurveyUnitAddress().setCityName(newCityName);
         String jsonSurveyUnitUpdate = createJsonSurveyUnitAddress(surveyUnit);
         mockMvc.perform(put(Constants.API_SURVEY_UNITS +"/"+ identifier).content(jsonSurveyUnitUpdate)
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
                 .andExpect(content().json(jsonSurveyUnitUpdate.toString(), false));
         SurveyUnit countactFoundAfterUpdate = surveyUnitService.findbyId(identifier);
-        assertEquals(surveyUnit.getSurveyUnitAddress().getCity(),
-                countactFoundAfterUpdate.getSurveyUnitAddress().getCity());
+        assertEquals(surveyUnit.getSurveyUnitAddress().getCityName(),
+                countactFoundAfterUpdate.getSurveyUnitAddress().getCityName());
 
         // delete surveyUnit
         surveyUnitService.deleteSurveyUnit(identifier);
@@ -169,7 +169,7 @@ public class SurveyUnitControllerTest {
 
     private SurveyUnitAddress initAddress(String identifier) {
         SurveyUnitAddress address = new SurveyUnitAddress();
-        address.setCity("city " + identifier);
+        address.setCityName("city " + identifier);
         address.setCountryName("country " + identifier);
         address.setStreetName("steet " + identifier);
         address.setStreetNumber(identifier);
@@ -196,7 +196,7 @@ public class SurveyUnitControllerTest {
 
     private JSONObject createJsonAddress(SurveyUnit surveyUnit) throws JSONException {
         JSONObject jo = new JSONObject();
-        jo.put("city", surveyUnit.getSurveyUnitAddress().getCity());
+        jo.put("city", surveyUnit.getSurveyUnitAddress().getCityName());
         jo.put("streetName", surveyUnit.getSurveyUnitAddress().getStreetName());
         jo.put("countryName", surveyUnit.getSurveyUnitAddress().getCountryName());
         return jo;

@@ -1,5 +1,35 @@
 package fr.insee.survey.datacollectionmanagement.contact.controller;
 
+import java.text.ParseException;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
 import fr.insee.survey.datacollectionmanagement.constants.Constants;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact.Gender;
@@ -7,6 +37,7 @@ import fr.insee.survey.datacollectionmanagement.contact.dto.ContactDto;
 import fr.insee.survey.datacollectionmanagement.contact.service.AddressService;
 import fr.insee.survey.datacollectionmanagement.contact.service.ContactService;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
+import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningAccreditation;
 import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningAccreditationService;
 import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningService;
 import fr.insee.survey.datacollectionmanagement.view.service.ViewService;
@@ -16,29 +47,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.apache.commons.lang3.StringUtils;
-import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.*;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import java.text.ParseException;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @PreAuthorize("@AuthorizeMethodDecider.isInternalUser() "
         + "|| @AuthorizeMethodDecider.isWebClient() ")
-@Tag(name="1 - Contacts", description = "Enpoints to create, update, delete and find contacts")
+@Tag(name = "1 - Contacts", description = "Enpoints to create, update, delete and find contacts")
+@Slf4j
 public class ContactController {
 
     static final Logger LOGGER = LoggerFactory.getLogger(ContactController.class);
@@ -127,14 +142,14 @@ public class ContactController {
             contact = convertToEntityNewContact(contactDto);
             if (contactDto.getAddress() != null)
                 contact.setAddress(addressService.convertToEntity(contactDto.getAddress()));
-            Contact contactCreate = contactService.createContactAddressEvent(contact);
+            Contact contactCreate = contactService.createContactAddressEvent(contact, null);
             viewService.createView(id, null, null);
             return ResponseEntity.status(HttpStatus.CREATED).headers(responseHeaders).body(convertToDto(contactCreate));
 
         }
         if (contactDto.getAddress() != null)
             contact.setAddress(addressService.convertToEntity(contactDto.getAddress()));
-        Contact contactUpdate = contactService.updateContactAddressEvent(contact);
+        Contact contactUpdate = contactService.updateContactAddressEvent(contact, null);
         return ResponseEntity.ok().headers(responseHeaders).body(convertToDto(contactUpdate));
     }
 
@@ -154,12 +169,14 @@ public class ContactController {
             viewService.findViewByIdentifier(id).stream().forEach(c -> viewService.deleteView(c));
             questioningAccreditationService.findByContactIdentifier(id).stream().forEach(acc -> {
                 Questioning questioning = questioningService.findbyId(acc.getQuestioning().getId());
-                questioning.getQuestioningAccreditations().remove(acc);
+                Set<QuestioningAccreditation> newSet = questioning.getQuestioningAccreditations();
+                newSet.removeIf(a -> a.getId().equals(acc.getId()));
+                questioning.setQuestioningAccreditations(newSet);
                 questioningService.saveQuestioning(questioning);
                 questioningAccreditationService.deleteAccreditation(acc);
 
             });
-
+            log.info("Delete contact {}", id);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Contact deleted");
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Contact does not exist");

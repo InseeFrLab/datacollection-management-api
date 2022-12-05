@@ -1,5 +1,6 @@
 package fr.insee.survey.datacollectionmanagement.query.dto;
 
+import fr.insee.survey.datacollectionmanagement.metadata.util.PeriodEnum;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,7 +11,7 @@ public class AccreditationDetailDto {
     private String sourceId;
     private String sourceWording;
     private int year;
-    private String period;
+    private PeriodEnum period;
     private String partition;
     private String identificationCode;
     private String identificationName;
@@ -20,7 +21,7 @@ public class AccreditationDetailDto {
         String sourceId,
         String sourceWording,
         int year,
-        String period,
+        PeriodEnum period,
         String partition,
         String identificationCode,
         String identificationName,

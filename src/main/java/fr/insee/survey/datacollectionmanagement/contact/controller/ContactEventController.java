@@ -1,18 +1,10 @@
 package fr.insee.survey.datacollectionmanagement.contact.controller;
 
-import fr.insee.survey.datacollectionmanagement.constants.Constants;
-import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
-import fr.insee.survey.datacollectionmanagement.contact.domain.ContactEvent;
-import fr.insee.survey.datacollectionmanagement.contact.dto.ContactEventDto;
-import fr.insee.survey.datacollectionmanagement.contact.service.ContactEventService;
-import fr.insee.survey.datacollectionmanagement.contact.service.ContactService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,13 +15,28 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.stream.Collectors;
+import fr.insee.survey.datacollectionmanagement.constants.Constants;
+import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
+import fr.insee.survey.datacollectionmanagement.contact.domain.ContactEvent;
+import fr.insee.survey.datacollectionmanagement.contact.dto.ContactEventDto;
+import fr.insee.survey.datacollectionmanagement.contact.service.ContactEventService;
+import fr.insee.survey.datacollectionmanagement.contact.service.ContactService;
+import fr.insee.survey.datacollectionmanagement.exception.EventException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController(value = "contactEvents")
 @PreAuthorize("@AuthorizeMethodDecider.isInternalUser() "
@@ -73,7 +80,8 @@ public class ContactEventController {
     @PostMapping(value = Constants.API_CONTACTEVENTS, produces = "application/json", consumes = "application/json")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = ContactEventDto.class))),
-            @ApiResponse(responseCode = "400", description = "Bad request")
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "404", description = "Not found")
     })
     public ResponseEntity<?> postContactEvent(@RequestBody ContactEventDto contactEventDto) {
         try {
@@ -91,6 +99,9 @@ public class ContactEventController {
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Contact does not exist");
 
+        } catch (EventException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Event not recognized: only update and create are possible");
         }
 
     }
@@ -106,7 +117,8 @@ public class ContactEventController {
         try {
             ContactEvent contactEvent = contactEventService.findById(id);
             Contact contact = contactEvent.getContact();
-            contact.setContactEvents(contact.getContactEvents().stream().filter(ce->!ce.equals(contactEvent)).collect(Collectors.toSet()));
+            contact.setContactEvents(contact.getContactEvents().stream().filter(ce -> !ce.equals(contactEvent))
+                    .collect(Collectors.toSet()));
             contactService.saveContact(contact);
             contactEventService.deleteContactEvent(id);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Contact event deleted");
@@ -124,8 +136,10 @@ public class ContactEventController {
         return ceDto;
     }
 
-    private ContactEvent convertToEntity(ContactEventDto contactEventDto) {
+    private ContactEvent convertToEntity(ContactEventDto contactEventDto) throws EventException {
         ContactEvent contactEvent = modelMapper.map(contactEventDto, ContactEvent.class);
+        if (contactEvent.getType() == null)
+            throw new EventException("Contact event not recognized");
         return contactEvent;
     }
 

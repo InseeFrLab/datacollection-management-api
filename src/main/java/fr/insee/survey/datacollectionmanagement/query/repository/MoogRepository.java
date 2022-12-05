@@ -1,15 +1,15 @@
 package fr.insee.survey.datacollectionmanagement.query.repository;
 
-import fr.insee.survey.datacollectionmanagement.query.dto.MoogQuestioningEventDto;
-import fr.insee.survey.datacollectionmanagement.query.dto.MoogSearchDto;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
+import fr.insee.survey.datacollectionmanagement.query.dto.MoogQuestioningEventDto;
 
 @Repository
 public class MoogRepository {

@@ -26,18 +26,14 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import fr.insee.survey.datacollectionmanagement.constants.Constants;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Owner;
-import fr.insee.survey.datacollectionmanagement.metadata.domain.Source;
 import fr.insee.survey.datacollectionmanagement.metadata.dto.OwnerDto;
-import fr.insee.survey.datacollectionmanagement.metadata.dto.SurveyDto;
 import fr.insee.survey.datacollectionmanagement.metadata.service.OwnerService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
@@ -76,7 +72,7 @@ public class OwnerController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "400", description = "Bad request")
     })
-    public ResponseEntity<?> getOwner(@PathVariable("id") Long id) {
+    public ResponseEntity<?> getOwner(@PathVariable("id") String id) {
         Optional<Owner> owner = ownerService.findById(id);
         if (!owner.isPresent()) {
             log.warn("Owner {} does not exist", id);
@@ -94,7 +90,7 @@ public class OwnerController {
             @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = OwnerDto.class))),
             @ApiResponse(responseCode = "400", description = "Bad request")
     })
-    public ResponseEntity<?> putOwner(@PathVariable("id") Long id, @RequestBody OwnerDto ownerDto) {
+    public ResponseEntity<?> putOwner(@PathVariable("id") String id, @RequestBody OwnerDto ownerDto) {
         if (!ownerDto.getId().equals(id)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("id and owner id don't match");
         }

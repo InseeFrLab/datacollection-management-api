@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class SupportDto {
 
-    private Long id;
+    private String id;
     private String label;
     private String phoneNumber;
     private String mail;

@@ -1,13 +1,12 @@
 package fr.insee.survey.datacollectionmanagement.config;
 
-import lombok.Getter;
-import lombok.Setter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Optional;
+import lombok.Getter;
+import lombok.Setter;
 
 @Configuration
 @Getter

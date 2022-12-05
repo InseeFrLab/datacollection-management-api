@@ -14,6 +14,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
 import fr.insee.survey.datacollectionmanagement.contact.domain.ContactEvent;
 import fr.insee.survey.datacollectionmanagement.contact.domain.ContactEvent.ContactEventType;
@@ -112,17 +114,17 @@ public class ContactServiceImpl implements ContactService {
     }
     
     @Override
-    public Contact createContactAddressEvent(Contact contact) {
+    public Contact createContactAddressEvent(Contact contact, JsonNode payload) {
         if (contact.getAddress() != null) {
             addressService.saveAddress(contact.getAddress());
         }
-        ContactEvent newContactEvent = contactEventService.createContactEvent(contact, ContactEventType.create);
+        ContactEvent newContactEvent = contactEventService.createContactEvent(contact, ContactEventType.create, payload);
         contact.setContactEvents(new HashSet<>(Arrays.asList(newContactEvent)));
         return saveContact(contact);
     }
 
     @Override
-    public Contact updateContactAddressEvent(Contact contact) {
+    public Contact updateContactAddressEvent(Contact contact,JsonNode payload) {
 
         Contact existingContact = findByIdentifier(contact.getIdentifier());
         if (contact.getAddress() != null) {
@@ -132,8 +134,8 @@ public class ContactServiceImpl implements ContactService {
             addressService.saveAddress(contact.getAddress());
         }
 
-        Set<ContactEvent> setContactEventsContact = contactEventService.findContactEventsByContact(contact);
-        ContactEvent contactEventUpdate = contactEventService.createContactEvent(contact, ContactEventType.update);
+        Set<ContactEvent> setContactEventsContact = existingContact.getContactEvents();
+        ContactEvent contactEventUpdate = contactEventService.createContactEvent(contact, ContactEventType.update, payload);
         setContactEventsContact.add(contactEventUpdate);
         contact.setContactEvents(setContactEventsContact);
         return saveContact(contact);

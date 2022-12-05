@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class OwnerDto {
 
-    private Long id;
+    private String id;
     private String label;
     private String ministry;
     private String logo;

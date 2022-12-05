@@ -14,7 +14,6 @@ import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningAc
 import fr.insee.survey.datacollectionmanagement.questioning.domain.SurveyUnit;
 import fr.insee.survey.datacollectionmanagement.questioning.repository.QuestioningAccreditationRepository;
 import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningAccreditationService;
-import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningService;
 
 @Service
 public class QuestioningAccreditationServiceImpl implements QuestioningAccreditationService {
@@ -81,7 +80,7 @@ public class QuestioningAccreditationServiceImpl implements QuestioningAccredita
 
     @Override
     public void deleteAccreditation(QuestioningAccreditation acc) {
-        questioningAccreditationRepository.delete(acc);
+        questioningAccreditationRepository.deleteById(acc.getId());
     }
 
 }

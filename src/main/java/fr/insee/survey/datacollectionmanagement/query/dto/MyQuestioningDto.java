@@ -1,7 +1,6 @@
 package fr.insee.survey.datacollectionmanagement.query.dto;
 
 import java.sql.Timestamp;
-import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 

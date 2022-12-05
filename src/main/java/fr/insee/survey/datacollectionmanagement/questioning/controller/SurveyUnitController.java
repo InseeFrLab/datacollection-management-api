@@ -1,5 +1,33 @@
 package fr.insee.survey.datacollectionmanagement.questioning.controller;
 
+import java.text.ParseException;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
 import fr.insee.survey.datacollectionmanagement.constants.Constants;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.SurveyUnit;
 import fr.insee.survey.datacollectionmanagement.questioning.dto.SurveyUnitDto;
@@ -10,28 +38,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.apache.commons.lang3.StringUtils;
-import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.*;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import java.text.ParseException;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @PreAuthorize("@AuthorizeMethodDecider.isInternalUser() "
         + "|| @AuthorizeMethodDecider.isWebClient() ")
 @Tag(name = "2 - Questioning", description = "Enpoints to create, update, delete and find entities around the questionings")
+@Slf4j
 public class SurveyUnitController {
 
     static final Logger LOGGER = LoggerFactory.getLogger(SurveyUnitController.class);
@@ -111,8 +124,34 @@ public class SurveyUnitController {
             LOGGER.info("Creating survey with the id {}", surveyUnitDto.getIdSu());
             responseStatus = HttpStatus.CREATED;
         }
-        return ResponseEntity.status(responseStatus).body(convertToDto(surveyUnitService.saveSurveyUnit(surveyUnit)));
+        return ResponseEntity.status(responseStatus)
+                .body(convertToDto(surveyUnitService.saveSurveyUnitAndAddress(surveyUnit)));
 
+    }
+
+    @Operation(summary = "Delete a survey unit by its id")
+    @DeleteMapping(value = Constants.API_SURVEY_UNITS_ID, produces = "application/json")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "No content"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "400", description = "Bad request")
+    })
+    public ResponseEntity<?> deleteSurveyUnit(@PathVariable("id") String id) {
+        SurveyUnit surveyUnit;
+        try {
+            surveyUnit = surveyUnitService.findbyId(StringUtils.upperCase(id));
+            if (!surveyUnit.getQuestionings().isEmpty()) {
+                log.warn("Some questionings exist for the survey unit {}, the survey unit can't be deleted", id);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Some questionings exist for this survey unit, the survey unit can't be deleted");
+            }
+            surveyUnitService.deleteSurveyUnit(id);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Survey unit deleted");
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("survey unit not found");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
+        }
     }
 
     private SurveyUnitDto convertToDto(SurveyUnit surveyUnit) {

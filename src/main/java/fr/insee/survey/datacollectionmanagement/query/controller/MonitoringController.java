@@ -21,10 +21,12 @@ import fr.insee.survey.datacollectionmanagement.query.dto.MoogFollowUpDto;
 import fr.insee.survey.datacollectionmanagement.query.dto.MoogProgressDto;
 import fr.insee.survey.datacollectionmanagement.query.service.MonitoringService;
 import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @PreAuthorize("@AuthorizeMethodDecider.isInternalUser() "
         + "|| @AuthorizeMethodDecider.isWebClient() ")
+@Tag(name = "5 - Moog", description = "Enpoints for moog")
 public class MonitoringController {
     static final Logger LOGGER = LoggerFactory.getLogger(MonitoringController.class);
 
