@@ -2,7 +2,6 @@ package fr.insee.survey.datacollectionmanagement.query.service.impl;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import fr.insee.survey.datacollectionmanagement.config.ApplicationConfig;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Partitioning;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Survey;
 import fr.insee.survey.datacollectionmanagement.metadata.service.PartitioningService;
@@ -28,9 +28,6 @@ public class MySurveysServiceImpl implements MySurveysService {
 
     private static final Logger LOGGER = LogManager.getLogger(MySurveysServiceImpl.class);
 
-    private static final String STROMAE_URL = "https://dev.insee.io/questionnaire/";
-    
-
     @Autowired
     private QuestioningAccreditationService questioningAccreditationService;
 
@@ -39,6 +36,9 @@ public class MySurveysServiceImpl implements MySurveysService {
 
     @Autowired
     private QuestioningEventService questioningEventService;
+
+    @Autowired
+    ApplicationConfig applicationConfig;
 
 
     @Override
@@ -56,7 +56,8 @@ public class MySurveysServiceImpl implements MySurveysService {
                 surveyDto.setSurveyWording(survey.getLongWording());
                 surveyDto.setSurveyObjectives(survey.getLongObjectives());
                 surveyDto.setAccessUrl(
-                        STROMAE_URL + part.get().getCampaign().getId() + "/unite-enquetee/" + surveyUnitId);
+                        applicationConfig.getQuestioningUrl() + "/questionnaire/" + part.get().getCampaign().getId()
+                                + "/unite-enquetee/" + surveyUnitId);
                 surveyDto.setIdentificationCode(surveyUnitId);
                 surveyDto.setOpeningDate(new Timestamp(part.get().getOpeningDate().getTime()));
                 surveyDto.setClosingDate(new Timestamp(part.get().getClosingDate().getTime()));
@@ -68,7 +69,7 @@ public class MySurveysServiceImpl implements MySurveysService {
                     surveyDto.setQuestioningStatus(questioningEvent.get().getType().name());
                     surveyDto.setQuestioningDate(new Timestamp(questioningEvent.get().getDate().getTime()));
                 } else {
-                    LOGGER.info("No questioningEvents found for questioning {} for identifier {}",
+                    LOGGER.debug("No questioningEvents found for questioning {} for identifier {}",
                             questioning.getId(), id);
                 }
 
@@ -76,6 +77,7 @@ public class MySurveysServiceImpl implements MySurveysService {
             listSurveys.add(surveyDto);
 
         }
+        LOGGER.info("Get my questionings for id {} - nb results: {}", id, listSurveys.size());
         return listSurveys;
     }
 

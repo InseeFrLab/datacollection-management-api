@@ -47,5 +47,7 @@ public class ApplicationConfig {
     private String keycloakRealm;
     @Value("${fr.insee.datacollectionmanagement.auth.server-url}")
     private String keyCloakUrl;
-
+    
+    @Value("${fr.insee.datacollectionmanagement.api.questioning.url}")
+    private String questioningUrl;
 }
