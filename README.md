@@ -307,7 +307,6 @@ List of support ids =
 {
   "id": "CHICKEN-2022-M01-000", //NOT NULL
   "campaignId": "CHICKEN-2022-M01", //NOT NULL
-  "status": "open",
   "openingDate": 1649658607374,
   "closingDate": 1672486325330,
   "returnDate": 1650248506148
@@ -365,7 +364,6 @@ List of support ids =
   "partitioning": {
     "id": "CHICKEN-2022-M1-000",
     "campaignId": "CHICKEN-2022-M1",
-    "status": "open",
     "openingDate": "2022-04-20T16:27:02.745+00:00",
     "closingDate": "2022-09-26T11:35:03.223+00:00",
     "returnDate": "2022-05-26T06:28:27.086+00:00"

@@ -21,7 +21,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.insee.survey.datacollectionmanagement.query.dto.MyQuestioningDto;
-import fr.insee.survey.datacollectionmanagement.query.service.CheckAccreditationService;
+import fr.insee.survey.datacollectionmanagement.query.service.CheckHabilitationService;
 
 @AutoConfigureMockMvc
 @SpringBootTest
@@ -32,7 +32,7 @@ public class MyQuestioningsControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private CheckAccreditationService checkAccreditationService;
+    private CheckHabilitationService checkAccreditationService;
 
     @Test
     public void myQuestionings() throws Exception {
