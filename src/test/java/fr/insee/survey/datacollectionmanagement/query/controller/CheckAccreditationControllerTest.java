@@ -16,7 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import fr.insee.survey.datacollectionmanagement.constants.Constants;
-import fr.insee.survey.datacollectionmanagement.query.service.CheckAccreditationService;
+import fr.insee.survey.datacollectionmanagement.query.service.CheckHabilitationService;
 
 @AutoConfigureMockMvc
 @SpringBootTest
@@ -27,7 +27,7 @@ public class CheckAccreditationControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private CheckAccreditationService checkAccreditationService;
+    private CheckHabilitationService checkAccreditationService;
 
     @Test
     public void checkAccreditationV2() throws Exception {
@@ -35,11 +35,11 @@ public class CheckAccreditationControllerTest {
         String idSu = "12345";
         String campaginId = "CAMPAIGN";
 
-        when(checkAccreditationService.checkAccreditation(identifier, idSu, campaginId)).thenReturn(true);
-        this.mockMvc.perform(get(Constants.API_CHECK_ACCREDITATIONS).param("identifier", identifier).param("idSu", idSu).param("campaignId", campaginId))
+        when(checkAccreditationService.checkHabilitation(identifier, idSu, campaginId)).thenReturn(true);
+        this.mockMvc.perform(get(Constants.API_CHECK_HABILITATION).param("identifier", identifier).param("idSu", idSu).param("campaignId", campaginId))
             .andDo(print()).andExpect(status().isOk()).andExpect(content().string(containsString("true")));
 
-        this.mockMvc.perform(get(Constants.API_CHECK_ACCREDITATIONS).param("identifier", identifier).param("idSu", "bidon").param("campaignId", campaginId))
+        this.mockMvc.perform(get(Constants.API_CHECK_HABILITATION).param("identifier", identifier).param("idSu", "bidon").param("campaignId", campaginId))
             .andDo(print()).andExpect(status().isOk()).andExpect(content().string(containsString("false")));
     }
 
