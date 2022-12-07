@@ -11,28 +11,28 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.insee.survey.datacollectionmanagement.constants.Constants;
-import fr.insee.survey.datacollectionmanagement.query.service.CheckAccreditationService;
+import fr.insee.survey.datacollectionmanagement.query.service.CheckHabilitationService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @Tag(name = "4 - Cross domain")
-public class CheckAccreditationController {
+public class CheckHabilitationController {
 
-    static final Logger LOGGER = LoggerFactory.getLogger(CheckAccreditationController.class);
+    static final Logger LOGGER = LoggerFactory.getLogger(CheckHabilitationController.class);
 
     @Autowired
-    private CheckAccreditationService checkAccreditationService;
+    private CheckHabilitationService checkHabilitationService;
 
     @PreAuthorize("@AuthorizeMethodDecider.isInternalUser() "
             + "|| @AuthorizeMethodDecider.isWebClient() "
             + "|| @AuthorizeMethodDecider.isRespondent()")
-    @GetMapping(path = Constants.API_CHECK_ACCREDITATIONS)
-    public ResponseEntity<?> checkAccreditationV2(
+    @GetMapping(path = Constants.API_CHECK_HABILITATION)
+    public ResponseEntity<?> checkHabilitation(
         @RequestParam(required = true) String identifier,
         @RequestParam(required = true) String idSu,
         @RequestParam(required = true) String campaignId) {
 
-        boolean res = checkAccreditationService.checkAccreditation(identifier, idSu, campaignId);
+        boolean res = checkHabilitationService.checkHabilitation(identifier, idSu, campaignId);
         return new ResponseEntity<>(res, HttpStatus.OK);
 
     }
