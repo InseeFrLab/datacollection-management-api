@@ -289,7 +289,6 @@ public class DataloaderTest {
                             part.setOpeningDate(openingDate);
                             part.setClosingDate(closingDate);
                             part.setReturnDate(returnDate);
-                            part.setStatus(today.compareTo(closingDate) < 0 ? "open" : "closed");
                             setParts.add(part);
                             part.setCampaign(campaign);
                             partitioningRepository.save(part);

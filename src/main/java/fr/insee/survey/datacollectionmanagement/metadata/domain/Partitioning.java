@@ -19,8 +19,6 @@ public class Partitioning {
 
     @Id
     private String id;
-
-    private String status;
     private String label;
     private Date openingDate;
     private Date closingDate;
