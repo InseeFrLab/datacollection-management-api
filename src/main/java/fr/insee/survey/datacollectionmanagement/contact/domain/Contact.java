@@ -43,8 +43,6 @@ public class Contact {
     private String comment;
     @Column(columnDefinition = "boolean default false")
     private boolean emailVerify;
-    @Column(columnDefinition = "boolean default false")
-    private boolean firstLogin;
 
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @EqualsAndHashCode.Exclude

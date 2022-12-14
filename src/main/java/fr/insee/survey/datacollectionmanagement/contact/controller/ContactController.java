@@ -33,7 +33,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import fr.insee.survey.datacollectionmanagement.constants.Constants;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact.Gender;
+import fr.insee.survey.datacollectionmanagement.contact.domain.ContactEvent.ContactEventType;
 import fr.insee.survey.datacollectionmanagement.contact.dto.ContactDto;
+import fr.insee.survey.datacollectionmanagement.contact.dto.ContactFirstLoginDto;
 import fr.insee.survey.datacollectionmanagement.contact.service.AddressService;
 import fr.insee.survey.datacollectionmanagement.contact.service.ContactService;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
@@ -97,7 +99,7 @@ public class ContactController {
             + "|| @AuthorizeMethodDecider.isWebClient() "
             + "|| @AuthorizeMethodDecider.isRespondent()")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ContactDto.class))),
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ContactFirstLoginDto.class))),
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "400", description = "Bad Request")
     })
@@ -105,7 +107,7 @@ public class ContactController {
         Contact contact = null;
         try {
             contact = contactService.findByIdentifier(StringUtils.upperCase(id));
-            return ResponseEntity.ok().body(convertToDto(contact));
+            return ResponseEntity.ok().body(convertToFirstLoginDto(contact));
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Contact does not exist");
         } catch (Exception e) {
@@ -191,6 +193,16 @@ public class ContactController {
         contactDto.setCivility(civility);
         return contactDto;
     }
+    
+    private ContactFirstLoginDto convertToFirstLoginDto(Contact contact) {
+        ContactFirstLoginDto contactFirstLoginDto = modelMapper.map(contact, ContactFirstLoginDto.class);
+        String civility = contact.getGender().equals(Gender.Male) ? "Mr" : "Mme";
+        contactFirstLoginDto.setCivility(civility);
+        contactFirstLoginDto.setFirstConnect(contact.getContactEvents().stream().filter(e -> e.getType().equals(ContactEventType.firstConnect)).collect(Collectors.toList()).isEmpty());
+        return contactFirstLoginDto;
+    }
+    
+    
 
     private Contact convertToEntity(ContactDto contactDto) throws ParseException {
         Contact contact = modelMapper.map(contactDto, Contact.class);

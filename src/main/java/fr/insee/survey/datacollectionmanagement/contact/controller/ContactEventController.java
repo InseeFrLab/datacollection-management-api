@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -26,6 +27,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import fr.insee.survey.datacollectionmanagement.constants.Constants;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
 import fr.insee.survey.datacollectionmanagement.contact.domain.ContactEvent;
+import fr.insee.survey.datacollectionmanagement.contact.domain.ContactEvent.ContactEventType;
 import fr.insee.survey.datacollectionmanagement.contact.dto.ContactEventDto;
 import fr.insee.survey.datacollectionmanagement.contact.service.ContactEventService;
 import fr.insee.survey.datacollectionmanagement.contact.service.ContactService;
@@ -101,7 +103,9 @@ public class ContactEventController {
 
         } catch (EventException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Event not recognized: only update and create are possible");
+                    .body("Event not recognized: only [" + Stream.of(ContactEventType.values()).
+                            map(ContactEventType::name).
+                            collect(Collectors.joining(", "))+"] are possible");
         }
 
     }
