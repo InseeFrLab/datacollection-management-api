@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ContactDto{
+public class ContactFirstLoginDto{
 
     private String identifier;
     private String externalId;
@@ -15,6 +15,7 @@ public class ContactDto{
     private String function;
     private String email;
     private String phone;
+    private boolean firstConnect;
     private AddressDto address;
 
 }
