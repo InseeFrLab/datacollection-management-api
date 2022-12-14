@@ -56,7 +56,7 @@ public class MySurveysServiceImpl implements MySurveysService {
                 surveyDto.setSurveyWording(survey.getLongWording());
                 surveyDto.setSurveyObjectives(survey.getLongObjectives());
                 surveyDto.setAccessUrl(
-                        applicationConfig.getQuestioningUrl() + "/questionnaire/" + part.get().getCampaign().getId()
+                        applicationConfig.getQuestioningUrl() + "/questionnaire/" + questioning.getModelName()
                                 + "/unite-enquetee/" + surveyUnitId);
                 surveyDto.setIdentificationCode(surveyUnitId);
                 surveyDto.setOpeningDate(new Timestamp(part.get().getOpeningDate().getTime()));
