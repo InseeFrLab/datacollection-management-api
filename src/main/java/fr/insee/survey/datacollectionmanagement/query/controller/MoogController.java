@@ -2,6 +2,7 @@ package fr.insee.survey.datacollectionmanagement.query.controller;
 
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.insee.survey.datacollectionmanagement.constants.Constants;
+import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
+import fr.insee.survey.datacollectionmanagement.contact.service.ContactService;
 import fr.insee.survey.datacollectionmanagement.query.dto.MoogQuestioningEventDto;
 import fr.insee.survey.datacollectionmanagement.query.dto.MoogSearchDto;
 import fr.insee.survey.datacollectionmanagement.query.service.MoogService;
@@ -42,6 +45,9 @@ public class MoogController {
     @Autowired
     private MoogService moogService;
 
+    @Autowired
+    private ContactService contactService;
+
     @GetMapping(path = Constants.API_MOOG_SEARCH)
     public ResponseEntity<?> moogSearch(@RequestParam(required = false) String filter1,
             @RequestParam(required = false) String filter2,
@@ -64,6 +70,22 @@ public class MoogController {
         } else
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
+    }
+
+    @GetMapping(path = Constants.API_MOOG_MAIL, produces = "application/json")
+    @Operation(summary = "Get Moog questioning events by campaign and idSu")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = MoogQuestioningEventDto.class)))),
+            @ApiResponse(responseCode = "404", description = "Not found")
+    })
+    public ResponseEntity<?> getMoogMail(@PathVariable("id") String contactId) {
+        Contact contact;
+        try {
+            contact = contactService.findByIdentifier(contactId);
+            return ResponseEntity.ok().body(contact.getEmail());
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Contact not found");
+        }
     }
 
     @GetMapping(path = Constants.API_MOOG_EVENTS, produces = "application/json")
