@@ -154,8 +154,11 @@ public class SourceController {
                 log.warn("Source {} does not exist", id);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("source does not exist");
             }
-            ownerService.removeSourceFromOwner(source.get().getOwner(), source.get());
-            supportService.removeSourceFromSupport(source.get().getSupport(), source.get());
+            if (source.get().getOwner() != null)
+                ownerService.removeSourceFromOwner(source.get().getOwner(), source.get());
+
+            if (source.get().getSupport()!=null)
+                supportService.removeSourceFromSupport(source.get().getSupport(), source.get());
 
             sourceService.deleteSourceById(id);
             List<Campaign> listCampaigns = new ArrayList<>();

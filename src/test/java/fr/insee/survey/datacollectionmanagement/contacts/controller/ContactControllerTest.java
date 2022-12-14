@@ -57,13 +57,13 @@ public class ContactControllerTest {
         String identifier = "CONT1";
         Contact contact = contactService.findByIdentifier(identifier);
         String json = createJson(contact);
-        this.mockMvc.perform(get(Constants.API_CONTACTS + identifier)).andDo(print()).andExpect(status().isOk()).andExpect(content().json(json, false));
+        this.mockMvc.perform(get(Constants.API_CONTACTS_ID, identifier)).andDo(print()).andExpect(status().isOk()).andExpect(content().json(json, false));
     }
 
     @Test
     public void getContactNotFound() throws Exception {
         String identifier = "CONT500";
-        this.mockMvc.perform(get(Constants.API_CONTACTS + identifier)).andDo(print()).andExpect(status().is(HttpStatus.NOT_FOUND.value()));
+        this.mockMvc.perform(get(Constants.API_CONTACTS_ID, identifier)).andDo(print()).andExpect(status().is(HttpStatus.NOT_FOUND.value()));
 
     }
 
@@ -83,7 +83,7 @@ public class ContactControllerTest {
         // create contact - status created
         Contact contact = initContact(identifier);
         String jsonContact = createJson(contact);
-        mockMvc.perform(put(Constants.API_CONTACTS + identifier).content(jsonContact).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isCreated())
+        mockMvc.perform(put(Constants.API_CONTACTS_ID, identifier).content(jsonContact).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isCreated())
             .andExpect(content().json(jsonContact.toString(), false));
         Contact contactFound = contactService.findByIdentifier(identifier);
         assertEquals(contact.getLastName(), contactFound.getLastName());
@@ -97,7 +97,7 @@ public class ContactControllerTest {
         // update contact - status ok
         contact.setLastName("lastNameUpdate");
         String jsonContactUpdate = createJson(contact);
-        mockMvc.perform(put(Constants.API_CONTACTS + identifier).content(jsonContactUpdate).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+        mockMvc.perform(put(Constants.API_CONTACTS_ID, identifier).content(jsonContactUpdate).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
             .andExpect(content().json(jsonContactUpdate.toString(), false));
         Contact contactFoundAfterUpdate = contactService.findByIdentifier(identifier);
         assertEquals("lastNameUpdate", contactFoundAfterUpdate.getLastName());
@@ -108,7 +108,7 @@ public class ContactControllerTest {
         assertEquals(listUpdate.get(1).getType(), ContactEventType.update);
 
         // delete contact
-        mockMvc.perform(delete(Constants.API_CONTACTS + identifier).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent());
+        mockMvc.perform(delete(Constants.API_CONTACTS_ID, identifier).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent());
         assertThrows(NoSuchElementException.class, () -> {
             contactService.findByIdentifier(identifier);
         });
@@ -126,7 +126,7 @@ public class ContactControllerTest {
         // create contact - status created
         Contact contact = initContactAddress(identifier);
         String jsonContact = createJsonContactAddress(contact);
-        mockMvc.perform(put(Constants.API_CONTACTS + identifier).content(jsonContact).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isCreated())
+        mockMvc.perform(put(Constants.API_CONTACTS_ID, identifier).content(jsonContact).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isCreated())
             .andExpect(content().json(jsonContact.toString(), false));
         Contact countactFound = contactService.findByIdentifier(identifier);
         assertEquals(contact.getAddress().getCityName(), countactFound.getAddress().getCityName());
@@ -135,13 +135,13 @@ public class ContactControllerTest {
         String newCityName = "cityUpdate";
         contact.getAddress().setCityName(newCityName);
         String jsonContactUpdate = createJsonContactAddress(contact);
-        mockMvc.perform(put(Constants.API_CONTACTS + identifier).content(jsonContactUpdate).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+        mockMvc.perform(put(Constants.API_CONTACTS_ID, identifier).content(jsonContactUpdate).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
             .andExpect(content().json(jsonContactUpdate.toString(), false));
         Contact countactFoundAfterUpdate = contactService.findByIdentifier(identifier);
         assertEquals(contact.getAddress().getCityName(), countactFoundAfterUpdate.getAddress().getCityName());
 
         // delete contact
-        mockMvc.perform(delete(Constants.API_CONTACTS + identifier).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent());
+        mockMvc.perform(delete(Constants.API_CONTACTS_ID, identifier).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent());
         assertThrows(NoSuchElementException.class, () -> {
             contactService.findByIdentifier(identifier);
         });
@@ -154,7 +154,7 @@ public class ContactControllerTest {
         String otherIdentifier = "WRONG";
         Contact contact = initContact(identifier);
         String jsonContact = createJson(contact);
-        mockMvc.perform(put(Constants.API_CONTACTS + otherIdentifier).content(jsonContact).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(put(Constants.API_CONTACTS_ID , otherIdentifier).content(jsonContact).contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest()).andExpect(content().string("id and contact identifier don't match"));
 
     }
@@ -210,7 +210,7 @@ public class ContactControllerTest {
 
     private JSONObject createJsonAddress(Contact contact) throws JSONException {
         JSONObject jo = new JSONObject();
-        jo.put("city", contact.getAddress().getCityName());
+        jo.put("cityName", contact.getAddress().getCityName());
         jo.put("streetName", contact.getAddress().getStreetName());
         jo.put("countryName", contact.getAddress().getCountryName());
         return jo;

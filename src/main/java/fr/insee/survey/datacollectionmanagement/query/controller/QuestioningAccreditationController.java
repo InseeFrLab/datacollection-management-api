@@ -67,7 +67,7 @@ public class QuestioningAccreditationController {
     private ModelMapper modelMapper;
 
     @Operation(summary = "Search for questioning accreditations by questioning id")
-    @GetMapping(value = Constants.API_QUESTIONINGS_ID_QUESTIONING_ACCREDITATIONS_ID, produces = "application/json")
+    @GetMapping(value = Constants.API_QUESTIONINGS_ID_QUESTIONING_ACCREDITATIONS, produces = "application/json")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = QuestioningAccreditationDto.class)))),
             @ApiResponse(responseCode = "404", description = "Not found"),
@@ -89,7 +89,7 @@ public class QuestioningAccreditationController {
     }
 
     @Operation(summary = "Create or update a questioning accreditation for a questioning")
-    @PostMapping(value = Constants.API_QUESTIONINGS_ID_QUESTIONING_ACCREDITATIONS_ID, produces = "application/json", consumes = "application/json")
+    @PostMapping(value = Constants.API_QUESTIONINGS_ID_QUESTIONING_ACCREDITATIONS, produces = "application/json", consumes = "application/json")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Created",
 

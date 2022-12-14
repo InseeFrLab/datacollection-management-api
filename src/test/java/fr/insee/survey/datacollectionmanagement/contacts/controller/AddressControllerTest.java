@@ -43,13 +43,13 @@ public class AddressControllerTest {
         String identifier = "CONT1";
         Contact contact = contactService.findByIdentifier(identifier);
         String json = createJsonAddress(contact);
-        this.mockMvc.perform(get(Constants.API_CONTACTS + identifier + "/address")).andDo(print()).andExpect(status().isOk()).andExpect(content().json(json, false));
+        this.mockMvc.perform(get(Constants.API_CONTACTS_ID_ADDRESS , identifier)).andDo(print()).andExpect(status().isOk()).andExpect(content().json(json, false));
     }
 
     @Test
     public void getAddressContacttNotFound() throws Exception {
         String identifier = "CONT500";
-        this.mockMvc.perform(get(Constants.API_CONTACTS + identifier + "/address")).andDo(print()).andExpect(status().is(HttpStatus.NOT_FOUND.value()));
+        this.mockMvc.perform(get(Constants.API_CONTACTS_ID_ADDRESS , identifier)).andDo(print()).andExpect(status().is(HttpStatus.NOT_FOUND.value()));
 
     }
 
@@ -65,13 +65,13 @@ public class AddressControllerTest {
         contact = contactService.saveContact(contact);
         addressService.deleteAddressById(addressBefore.getId());
         
-        this.mockMvc.perform(get(Constants.API_CONTACTS + identifier + "/address")).andDo(print()).andExpect(status().is(HttpStatus.NOT_FOUND.value()));
+        this.mockMvc.perform(get(Constants.API_CONTACTS_ID_ADDRESS , identifier)).andDo(print()).andExpect(status().is(HttpStatus.NOT_FOUND.value()));
 
         // Create address - status created
         Address addressCreated = initAddressMock(identifier);
         contact.setAddress(addressCreated);
         String jsonCreate = createJsonAddress(contact);
-        this.mockMvc.perform(put(Constants.API_CONTACTS + identifier + "/address").content(jsonCreate).contentType(MediaType.APPLICATION_JSON)).andDo(print())
+        this.mockMvc.perform(put(Constants.API_CONTACTS_ID_ADDRESS , identifier).content(jsonCreate).contentType(MediaType.APPLICATION_JSON)).andDo(print())
             .andExpect(status().isCreated()).andExpect(content().json(jsonCreate.toString(), false));
         Contact contactAfterCreate = contactService.findByIdentifier(identifier);
         assertEquals(contactAfterCreate.getAddress().getCityName(), addressCreated.getCityName());
@@ -82,7 +82,7 @@ public class AddressControllerTest {
         Address addressUpdated = initAddressMock("UPDATE");
         contact.setAddress(addressUpdated);
         String jsonUpdate = createJsonAddress(contact);
-        this.mockMvc.perform(put(Constants.API_CONTACTS + identifier + "/address").content(jsonUpdate).contentType(MediaType.APPLICATION_JSON)).andDo(print())
+        this.mockMvc.perform(put(Constants.API_CONTACTS_ID_ADDRESS , identifier).content(jsonUpdate).contentType(MediaType.APPLICATION_JSON)).andDo(print())
             .andExpect(status().isOk()).andExpect(content().json(jsonUpdate.toString(), false));
         Contact contactAfterUpdate = contactService.findByIdentifier(identifier);
         assertEquals(contactAfterUpdate.getAddress().getCityName(), addressUpdated.getCityName());
@@ -101,7 +101,7 @@ public class AddressControllerTest {
 
     private Address initAddressMock(String identifier) {
         Address address = new Address();
-        address.setCityName("city " + identifier);
+        address.setCityName("cityName" + identifier);
         address.setStreetName("street name " + identifier);
         address.setStreetNumber(Integer.toString(identifier.length()));
         address.setCountryName("country " + identifier);
@@ -110,7 +110,7 @@ public class AddressControllerTest {
 
     private String createJsonAddress(Contact contact) throws JSONException {
         JSONObject jo = new JSONObject();
-        jo.put("city", contact.getAddress().getCityName());
+        jo.put("cityName", contact.getAddress().getCityName());
         jo.put("streetName", contact.getAddress().getStreetName());
         jo.put("countryName", contact.getAddress().getCountryName());
         return jo.toString();

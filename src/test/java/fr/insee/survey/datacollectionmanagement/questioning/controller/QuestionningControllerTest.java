@@ -16,6 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import fr.insee.survey.datacollectionmanagement.constants.Constants;
+
 @AutoConfigureMockMvc
 @SpringBootTest
 @ActiveProfiles("test")
@@ -26,16 +28,16 @@ public class QuestionningControllerTest {
 
     @Test
     public void getQuestioningOk() throws Exception {
-        int id = 12;
+        int id = 11;
         String json = createJson(id).toString();
-        this.mockMvc.perform(get("/api/questionings/" + id)).andDo(print()).andExpect(status().isOk())
+        this.mockMvc.perform(get(Constants.API_QUESTIONINGS_ID, id)).andDo(print()).andExpect(status().isOk())
                 .andExpect(content().json(json, false));
     }
 
     @Test
     public void getQuestioningNotFound() throws Exception {
         String id = "300";
-        this.mockMvc.perform(get("/api/questionings/" + id)).andDo(print())
+        this.mockMvc.perform(get(Constants.API_QUESTIONINGS_ID, id)).andDo(print())
                 .andExpect(status().is(HttpStatus.NOT_FOUND.value()));
 
     }
@@ -44,7 +46,7 @@ public class QuestionningControllerTest {
     public void getQuestioningsBySurveyUnit() throws Exception {
         String idSu = "100000000";
         String json = createJsonQuestionings(idSu);
-        this.mockMvc.perform(get("/api/survey-units/" + idSu + "/questionings")).andDo(print())
+        this.mockMvc.perform(get(Constants.API_SURVEY_UNITS_ID_QUESTIONINGS, idSu)).andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().json(json, false));
 

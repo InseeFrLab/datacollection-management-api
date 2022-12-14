@@ -44,18 +44,18 @@ public class SurveyControllerTest {
 
     @Test
     public void getSurveyOk() throws Exception {
-        String identifier = "SOURCE22022";
+        String identifier = "SOURCE12022";
         Optional<Survey> survey = surveyService.findById(identifier);
         assertTrue(survey.isPresent());
-        String json = createJson(survey.get());
-        this.mockMvc.perform(get(Constants.API_SURVEYS + "/" + identifier)).andDo(print()).andExpect(status().isOk())
+        String json = createJson(survey.get(), "SOURCE1");
+        this.mockMvc.perform(get(Constants.API_SURVEYS_ID, identifier)).andDo(print()).andExpect(status().isOk())
                 .andExpect(content().json(json, false));
     }
 
     @Test
     public void getSurveyNotFound() throws Exception {
         String identifier = "SURVEYNOTFOUND";
-        this.mockMvc.perform(get(Constants.API_SURVEYS + "/" + identifier)).andDo(print())
+        this.mockMvc.perform(get(Constants.API_SURVEYS_ID, identifier)).andDo(print())
                 .andExpect(status().is(HttpStatus.NOT_FOUND.value()));
 
     }
@@ -67,9 +67,9 @@ public class SurveyControllerTest {
 
         // create survey - status created
         Survey survey = initSurvey(identifier);
-        String jsonSurvey = createJson(survey);
+        String jsonSurvey = createJson(survey, "SOURCE1");
         mockMvc.perform(
-                put(Constants.API_SURVEYS + "/" + identifier).content(jsonSurvey)
+                put(Constants.API_SURVEYS_ID, identifier).content(jsonSurvey)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(content().json(jsonSurvey.toString(), false));
@@ -81,8 +81,8 @@ public class SurveyControllerTest {
 
         // update survey - status ok
         survey.setLongWording("Long wording update");
-        String jsonSurveyUpdate = createJson(survey);
-        mockMvc.perform(put(Constants.API_SURVEYS + "/" + identifier).content(jsonSurveyUpdate)
+        String jsonSurveyUpdate = createJson(survey,"SOURCE1");
+        mockMvc.perform(put(Constants.API_SURVEYS_ID, identifier).content(jsonSurveyUpdate)
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
                 .andExpect(content().json(jsonSurveyUpdate.toString(), false));
         Optional<Survey> surveyFoundAfterUpdate = surveyService.findById(identifier);
@@ -91,12 +91,12 @@ public class SurveyControllerTest {
         assertEquals(survey.getId(), surveyFoundAfterUpdate.get().getId());
 
         // delete survey
-        mockMvc.perform(delete(Constants.API_SURVEYS + "/" + identifier).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(delete(Constants.API_SURVEYS_ID, identifier).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
         assertFalse(surveyService.findById(identifier).isPresent());
 
         // delete survey not found
-        mockMvc.perform(delete(Constants.API_SURVEYS + "/" + identifier).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(delete(Constants.API_SURVEYS_ID, identifier).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
     }
@@ -106,8 +106,8 @@ public class SurveyControllerTest {
         String identifier = "NEWONE";
         String otherIdentifier = "WRONG";
         Survey survey = initSurvey(identifier);
-        String jsonSurvey = createJson(survey);
-        mockMvc.perform(put(Constants.API_SURVEYS + "/" + otherIdentifier).content(jsonSurvey)
+        String jsonSurvey = createJson(survey, "SOURCE1");
+        mockMvc.perform(put(Constants.API_SURVEYS_ID, otherIdentifier).content(jsonSurvey)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest()).andExpect(content().string("id and idSurvey don't match"));
 
@@ -122,9 +122,10 @@ public class SurveyControllerTest {
         return surveyMock;
     }
 
-    private String createJson(Survey survey) throws JSONException {
+    private String createJson(Survey survey, String idSource) throws JSONException {
         JSONObject jo = new JSONObject();
         jo.put("id", survey.getId());
+        jo.put("sourceId", idSource);
         jo.put("longWording", survey.getLongWording());
         jo.put("shortWording", survey.getShortWording());
         jo.put("sampleSize", survey.getSampleSize());

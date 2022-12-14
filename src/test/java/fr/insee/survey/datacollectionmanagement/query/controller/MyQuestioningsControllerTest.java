@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import fr.insee.survey.datacollectionmanagement.constants.Constants;
 import fr.insee.survey.datacollectionmanagement.query.dto.MyQuestioningDto;
 import fr.insee.survey.datacollectionmanagement.query.service.CheckHabilitationService;
 
@@ -38,7 +39,7 @@ public class MyQuestioningsControllerTest {
     public void myQuestionings() throws Exception {
         String identifier = "CONT2";
 
-        MvcResult result = this.mockMvc.perform(get("/api/my-questionings/" + identifier)).andDo(print())
+        MvcResult result = this.mockMvc.perform(get(Constants.API_MY_QUESTIONINGS_ID, identifier)).andDo(print())
                 .andExpect(status().isOk()).andReturn();
         String json = result.getResponse().getContentAsString();
         MyQuestioningDto[] myQuestionings = new ObjectMapper().readValue(json, MyQuestioningDto[].class);
@@ -58,7 +59,7 @@ public class MyQuestioningsControllerTest {
     public void myQuestioningsContactNotExist() throws Exception {
         String identifier = "CONT500";
 
-        MvcResult result = this.mockMvc.perform(get("/api/my-questionings/" + identifier)).andDo(print())
+        MvcResult result = this.mockMvc.perform(get(Constants.API_MY_QUESTIONINGS_ID, identifier)).andDo(print())
                 .andExpect(status().isOk()).andReturn();
         String json = result.getResponse().getContentAsString();
         MyQuestioningDto[] myQuestionings = new ObjectMapper().readValue(json, MyQuestioningDto[].class);

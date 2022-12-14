@@ -23,7 +23,7 @@ public class Constants {
     public static final String API_SURVEY_UNITS_ID = "/api/survey-units/{id}";
     public static final String API_SURVEY_UNITS_ID_QUESTIONINGS = "/api/survey-units/{id}/questionings";
     public static final String API_QUESTIONING_ACCREDITATIONS = "/api/questioning-accreditations";
-    public static final String API_QUESTIONINGS_ID_QUESTIONING_ACCREDITATIONS_ID = "/api/questionings/{id}/questioning-accreditations";
+    public static final String API_QUESTIONINGS_ID_QUESTIONING_ACCREDITATIONS = "/api/questionings/{id}/questioning-accreditations";
     public static final String API_QUESTIONING_QUESTIONING_EVENTS = "/api/questionings/questioning-events";
     public static final String API_QUESTIONING_ID_QUESTIONING_EVENTS = "/api/questionings/{id}/questioning-events";
     public static final String API_QUESTIONING_QUESTIONING_EVENTS_ID = "/api/questionings/questioning-events/{id}";
@@ -34,7 +34,6 @@ public class Constants {
     public static final String API_SOURCES = "/api/sources";
     public static final String API_SOURCES_ID = "/api/sources/{id}";
     public static final String API_SOURCES_ID_SURVEYS = "/api/sources/{id}/surveys";
-    public static final String API_SURVEYS = "/api/surveys";
     public static final String API_SURVEYS_ID = "/api/surveys/{id}";
     public static final String API_SURVEYS_ID_CAMPAIGNS = "/api/surveys/{id}/campaigns";
     public static final String API_CAMPAIGNS = "/api/campaigns";

@@ -16,6 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import fr.insee.survey.datacollectionmanagement.constants.Constants;
+
 @AutoConfigureMockMvc
 @SpringBootTest
 @ActiveProfiles("test")
@@ -26,17 +28,16 @@ public class QuestionningEventControllerTest {
 
     @Test
     public void getQuestioningEventOk() throws Exception {
-        String identifier = "12";
+        String identifier = "11";
         String json = createJsonQuestioningEvent(identifier);
-        this.mockMvc.perform(get("/api/questionings/" + identifier
-                + "/questioning-events")).andDo(print()).andExpect(status().isOk())
+        this.mockMvc.perform(get(Constants.API_QUESTIONING_ID_QUESTIONING_EVENTS,identifier)).andDo(print()).andExpect(status().isOk())
                 .andExpect(content().json(json, false));
     }
 
     @Test
     public void getQuestioningEventNotFound() throws Exception {
         String identifier = "300";
-        this.mockMvc.perform(get("/api/questionings/" + identifier + "/questioning-events")).andDo(print())
+        this.mockMvc.perform(get(Constants.API_QUESTIONING_ID_QUESTIONING_EVENTS,identifier)).andDo(print())
                 .andExpect(status().is(HttpStatus.NOT_FOUND.value()));
 
     }
