@@ -75,7 +75,7 @@ public class MoogController {
     @GetMapping(path = Constants.API_MOOG_MAIL, produces = "application/json")
     @Operation(summary = "Get Moog questioning events by campaign and idSu")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = MoogQuestioningEventDto.class)))),
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = String.class))),
             @ApiResponse(responseCode = "404", description = "Not found")
     })
     public ResponseEntity<?> getMoogMail(@PathVariable("id") String contactId) {
