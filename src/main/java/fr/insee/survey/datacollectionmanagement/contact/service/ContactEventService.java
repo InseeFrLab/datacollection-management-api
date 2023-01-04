@@ -1,5 +1,6 @@
 package fr.insee.survey.datacollectionmanagement.contact.service;
 
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.data.domain.Page;
@@ -17,7 +18,7 @@ public interface ContactEventService {
 
     public Page<ContactEvent> findAll(Pageable pageable);
 
-    public ContactEvent findById(Long id);
+    public Optional<ContactEvent> findById(Long id);
 
     public ContactEvent saveContactEvent(ContactEvent contactEvent);
 

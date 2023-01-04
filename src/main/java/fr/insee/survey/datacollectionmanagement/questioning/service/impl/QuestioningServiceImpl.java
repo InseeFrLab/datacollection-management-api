@@ -1,5 +1,6 @@
 package fr.insee.survey.datacollectionmanagement.questioning.service.impl;
 
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +38,8 @@ public class QuestioningServiceImpl implements QuestioningService {
     }
 
     @Override
-    public Questioning findbyId(Long id) {
-        return questioningRepository.findById(id).orElseThrow();
+    public Optional<Questioning> findbyId(Long id) {
+        return questioningRepository.findById(id);
     }
 
     @Override

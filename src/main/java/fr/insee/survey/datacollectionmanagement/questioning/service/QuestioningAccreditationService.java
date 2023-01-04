@@ -1,6 +1,7 @@
 package fr.insee.survey.datacollectionmanagement.questioning.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.data.domain.Page;
@@ -29,7 +30,7 @@ public interface QuestioningAccreditationService {
 
     public Page<QuestioningAccreditation> findAll(Pageable pageable);
 
-    public QuestioningAccreditation findById(Long id);
+    public Optional<QuestioningAccreditation> findById(Long id);
    
     public QuestioningAccreditation saveQuestioningAccreditation(QuestioningAccreditation questioningAccreditation);
 

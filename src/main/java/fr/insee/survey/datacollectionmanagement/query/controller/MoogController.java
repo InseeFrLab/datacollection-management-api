@@ -2,7 +2,7 @@ package fr.insee.survey.datacollectionmanagement.query.controller;
 
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,13 +79,9 @@ public class MoogController {
             @ApiResponse(responseCode = "404", description = "Not found")
     })
     public ResponseEntity<?> getMoogMail(@PathVariable("id") String contactId) {
-        Contact contact;
-        try {
-            contact = contactService.findByIdentifier(contactId);
-            return ResponseEntity.ok().body(contact.getEmail());
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Contact not found");
-        }
+        Optional<Contact> contact = contactService.findByIdentifier(contactId);
+        return contact.isPresent() ? ResponseEntity.ok().body(contact.get().getEmail())
+                : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Contact not found");
     }
 
     @GetMapping(path = Constants.API_MOOG_EVENTS, produces = "application/json")
@@ -96,7 +92,6 @@ public class MoogController {
     })
     public ResponseEntity<?> getMoogQuestioningEvents(@PathVariable("campaign") String campaignId,
             @PathVariable("id") String idSu) {
-
         return new ResponseEntity<>(Map.of("datas", moogService.getMoogEvents(campaignId, idSu)), HttpStatus.OK);
 
     }

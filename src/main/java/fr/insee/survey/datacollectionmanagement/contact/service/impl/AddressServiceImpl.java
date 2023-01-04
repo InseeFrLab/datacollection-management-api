@@ -1,5 +1,7 @@
 package fr.insee.survey.datacollectionmanagement.contact.service.impl;
 
+import java.util.Optional;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,8 +23,8 @@ public class AddressServiceImpl implements AddressService {
     private ModelMapper modelMapper;
 
     @Override
-    public Address findById(Long id) {
-        return addressRepository.findById(id).orElseThrow();
+    public Optional<Address> findById(Long id) {
+        return addressRepository.findById(id);
     }
 
     @Override

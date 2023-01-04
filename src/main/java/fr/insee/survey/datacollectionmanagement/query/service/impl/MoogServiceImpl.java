@@ -48,10 +48,13 @@ public class MoogServiceImpl implements MoogService {
         List<MoogSearchDto> listResult = new ArrayList<>();
         for (View view : listView) {
             MoogSearchDto moogSearchDto = new MoogSearchDto();
-            Contact c = contactService.findByIdentifier(view.getIdentifier());
+            Optional<Contact> c = contactService.findByIdentifier(view.getIdentifier());
             Optional<Campaign> camp = campaignService.findById(view.getCampaignId());
             if (!camp.isPresent()) {
                 throw new NoSuchElementException("campaign does not exist");
+            }
+            if (!c.isPresent()) {
+                throw new NoSuchElementException("contact does not exist");
             }
             MoogCampaign moogCampaign = new MoogCampaign();
             moogCampaign.setId(view.getCampaignId());
@@ -61,11 +64,11 @@ public class MoogServiceImpl implements MoogService {
             moogCampaign
                     .setCollectionStartDate(camp.get().getPartitionings().iterator().next().getOpeningDate().getTime());
             moogSearchDto.setIdContact(view.getIdentifier());
-            moogSearchDto.setAddress(c.getAddress().getZipCode().concat(" ").concat(c.getAddress().getCityName()));
+            moogSearchDto.setAddress(c.get().getAddress().getZipCode().concat(" ").concat(c.get().getAddress().getCityName()));
             moogSearchDto.setIdSu(view.getIdSu());
             moogSearchDto.setCampaign(moogCampaign);
-            moogSearchDto.setFirstName(c.getFirstName());
-            moogSearchDto.setLastname(c.getLastName());
+            moogSearchDto.setFirstName(c.get().getFirstName());
+            moogSearchDto.setLastname(c.get().getLastName());
             listResult.add(moogSearchDto);
         }
         return listResult;

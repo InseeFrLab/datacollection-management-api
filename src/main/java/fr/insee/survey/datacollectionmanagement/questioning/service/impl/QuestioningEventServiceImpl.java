@@ -1,6 +1,5 @@
 package fr.insee.survey.datacollectionmanagement.questioning.service.impl;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -26,8 +25,8 @@ public class QuestioningEventServiceImpl implements QuestioningEventService {
     QuestioningEventRepository questioningEventRepository;
 
     @Override
-    public QuestioningEvent findbyId(Long id) {
-        return questioningEventRepository.findById(id).orElseThrow();
+    public Optional<QuestioningEvent> findbyId(Long id) {
+        return questioningEventRepository.findById(id);
     }
 
     @Override
@@ -40,12 +39,11 @@ public class QuestioningEventServiceImpl implements QuestioningEventService {
         questioningEventRepository.deleteById(id);
 
     }
-    
-    
 
     @Override
-    public Optional<QuestioningEvent> getLastQuestioningEvent(Questioning questioning, List<TypeQuestioningEvent> events) {
-                
+    public Optional<QuestioningEvent> getLastQuestioningEvent(Questioning questioning,
+            List<TypeQuestioningEvent> events) {
+
         List<QuestioningEvent> listQuestioningEvent = questioning.getQuestioningEvents().stream()
                 .filter(qe -> events.contains(qe.getType()))
                 .collect(Collectors.toList());

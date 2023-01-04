@@ -1,7 +1,7 @@
 package fr.insee.survey.datacollectionmanagement.questioning.service.impl;
 
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,8 +25,8 @@ public class SurveyUnitServiceImpl implements SurveyUnitService {
     private SurveyUnitAddressRepository surveyUnitAddressRepository;
 
     @Override
-    public SurveyUnit findbyId(String idSu) {
-        return surveyUnitRepository.findById(idSu).orElseThrow();
+    public Optional<SurveyUnit> findbyId(String idSu) {
+        return surveyUnitRepository.findById(idSu);
     }
 
     @Override
@@ -53,14 +53,15 @@ public class SurveyUnitServiceImpl implements SurveyUnitService {
     public SurveyUnit saveSurveyUnitAndAddress(SurveyUnit surveyUnit) {
 
         if (surveyUnit.getSurveyUnitAddress() != null) {
-            try {
-                SurveyUnit existingSurveyUnit = findbyId(surveyUnit.getIdSu());
-                if (existingSurveyUnit.getSurveyUnitAddress() != null) {
-                    surveyUnit.getSurveyUnitAddress().setId(existingSurveyUnit.getSurveyUnitAddress().getId());
+
+            Optional<SurveyUnit> existingSurveyUnit = findbyId(surveyUnit.getIdSu());
+            if (existingSurveyUnit.isPresent()) {
+                if (existingSurveyUnit.get().getSurveyUnitAddress() != null) {
+                    surveyUnit.getSurveyUnitAddress().setId(existingSurveyUnit.get().getSurveyUnitAddress().getId());
                 }
-            } catch (NoSuchElementException e) {
+            } else
                 log.info("Survey unit does not exist");
-            }
+
             surveyUnitAddressRepository.save(surveyUnit.getSurveyUnitAddress());
         }
         return surveyUnitRepository.save(surveyUnit);

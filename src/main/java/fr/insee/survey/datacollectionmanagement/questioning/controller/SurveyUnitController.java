@@ -3,6 +3,7 @@ package fr.insee.survey.datacollectionmanagement.questioning.controller;
 import java.text.ParseException;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -80,12 +81,13 @@ public class SurveyUnitController {
             @ApiResponse(responseCode = "400", description = "Bad Request")
     })
     public ResponseEntity<?> findSurveyUnit(@PathVariable("id") String id) {
-        SurveyUnit surveyUnit = null;
+
         try {
-            surveyUnit = surveyUnitService.findbyId(StringUtils.upperCase(id));
-            return ResponseEntity.status(HttpStatus.OK).body(convertToDto(surveyUnit));
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("survey unit not found");
+            Optional<SurveyUnit> surveyUnit = surveyUnitService.findbyId(StringUtils.upperCase(id));
+            if (surveyUnit.isPresent())
+                return ResponseEntity.status(HttpStatus.OK).body(convertToDto(surveyUnit.get()));
+            else
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("survey unit not found");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
         }
@@ -117,10 +119,9 @@ public class SurveyUnitController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Impossible to parse survey unit");
         }
 
-        try {
-            surveyUnitService.findbyId(surveyUnitDto.getIdSu());
+        if (surveyUnitService.findbyId(surveyUnitDto.getIdSu()).isPresent())
             responseStatus = HttpStatus.OK;
-        } catch (NoSuchElementException e) {
+        else {
             LOGGER.info("Creating survey with the id {}", surveyUnitDto.getIdSu());
             responseStatus = HttpStatus.CREATED;
         }
@@ -137,18 +138,18 @@ public class SurveyUnitController {
             @ApiResponse(responseCode = "400", description = "Bad request")
     })
     public ResponseEntity<?> deleteSurveyUnit(@PathVariable("id") String id) {
-        SurveyUnit surveyUnit;
         try {
-            surveyUnit = surveyUnitService.findbyId(StringUtils.upperCase(id));
-            if (!surveyUnit.getQuestionings().isEmpty()) {
-                log.warn("Some questionings exist for the survey unit {}, the survey unit can't be deleted", id);
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("Some questionings exist for this survey unit, the survey unit can't be deleted");
-            }
-            surveyUnitService.deleteSurveyUnit(id);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Survey unit deleted");
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("survey unit not found");
+            Optional<SurveyUnit> surveyUnit = surveyUnitService.findbyId(StringUtils.upperCase(id));
+            if (surveyUnit.isPresent()) {
+                if (!surveyUnit.get().getQuestionings().isEmpty()) {
+                    log.warn("Some questionings exist for the survey unit {}, the survey unit can't be deleted", id);
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body("Some questionings exist for this survey unit, the survey unit can't be deleted");
+                }
+                surveyUnitService.deleteSurveyUnit(id);
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Survey unit deleted");
+            } else
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("survey unit not found");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
         }

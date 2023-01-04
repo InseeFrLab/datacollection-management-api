@@ -1,6 +1,7 @@
 package fr.insee.survey.datacollectionmanagement.contact.service.impl;
 
 import java.util.Date;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +29,8 @@ public class ContactEventServiceImpl implements ContactEventService {
     }
 
     @Override
-    public ContactEvent findById(Long id) {
-        return contactEventRepository.findById(id).orElseThrow();
+    public Optional<ContactEvent> findById(Long id) {
+        return contactEventRepository.findById(id);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package fr.insee.survey.datacollectionmanagement.questioning.service;
 
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.data.domain.Page;
@@ -12,7 +13,7 @@ public interface QuestioningService {
 
     public Page<Questioning> findAll(Pageable pageable);
 
-    public Questioning findbyId(Long id);
+    public Optional<Questioning> findbyId(Long id);
 
     public Questioning saveQuestioning(Questioning questioning);
 

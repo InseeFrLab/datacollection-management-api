@@ -1,14 +1,12 @@
 package fr.insee.survey.datacollectionmanagement.questioning.controller;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.NoSuchElementException;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,7 +42,7 @@ public class SurveyUnitControllerTest {
     @Test
     public void getSurveyUnitOk() throws Exception {
         String identifier = "100000000";
-        SurveyUnit surveyUnit = surveyUnitService.findbyId(identifier);
+        SurveyUnit surveyUnit = surveyUnitService.findbyId(identifier).get();
         String json = createJson(surveyUnit);
         this.mockMvc.perform(get(Constants.API_SURVEY_UNITS_ID, identifier)).andDo(print()).andExpect(status().isOk())
                 .andExpect(content().json(json, false));
@@ -80,7 +78,7 @@ public class SurveyUnitControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(content().json(jsonSurveyUnit.toString(), false));
-        SurveyUnit surveyUnitFound = surveyUnitService.findbyId(identifier);
+        SurveyUnit surveyUnitFound = surveyUnitService.findbyId(identifier).get();
         assertEquals(surveyUnit.getIdSu(), surveyUnitFound.getIdSu());
         assertEquals(surveyUnit.getIdentificationCode(), surveyUnitFound.getIdentificationCode());
         assertEquals(surveyUnit.getIdentificationName(), surveyUnitFound.getIdentificationName());
@@ -91,16 +89,15 @@ public class SurveyUnitControllerTest {
         mockMvc.perform(put(Constants.API_SURVEY_UNITS_ID, identifier).content(jsonSurveyUnitUpdate)
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
                 .andExpect(content().json(jsonSurveyUnitUpdate.toString(), false));
-        SurveyUnit surveyUnitFoundAfterUpdate = surveyUnitService.findbyId(identifier);
+        SurveyUnit surveyUnitFoundAfterUpdate = surveyUnitService.findbyId(identifier).get();
         assertEquals("identificationNameUpdate", surveyUnitFoundAfterUpdate.getIdentificationName());
         assertEquals(surveyUnit.getIdSu(), surveyUnitFoundAfterUpdate.getIdSu());
         assertEquals(surveyUnit.getIdentificationName(), surveyUnitFoundAfterUpdate.getIdentificationName());
 
         // delete surveyUnit
         surveyUnitService.deleteSurveyUnit(identifier);
-        assertThrows(NoSuchElementException.class, () -> {
-            surveyUnitService.findbyId(identifier);
-        });
+        assertFalse(
+                surveyUnitService.findbyId(identifier).isPresent());
 
     }
 
@@ -116,7 +113,7 @@ public class SurveyUnitControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(content().json(jsonSurveyUnit.toString(), false));
-        SurveyUnit suFound = surveyUnitService.findbyId(identifier);
+        SurveyUnit suFound = surveyUnitService.findbyId(identifier).get();
         assertEquals(surveyUnit.getSurveyUnitAddress().getCityName(), suFound.getSurveyUnitAddress().getCityName());
 
         // update surveyUnit - status ok
@@ -126,15 +123,13 @@ public class SurveyUnitControllerTest {
         mockMvc.perform(put(Constants.API_SURVEY_UNITS_ID, identifier).content(jsonSurveyUnitUpdate)
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
                 .andExpect(content().json(jsonSurveyUnitUpdate.toString(), false));
-        SurveyUnit countactFoundAfterUpdate = surveyUnitService.findbyId(identifier);
+        SurveyUnit countactFoundAfterUpdate = surveyUnitService.findbyId(identifier).get();
         assertEquals(surveyUnit.getSurveyUnitAddress().getCityName(),
                 countactFoundAfterUpdate.getSurveyUnitAddress().getCityName());
 
         // delete surveyUnit
         surveyUnitService.deleteSurveyUnit(identifier);
-        assertThrows(NoSuchElementException.class, () -> {
-            surveyUnitService.findbyId(identifier);
-        });
+        assertFalse(surveyUnitService.findbyId(identifier).isPresent());
 
     }
 
