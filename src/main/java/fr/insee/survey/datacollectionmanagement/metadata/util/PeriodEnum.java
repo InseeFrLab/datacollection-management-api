@@ -6,6 +6,7 @@ import lombok.Getter;
 public enum PeriodEnum {
 
     A00(PeriodicityEnum.A, "annual"),
+    X00(PeriodicityEnum.X, "pluriannual"),
     S01(PeriodicityEnum.S, "1st semester"),
     S02(PeriodicityEnum.S, "2nd semester"),
     T01(PeriodicityEnum.T, "1st trimester"),

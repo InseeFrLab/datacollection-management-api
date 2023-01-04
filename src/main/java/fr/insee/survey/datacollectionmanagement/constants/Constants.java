@@ -48,6 +48,7 @@ public class Constants {
     public static final String API_SUPPORTS = "/api/supports";
     public static final String API_SUPPORTS_ID = "/api/supports/{id}";
     public static final String API_PERIODICITIES = "/api/periodicities";
+    public static final String API_PERIODICITIES_ID_PERIODS = "/api/periodicities/{id}/periods";
     public static final String API_PERIODS = "/api/periods";
 
 
