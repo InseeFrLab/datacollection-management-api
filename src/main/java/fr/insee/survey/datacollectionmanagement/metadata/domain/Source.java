@@ -10,26 +10,28 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import javax.validation.constraints.NotNull;
 
 import fr.insee.survey.datacollectionmanagement.metadata.util.PeriodicityEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.ToString;
 
 @Entity
 @Data
+@NoArgsConstructor
 public class Source {
 
     @Id
     private String id;
     private String longWording;
     private String shortWording;
-    @NotNull
+    @NonNull
     @Enumerated(EnumType.STRING)
     private PeriodicityEnum periodicity;
-    @NotNull
-    private boolean mandatoryMySurveys;
+    @NonNull
+    private Boolean mandatoryMySurveys;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @EqualsAndHashCode.Exclude
@@ -37,11 +39,11 @@ public class Source {
     private Set<Survey> surveys;
 
     @OneToOne
-    @NotNull
+    @NonNull
     private Owner owner;
 
     @OneToOne
-    @NotNull
+    @NonNull
     private Support support;
 
 }

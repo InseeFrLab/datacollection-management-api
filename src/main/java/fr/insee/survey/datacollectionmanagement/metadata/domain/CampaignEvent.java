@@ -6,22 +6,24 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.validation.constraints.NotNull;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.ToString;
 
 @Entity
 @Data
+@NoArgsConstructor
 public class CampaignEvent {
 
     @Id
     @GeneratedValue
     private Long id;
-    @NotNull
+    @NonNull
     private String type;
-    @NotNull
+    @NonNull
     private Date date;
 
     @ManyToOne

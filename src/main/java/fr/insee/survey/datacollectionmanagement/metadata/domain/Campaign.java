@@ -13,15 +13,17 @@ import javax.persistence.Index;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 
 import fr.insee.survey.datacollectionmanagement.metadata.util.PeriodEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.ToString;
 
 @Entity
 @Data
+@NoArgsConstructor
 @Table(indexes = {
         @Index(name = "year_index", columnList = "year_value"),
         @Index(name = "surveyid_index", columnList = "survey_id")
@@ -32,11 +34,11 @@ public class Campaign {
     private String id;
     
     @Column(name = "YEAR_VALUE")
-    @NotNull
-    private int year;
+    @NonNull 
+    private Integer year;
     
     @Column(name = "PERIOD_VALUE")
-    @NotNull
+    @NonNull
     @Enumerated(EnumType.STRING)
     private PeriodEnum period;
     
