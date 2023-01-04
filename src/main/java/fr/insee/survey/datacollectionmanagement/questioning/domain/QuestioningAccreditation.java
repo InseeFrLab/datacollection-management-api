@@ -27,8 +27,7 @@ public class QuestioningAccreditation {
     @GeneratedValue
     private Long id;
 
-    @NonNull
-    private Boolean isMain;
+    private boolean isMain;
     private Date creationDate;
     private String creationAuthor;
     @NonNull
