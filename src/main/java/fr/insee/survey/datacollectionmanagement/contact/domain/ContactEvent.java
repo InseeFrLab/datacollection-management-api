@@ -7,7 +7,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -17,10 +16,13 @@ import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.ToString;
 
 @Entity
 @Data
+@NoArgsConstructor
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class ContactEvent {
 
@@ -31,9 +33,8 @@ public class ContactEvent {
     @Id
     @GeneratedValue
     private Long id;
-    @NotNull
     private Date eventDate;
-    @NotNull
+    @NonNull
     private ContactEventType type;
 
     @ManyToOne
@@ -50,5 +51,6 @@ public class ContactEvent {
         return "ContactEvent [id=" + id + ", eventDate=" + eventDate + ", type=" + type.name()
                 + ", payload=" + payload.toString() + "]";
     }
+
 
 }

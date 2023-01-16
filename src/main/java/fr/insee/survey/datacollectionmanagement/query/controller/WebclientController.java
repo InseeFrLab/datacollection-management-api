@@ -130,8 +130,6 @@ public class WebclientController {
     @Autowired
     private ModelMapper modelMapper;
 
-
-
     @Operation(summary = "Create or update questioning for webclients")
     @PutMapping(value = Constants.API_WEBCLIENT_QUESTIONINGS, produces = "application/json", consumes = "application/json")
     @ApiResponses(value = {
@@ -166,13 +164,12 @@ public class WebclientController {
         su = convertToEntity(questioningWebclientDto.getSurveyUnit());
 
         // Create su if not exists or update
-        try {
-            SurveyUnit suBase = surveyUnitService.findbyId(idSu);
-            su.setQuestionings(suBase.getQuestionings());
-        } catch (NoSuchElementException e) {
+        Optional<SurveyUnit> optSuBase = surveyUnitService.findbyId(idSu);
+        if (optSuBase.isPresent()) {
+            su.setQuestionings(optSuBase.get().getQuestionings());
+        } else {
             log.warn("survey unit {} does not exist - Creation of the survey unit",
                     idSu);
-
             su.setQuestionings(new HashSet<>());
         }
         surveyUnitService.saveSurveyUnitAndAddress(su);
@@ -290,7 +287,7 @@ public class WebclientController {
         List<ContactAccreditationDto> listContactAccreditationDto = new ArrayList<>();
         questioning.getQuestioningAccreditations().stream()
                 .forEach(acc -> listContactAccreditationDto
-                        .add(convertToDto(contactService.findByIdentifier(acc.getIdContact()), acc.isMain())));
+                        .add(convertToDto(contactService.findByIdentifier(acc.getIdContact()).get(), acc.isMain())));
         questioningWebclientDto.setContacts(listContactAccreditationDto);
         return ResponseEntity.status(httpStatus).body(questioningWebclientDto);
 
@@ -423,10 +420,10 @@ public class WebclientController {
 
     }
 
-    @Operation(summary = "Search for questioning accreditations by questioning id")
+    @Operation(summary = "Search for main contact")
     @GetMapping(value = Constants.API_MAIN_CONTACT, produces = "application/json")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ContactDto.class)))),
+            @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "400", description = "Bad Request")
     })
@@ -435,12 +432,20 @@ public class WebclientController {
             @RequestParam(value = "survey-unit", required = true) String surveyUnitId) {
 
         try {
-            List<Contact> listContacts = questioningService.findByIdPartitioningAndSurveyUnitIdSu(partitioningId,
-                    surveyUnitId).getQuestioningAccreditations().stream().filter(qa -> qa.isMain())
-                    .map(qa -> contactService.findByIdentifier(qa.getIdContact()))
-                    .collect(Collectors.toList());
-            return new ResponseEntity<>(listContacts,
-                    HttpStatus.OK);
+
+            Questioning questioning = questioningService
+                    .findByIdPartitioningAndSurveyUnitIdSu(partitioningId,
+                            surveyUnitId);
+            if (questioning != null) {
+                List<QuestioningAccreditation> listQa = questioning.getQuestioningAccreditations().stream()
+                        .filter(qa -> qa.isMain()).collect(Collectors.toList());
+                if (listQa != null && !listQa.isEmpty()) {
+                    Contact c = contactService.findByIdentifier(listQa.get(0).getIdContact()).get();
+                    return ResponseEntity.status(HttpStatus.OK).body(convertToDto((c)));
+                }
+            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No contact found");
+
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>("Questioning does not exist", HttpStatus.NOT_FOUND);
         } catch (Exception e) {
@@ -587,14 +592,16 @@ public class WebclientController {
         return modelMapper.map(surveyUnitDto, SurveyUnit.class);
     }
 
-    private Contact convertToEntity(ContactAccreditationDto contactAccreditationDto) {
+    private Contact convertToEntity(ContactAccreditationDto contactAccreditationDto) throws NoSuchElementException {
         Contact contact = modelMapper.map(contactAccreditationDto, Contact.class);
         contact.setGender(contactAccreditationDto.getCivility().equals("Mr") ? Gender.Male : Gender.Female);
 
-        Contact oldContact = contactService.findByIdentifier(contactAccreditationDto.getIdentifier());
-        contact.setComment(oldContact.getComment());
-        contact.setAddress(oldContact.getAddress());
-        contact.setContactEvents(oldContact.getContactEvents());
+        Optional<Contact> oldContact = contactService.findByIdentifier(contactAccreditationDto.getIdentifier());
+        if (!oldContact.isPresent())
+            throw new NoSuchElementException();
+        contact.setComment(oldContact.get().getComment());
+        contact.setAddress(oldContact.get().getAddress());
+        contact.setContactEvents(oldContact.get().getContactEvents());
 
         return contact;
     }
@@ -615,6 +622,10 @@ public class WebclientController {
 
     private SupportDto convertToDto(Support support) {
         return modelMapper.map(support, SupportDto.class);
+    }
+
+    private ContactDto convertToDto(Contact contact) {
+        return modelMapper.map(contact, ContactDto.class);
     }
 
     private SurveyUnitDto convertToDto(SurveyUnit surveyUnit) {

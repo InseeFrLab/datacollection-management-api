@@ -1,7 +1,7 @@
 package fr.insee.survey.datacollectionmanagement.contacts.controller;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -12,7 +12,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -55,15 +54,17 @@ public class ContactControllerTest {
     @Test
     public void getContactOk() throws Exception {
         String identifier = "CONT1";
-        Contact contact = contactService.findByIdentifier(identifier);
+        Contact contact = contactService.findByIdentifier(identifier).get();
         String json = createJson(contact);
-        this.mockMvc.perform(get(Constants.API_CONTACTS_ID, identifier)).andDo(print()).andExpect(status().isOk()).andExpect(content().json(json, false));
+        this.mockMvc.perform(get(Constants.API_CONTACTS_ID, identifier)).andDo(print()).andExpect(status().isOk())
+                .andExpect(content().json(json, false));
     }
 
     @Test
     public void getContactNotFound() throws Exception {
         String identifier = "CONT500";
-        this.mockMvc.perform(get(Constants.API_CONTACTS_ID, identifier)).andDo(print()).andExpect(status().is(HttpStatus.NOT_FOUND.value()));
+        this.mockMvc.perform(get(Constants.API_CONTACTS_ID, identifier)).andDo(print())
+                .andExpect(status().is(HttpStatus.NOT_FOUND.value()));
 
     }
 
@@ -73,7 +74,8 @@ public class ContactControllerTest {
         jo.put("totalElements", contactRepository.count());
         jo.put("numberOfElements", contactRepository.count());
 
-        this.mockMvc.perform(get(Constants.API_CONTACTS_ALL)).andDo(print()).andExpect(status().isOk()).andExpect(content().json(jo.toString(), false));
+        this.mockMvc.perform(get(Constants.API_CONTACTS_ALL)).andDo(print()).andExpect(status().isOk())
+                .andExpect(content().json(jo.toString(), false));
     }
 
     @Test
@@ -83,9 +85,11 @@ public class ContactControllerTest {
         // create contact - status created
         Contact contact = initContact(identifier);
         String jsonContact = createJson(contact);
-        mockMvc.perform(put(Constants.API_CONTACTS_ID, identifier).content(jsonContact).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isCreated())
-            .andExpect(content().json(jsonContact.toString(), false));
-        Contact contactFound = contactService.findByIdentifier(identifier);
+        mockMvc.perform(
+                put(Constants.API_CONTACTS_ID, identifier).content(jsonContact).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(content().json(jsonContact.toString(), false));
+        Contact contactFound = contactService.findByIdentifier(identifier).get();
         assertEquals(contact.getLastName(), contactFound.getLastName());
         assertEquals(contact.getFirstName(), contactFound.getFirstName());
         assertEquals(contact.getEmail(), contactFound.getEmail());
@@ -97,25 +101,27 @@ public class ContactControllerTest {
         // update contact - status ok
         contact.setLastName("lastNameUpdate");
         String jsonContactUpdate = createJson(contact);
-        mockMvc.perform(put(Constants.API_CONTACTS_ID, identifier).content(jsonContactUpdate).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
-            .andExpect(content().json(jsonContactUpdate.toString(), false));
-        Contact contactFoundAfterUpdate = contactService.findByIdentifier(identifier);
+        mockMvc.perform(put(Constants.API_CONTACTS_ID, identifier).content(jsonContactUpdate)
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+                .andExpect(content().json(jsonContactUpdate.toString(), false));
+        Contact contactFoundAfterUpdate = contactService.findByIdentifier(identifier).get();
         assertEquals("lastNameUpdate", contactFoundAfterUpdate.getLastName());
         assertEquals(contact.getFirstName(), contactFoundAfterUpdate.getFirstName());
         assertEquals(contact.getEmail(), contactFoundAfterUpdate.getEmail());
-        List<ContactEvent> listUpdate = new ArrayList<>(contactEventService.findContactEventsByContact(contactFoundAfterUpdate));
+        List<ContactEvent> listUpdate = new ArrayList<>(
+                contactEventService.findContactEventsByContact(contactFoundAfterUpdate));
         assertEquals(listUpdate.size(), 2);
         assertEquals(listUpdate.get(1).getType(), ContactEventType.update);
 
         // delete contact
-        mockMvc.perform(delete(Constants.API_CONTACTS_ID, identifier).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent());
-        assertThrows(NoSuchElementException.class, () -> {
-            contactService.findByIdentifier(identifier);
-        });
+        mockMvc.perform(delete(Constants.API_CONTACTS_ID, identifier).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+        assertFalse(contactService.findByIdentifier(identifier).isPresent());
         assertTrue(contactEventService.findContactEventsByContact(contactFoundAfterUpdate).isEmpty());
 
         // delete contact not found
-        mockMvc.perform(delete("/contacts/" + identifier).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound());
+        mockMvc.perform(delete("/contacts/" + identifier).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
 
     }
 
@@ -126,25 +132,27 @@ public class ContactControllerTest {
         // create contact - status created
         Contact contact = initContactAddress(identifier);
         String jsonContact = createJsonContactAddress(contact);
-        mockMvc.perform(put(Constants.API_CONTACTS_ID, identifier).content(jsonContact).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isCreated())
-            .andExpect(content().json(jsonContact.toString(), false));
-        Contact countactFound = contactService.findByIdentifier(identifier);
+        mockMvc.perform(
+                put(Constants.API_CONTACTS_ID, identifier).content(jsonContact).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(content().json(jsonContact.toString(), false));
+        Contact countactFound = contactService.findByIdentifier(identifier).get();
         assertEquals(contact.getAddress().getCityName(), countactFound.getAddress().getCityName());
 
         // update contact - status ok
         String newCityName = "cityUpdate";
         contact.getAddress().setCityName(newCityName);
         String jsonContactUpdate = createJsonContactAddress(contact);
-        mockMvc.perform(put(Constants.API_CONTACTS_ID, identifier).content(jsonContactUpdate).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
-            .andExpect(content().json(jsonContactUpdate.toString(), false));
-        Contact countactFoundAfterUpdate = contactService.findByIdentifier(identifier);
+        mockMvc.perform(put(Constants.API_CONTACTS_ID, identifier).content(jsonContactUpdate)
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+                .andExpect(content().json(jsonContactUpdate.toString(), false));
+        Contact countactFoundAfterUpdate = contactService.findByIdentifier(identifier).get();
         assertEquals(contact.getAddress().getCityName(), countactFoundAfterUpdate.getAddress().getCityName());
 
         // delete contact
-        mockMvc.perform(delete(Constants.API_CONTACTS_ID, identifier).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent());
-        assertThrows(NoSuchElementException.class, () -> {
-            contactService.findByIdentifier(identifier);
-        });
+        mockMvc.perform(delete(Constants.API_CONTACTS_ID, identifier).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+        assertFalse(contactService.findByIdentifier(identifier).isPresent());
 
     }
 
@@ -154,8 +162,10 @@ public class ContactControllerTest {
         String otherIdentifier = "WRONG";
         Contact contact = initContact(identifier);
         String jsonContact = createJson(contact);
-        mockMvc.perform(put(Constants.API_CONTACTS_ID , otherIdentifier).content(jsonContact).contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isBadRequest()).andExpect(content().string("id and contact identifier don't match"));
+        mockMvc.perform(put(Constants.API_CONTACTS_ID, otherIdentifier).content(jsonContact)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("id and contact identifier don't match"));
 
     }
 

@@ -5,14 +5,16 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
 
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
 @Table(indexes = {
         @Index(name = "view_identifier_index", columnList = "identifier"),
         @Index(name = "view_campaignId_index", columnList = "campaignId"),
@@ -23,7 +25,7 @@ public class View {
     @Id
     @GeneratedValue
     private Long id;
-    @NotNull
+    @NonNull
     private String identifier;
     private String campaignId;
     private String idSu;

@@ -3,6 +3,7 @@ package fr.insee.survey.datacollectionmanagement.contact.controller;
 import java.text.ParseException;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -104,12 +105,12 @@ public class ContactController {
             @ApiResponse(responseCode = "400", description = "Bad Request")
     })
     public ResponseEntity<?> getContact(@PathVariable("id") String id) {
-        Contact contact = null;
+        Optional<Contact> contact = contactService.findByIdentifier(StringUtils.upperCase(id));
         try {
-            contact = contactService.findByIdentifier(StringUtils.upperCase(id));
-            return ResponseEntity.ok().body(convertToFirstLoginDto(contact));
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Contact does not exist");
+            if (contact.isPresent())
+                return ResponseEntity.ok().body(convertToFirstLoginDto(contact.get()));
+            else
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Contact does not exist");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
         }
@@ -165,23 +166,25 @@ public class ContactController {
     @Transactional
     public ResponseEntity<?> deleteContact(@PathVariable("id") String id) {
         try {
-            Contact contact = contactService.findByIdentifier(id);
-            contactService.deleteContactAddressEvent(contact);
+            Optional<Contact> contact = contactService.findByIdentifier(id);
+            if (contact.isPresent()) {
+                contactService.deleteContactAddressEvent(contact.get());
 
-            viewService.findViewByIdentifier(id).stream().forEach(c -> viewService.deleteView(c));
-            questioningAccreditationService.findByContactIdentifier(id).stream().forEach(acc -> {
-                Questioning questioning = questioningService.findbyId(acc.getQuestioning().getId());
-                Set<QuestioningAccreditation> newSet = questioning.getQuestioningAccreditations();
-                newSet.removeIf(a -> a.getId().equals(acc.getId()));
-                questioning.setQuestioningAccreditations(newSet);
-                questioningService.saveQuestioning(questioning);
-                questioningAccreditationService.deleteAccreditation(acc);
+                viewService.findViewByIdentifier(id).stream().forEach(c -> viewService.deleteView(c));
+                questioningAccreditationService.findByContactIdentifier(id).stream().forEach(acc -> {
+                    Questioning questioning = questioningService.findbyId(acc.getQuestioning().getId()).get();
+                    Set<QuestioningAccreditation> newSet = questioning.getQuestioningAccreditations();
+                    newSet.removeIf(a -> a.getId().equals(acc.getId()));
+                    questioning.setQuestioningAccreditations(newSet);
+                    questioningService.saveQuestioning(questioning);
+                    questioningAccreditationService.deleteAccreditation(acc);
 
-            });
-            log.info("Delete contact {}", id);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Contact deleted");
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Contact does not exist");
+                });
+                log.info("Delete contact {}", id);
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Contact deleted");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Contact does not exist");
+            }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
         }
@@ -193,25 +196,27 @@ public class ContactController {
         contactDto.setCivility(civility);
         return contactDto;
     }
-    
+
     private ContactFirstLoginDto convertToFirstLoginDto(Contact contact) {
         ContactFirstLoginDto contactFirstLoginDto = modelMapper.map(contact, ContactFirstLoginDto.class);
         String civility = contact.getGender().equals(Gender.Male) ? "Mr" : "Mme";
         contactFirstLoginDto.setCivility(civility);
-        contactFirstLoginDto.setFirstConnect(contact.getContactEvents().stream().filter(e -> e.getType().equals(ContactEventType.firstConnect)).collect(Collectors.toList()).isEmpty());
+        contactFirstLoginDto.setFirstConnect(contact.getContactEvents().stream()
+                .filter(e -> e.getType().equals(ContactEventType.firstConnect)).collect(Collectors.toList()).isEmpty());
         return contactFirstLoginDto;
     }
-    
-    
 
-    private Contact convertToEntity(ContactDto contactDto) throws ParseException {
+    private Contact convertToEntity(ContactDto contactDto) throws ParseException, NoSuchElementException {
         Contact contact = modelMapper.map(contactDto, Contact.class);
         contact.setGender(contactDto.getCivility().equals("Mr") ? Gender.Male : Gender.Female);
 
-        Contact oldContact = contactService.findByIdentifier(contactDto.getIdentifier());
-        contact.setComment(oldContact.getComment());
-        contact.setAddress(oldContact.getAddress());
-        contact.setContactEvents(oldContact.getContactEvents());
+        Optional<Contact> oldContact = contactService.findByIdentifier(contactDto.getIdentifier());
+        if (!oldContact.isPresent()) {
+            throw new NoSuchElementException();
+        }
+        contact.setComment(oldContact.get().getComment());
+        contact.setAddress(oldContact.get().getAddress());
+        contact.setContactEvents(oldContact.get().getContactEvents());
 
         return contact;
     }

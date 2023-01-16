@@ -1,6 +1,6 @@
 package fr.insee.survey.datacollectionmanagement.query.controller;
 
-import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -61,13 +61,15 @@ public class QuestioningController {
     })
     public ResponseEntity<?> getQuestioning(@PathVariable("id") Long id) {
 
-        Questioning questioning = null;
+        Optional<Questioning> optQuestioning = null;
         try {
-            questioning = questioningService.findbyId(id);
-            return new ResponseEntity<>(convertToDto(questioning), HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            log.warn("Questioning {} does not exist", id);
-            return new ResponseEntity<>("Not Found", HttpStatus.NOT_FOUND);
+            optQuestioning = questioningService.findbyId(id);
+            if (optQuestioning.isPresent())
+                return new ResponseEntity<>(convertToDto(optQuestioning.get()), HttpStatus.OK);
+            else {
+                log.warn("Questioning {} does not exist", id);
+                return new ResponseEntity<>("Not Found", HttpStatus.NOT_FOUND);
+            }
         } catch (Exception e) {
             return new ResponseEntity<String>("Error", HttpStatus.BAD_REQUEST);
         }
@@ -80,13 +82,15 @@ public class QuestioningController {
             @ApiResponse(responseCode = "404", description = "NotFound")
     })
     public ResponseEntity<?> postQuestioning(@RequestBody QuestioningDto questioningDto) {
-        SurveyUnit su;
-        try {
-            su = surveyUnitService.findbyId(questioningDto.getSurveyUnitId());
-        } catch (NoSuchElementException e) {
+        Optional<SurveyUnit> optSu = surveyUnitService.findbyId(questioningDto.getSurveyUnitId());
+
+        if (!optSu.isPresent()) {
             log.warn("survey unit {} does not exist", questioningDto.getSurveyUnitId());
             return new ResponseEntity<>("survey unit does not exist", HttpStatus.NOT_FOUND);
         }
+
+        SurveyUnit su = optSu.get();
+
         if (!partitioningService.findById(questioningDto.getIdPartitioning()).isPresent()) {
             log.warn("partitioning {} does not exist", questioningDto.getIdPartitioning());
             return new ResponseEntity<>("partitioning does not exist", HttpStatus.NOT_FOUND);
@@ -110,15 +114,16 @@ public class QuestioningController {
             @ApiResponse(responseCode = "400", description = "Bad Request")
     })
     public ResponseEntity<?> getQuestioningsBySurveyUnit(@PathVariable("id") String id) {
-        SurveyUnit surveyUnit = null;
         try {
-            surveyUnit = surveyUnitService.findbyId(StringUtils.upperCase(id));
-            return new ResponseEntity<>(
-                    surveyUnit.getQuestionings().stream().map(q -> convertToDto(q)).collect(Collectors.toList()),
-                    HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            log.warn("survey unit {} does not exist", id);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("survey unit does not exist");
+            Optional<SurveyUnit> optSu = surveyUnitService.findbyId(StringUtils.upperCase(id));
+            if (optSu.isPresent())
+                return new ResponseEntity<>(
+                        optSu.get().getQuestionings().stream().map(q -> convertToDto(q)).collect(Collectors.toList()),
+                        HttpStatus.OK);
+            else {
+                log.warn("survey unit {} does not exist", id);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("survey unit does not exist");
+            }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
         }

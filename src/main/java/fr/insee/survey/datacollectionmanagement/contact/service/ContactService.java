@@ -2,6 +2,7 @@ package fr.insee.survey.datacollectionmanagement.contact.service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,10 +27,9 @@ public interface ContactService {
      * Find a contact by its identifier.
      * 
      * @param identifier
-     * @throws NoSuchElementException - if the contact doesn't exist
-     * @return contact found
+     * @return Optional contact found
      */
-    public Contact findByIdentifier(String identifier) throws NoSuchElementException;
+    public Optional<Contact> findByIdentifier(String identifier) ;
 
     /**
      * Update an existing contact and its address, or creates a new one
@@ -41,11 +41,9 @@ public interface ContactService {
 
     /**
      * Delete a contact. Delete also the contact address.
-     * 
-     * @throws NoSuchElementException - if the contact doesn't exist
      * @param identifier
      */
-    public void deleteContact(String identifier) throws NoSuchElementException;
+    public void deleteContact(String identifier);
 
     public List<Contact> findByLastName(String lastName);
 

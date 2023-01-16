@@ -1,7 +1,6 @@
 package fr.insee.survey.datacollectionmanagement.query.controller;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -76,13 +75,14 @@ public class QuestioningAccreditationController {
     public ResponseEntity<?> getQuestioningAccreditation(@PathVariable("id") Long id) {
 
         try {
-            Questioning questioning = questioningService.findbyId(id);
-            return new ResponseEntity<>(
-                    questioning.getQuestioningAccreditations().stream().map(c -> convertToDto(c))
-                            .collect(Collectors.toList()),
-                    HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>("Questioning does not exist", HttpStatus.NOT_FOUND);
+            Optional<Questioning> optQuestioning = questioningService.findbyId(id);
+            if (optQuestioning.isPresent())
+                return new ResponseEntity<>(
+                        optQuestioning.get().getQuestioningAccreditations().stream().map(c -> convertToDto(c))
+                                .collect(Collectors.toList()),
+                        HttpStatus.OK);
+            else
+                return new ResponseEntity<>("Questioning does not exist", HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<String>("Error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -100,25 +100,23 @@ public class QuestioningAccreditationController {
     public ResponseEntity<?> postQuestioningAccreditation(@PathVariable("id") Long id,
             @RequestBody QuestioningAccreditationDto questioningAccreditationDto) {
 
-        Questioning questioning = null;
+        Optional<Questioning> optQuestioning = null;
 
         String idContact = questioningAccreditationDto.getIdContact();
 
         // Check if questioning exists
         try {
-            questioning = questioningService.findbyId(id);
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Questioning does not exist");
+            optQuestioning = questioningService.findbyId(id);
+            if (!optQuestioning.isPresent())
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Questioning does not exist");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error");
         }
+        Questioning questioning = optQuestioning.get();
 
         // Check if contact exists
-        try {
-            contactService.findByIdentifier(idContact);
-        } catch (NoSuchElementException e) {
+        if (!contactService.findByIdentifier(idContact).isPresent())
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Contact does not exist");
-        }
 
         HttpHeaders responseHeaders = new HttpHeaders();
 

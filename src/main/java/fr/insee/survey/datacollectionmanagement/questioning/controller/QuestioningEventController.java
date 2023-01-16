@@ -3,6 +3,7 @@ package fr.insee.survey.datacollectionmanagement.questioning.controller;
 import java.text.ParseException;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -65,13 +66,14 @@ public class QuestioningEventController {
     })
     public ResponseEntity<?> findQuestioningEventsByQuestioning(@PathVariable("id") Long id) {
         try {
-            Questioning questioning = questioningService.findbyId(id);
-            Set<QuestioningEvent> setQe = questioning.getQuestioningEvents();
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(setQe.stream()
-                            .map(q -> convertToDto(q)).collect(Collectors.toList()));
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("questioning not found");
+            Optional<Questioning> questioning = questioningService.findbyId(id);
+            if (questioning.isPresent()) {
+                Set<QuestioningEvent> setQe = questioning.get().getQuestioningEvents();
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(setQe.stream()
+                                .map(q -> convertToDto(q)).collect(Collectors.toList()));
+            } else
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("questioning not found");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
         }
@@ -86,19 +88,22 @@ public class QuestioningEventController {
     public ResponseEntity<?> postQuestioningEvent(@Parameter(description = "questioning id") Long id,
             @RequestBody QuestioningEventDto questioningEventDto) {
         try {
-            Questioning questioning = questioningService.findbyId(id);
-            QuestioningEvent questioningEvent = convertToEntity(questioningEventDto);
-            QuestioningEvent newQuestioningEvent = questioningEventService.saveQuestioningEvent(questioningEvent);
-            Set<QuestioningEvent> setQuestioningEvents = questioning.getQuestioningEvents();
-            setQuestioningEvents.add(newQuestioningEvent);
-            questioning.setQuestioningEvents(setQuestioningEvents);
-            questioningService.saveQuestioning(questioning);
-            HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.set(HttpHeaders.LOCATION, ServletUriComponentsBuilder.fromCurrentRequest().toUriString());
-            return ResponseEntity.status(HttpStatus.CREATED).headers(responseHeaders)
-                    .body(convertToDto(newQuestioningEvent));
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Questioning does not exist");
+            Optional<Questioning> optQuestioning = questioningService.findbyId(id);
+            if (optQuestioning.isPresent()) {
+                Questioning questioning = optQuestioning.get();
+                QuestioningEvent questioningEvent = convertToEntity(questioningEventDto);
+                QuestioningEvent newQuestioningEvent = questioningEventService.saveQuestioningEvent(questioningEvent);
+                Set<QuestioningEvent> setQuestioningEvents = questioning.getQuestioningEvents();
+                setQuestioningEvents.add(newQuestioningEvent);
+                questioning.setQuestioningEvents(setQuestioningEvents);
+                questioningService.saveQuestioning(questioning);
+                HttpHeaders responseHeaders = new HttpHeaders();
+                responseHeaders.set(HttpHeaders.LOCATION,
+                        ServletUriComponentsBuilder.fromCurrentRequest().toUriString());
+                return ResponseEntity.status(HttpStatus.CREATED).headers(responseHeaders)
+                        .body(convertToDto(newQuestioningEvent));
+            } else
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Questioning does not exist");
         } catch (ParseException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
         }
@@ -114,14 +119,16 @@ public class QuestioningEventController {
     })
     public ResponseEntity<?> deleteQuestioningEvent(@PathVariable("id") Long id) {
         try {
-            QuestioningEvent questioningEvent = questioningEventService.findbyId(id);
-            Questioning quesitoning = questioningEvent.getQuestioning();
-            quesitoning.setQuestioningEvents(quesitoning.getQuestioningEvents().stream().filter(qe->!qe.equals(questioningEvent)).collect(Collectors.toSet()));
-            questioningService.saveQuestioning(quesitoning);
-            questioningEventService.deleteQuestioningEvent(id);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Questioning event deleted");
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Questioning event does not exist");
+            Optional<QuestioningEvent> questioningEvent = questioningEventService.findbyId(id);
+            if (questioningEvent.isPresent()) {
+                Questioning quesitoning = questioningEvent.get().getQuestioning();
+                quesitoning.setQuestioningEvents(quesitoning.getQuestioningEvents().stream()
+                        .filter(qe -> !qe.equals(questioningEvent.get())).collect(Collectors.toSet()));
+                questioningService.saveQuestioning(quesitoning);
+                questioningEventService.deleteQuestioningEvent(id);
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Questioning event deleted");
+            } else
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Questioning event does not exist");
         } catch (Exception e) {
             return new ResponseEntity<String>("Error", HttpStatus.BAD_REQUEST);
         }

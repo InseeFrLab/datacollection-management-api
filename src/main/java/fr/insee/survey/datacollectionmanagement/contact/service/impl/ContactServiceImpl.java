@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,7 +30,7 @@ public class ContactServiceImpl implements ContactService {
 
     @Autowired
     private ContactRepository contactRepository;
-    
+
     @Autowired
     private AddressService addressService;
 
@@ -42,8 +43,8 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public Contact findByIdentifier(String identifier) throws NoSuchElementException {
-        return contactRepository.findById(identifier).orElseThrow();
+    public Optional<Contact> findByIdentifier(String identifier) {
+        return contactRepository.findById(identifier);
     }
 
     @Override
@@ -52,7 +53,7 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public void deleteContact(String identifier) throws NoSuchElementException {
+    public void deleteContact(String identifier) {
         contactRepository.deleteById(identifier);
     }
 
@@ -72,61 +73,63 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public List<Contact> searchListContactParameters(String identifier, String lastName, String firstName, String email) {
+    public List<Contact> searchListContactParameters(String identifier, String lastName, String firstName,
+            String email) {
 
         List<Contact> listContactContact = new ArrayList<>();
         boolean alwaysEmpty = true;
 
-        if ( !StringUtils.isEmpty(identifier)) {
-            listContactContact = Arrays.asList(findByIdentifier(identifier));
+        if (!StringUtils.isEmpty(identifier)) {
+            listContactContact = Arrays.asList(findByIdentifier(identifier).get());
             alwaysEmpty = false;
         }
 
-        if ( !StringUtils.isEmpty(lastName)) {
+        if (!StringUtils.isEmpty(lastName)) {
             if (listContactContact.isEmpty() && alwaysEmpty) {
                 listContactContact.addAll(findByLastName(lastName));
                 alwaysEmpty = false;
-            }
-            else
-                listContactContact = listContactContact.stream().filter(c -> c.getLastName().equalsIgnoreCase(lastName)).collect(Collectors.toList());
+            } else
+                listContactContact = listContactContact.stream().filter(c -> c.getLastName().equalsIgnoreCase(lastName))
+                        .collect(Collectors.toList());
 
         }
 
-        if ( !StringUtils.isEmpty(firstName)) {
+        if (!StringUtils.isEmpty(firstName)) {
             if (listContactContact.isEmpty() && alwaysEmpty) {
                 listContactContact.addAll(findByFirstName(firstName));
                 alwaysEmpty = false;
-            }
-            else
-                listContactContact = listContactContact.stream().filter(c -> c.getFirstName().equalsIgnoreCase(firstName)).collect(Collectors.toList());
+            } else
+                listContactContact = listContactContact.stream()
+                        .filter(c -> c.getFirstName().equalsIgnoreCase(firstName)).collect(Collectors.toList());
         }
 
-        if ( !StringUtils.isEmpty(email)) {
+        if (!StringUtils.isEmpty(email)) {
             if (listContactContact.isEmpty() && alwaysEmpty) {
                 listContactContact.addAll(findByEmail(email));
                 alwaysEmpty = false;
-            }
-            else
-                listContactContact = listContactContact.stream().filter(c -> c.getEmail().equalsIgnoreCase(email)).collect(Collectors.toList());
+            } else
+                listContactContact = listContactContact.stream().filter(c -> c.getEmail().equalsIgnoreCase(email))
+                        .collect(Collectors.toList());
         }
 
         return listContactContact;
     }
-    
+
     @Override
     public Contact createContactAddressEvent(Contact contact, JsonNode payload) {
         if (contact.getAddress() != null) {
             addressService.saveAddress(contact.getAddress());
         }
-        ContactEvent newContactEvent = contactEventService.createContactEvent(contact, ContactEventType.create, payload);
+        ContactEvent newContactEvent = contactEventService.createContactEvent(contact, ContactEventType.create,
+                payload);
         contact.setContactEvents(new HashSet<>(Arrays.asList(newContactEvent)));
         return saveContact(contact);
     }
 
     @Override
-    public Contact updateContactAddressEvent(Contact contact,JsonNode payload) {
+    public Contact updateContactAddressEvent(Contact contact, JsonNode payload) {
 
-        Contact existingContact = findByIdentifier(contact.getIdentifier());
+        Contact existingContact = findByIdentifier(contact.getIdentifier()).get();
         if (contact.getAddress() != null) {
             if (existingContact.getAddress() != null) {
                 contact.getAddress().setId(existingContact.getAddress().getId());
@@ -135,7 +138,8 @@ public class ContactServiceImpl implements ContactService {
         }
 
         Set<ContactEvent> setContactEventsContact = existingContact.getContactEvents();
-        ContactEvent contactEventUpdate = contactEventService.createContactEvent(contact, ContactEventType.update, payload);
+        ContactEvent contactEventUpdate = contactEventService.createContactEvent(contact, ContactEventType.update,
+                payload);
         setContactEventsContact.add(contactEventUpdate);
         contact.setContactEvents(setContactEventsContact);
         return saveContact(contact);
@@ -147,6 +151,5 @@ public class ContactServiceImpl implements ContactService {
         deleteContact(contact.getIdentifier());
 
     }
-
 
 }

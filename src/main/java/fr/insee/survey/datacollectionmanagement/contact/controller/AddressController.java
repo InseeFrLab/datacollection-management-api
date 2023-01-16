@@ -1,7 +1,7 @@
 package fr.insee.survey.datacollectionmanagement.contact.controller;
 
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,14 +62,17 @@ public class AddressController {
     })
     public ResponseEntity<?> getContactAddress(@PathVariable("id") String id) {
         try {
-            Contact contact = contactService.findByIdentifier(id);
-            if (contact.getAddress() != null)
-                return ResponseEntity.status(HttpStatus.OK).body(addressService.convertToDto(contact.getAddress()));
-            else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Address does not exist");
+            Optional<Contact> contact = contactService.findByIdentifier(id);
+            if (contact.isPresent()) {
+                if (contact.get().getAddress() != null)
+                    return ResponseEntity.status(HttpStatus.OK)
+                            .body(addressService.convertToDto(contact.get().getAddress()));
+                else {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Address does not exist");
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Contact does not exist");
             }
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Contact does not exist");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error");
         }
@@ -87,11 +90,11 @@ public class AddressController {
             @ApiResponse(responseCode = "404", description = "Not found")
     })
     public ResponseEntity<?> putAddress(@PathVariable("id") String id, @RequestBody AddressDto addressDto) {
-        try {
-            Contact contact = contactService.findByIdentifier(id);
+        Optional<Contact> optContact = contactService.findByIdentifier(id);
+        if (optContact.isPresent()) {
             HttpStatus httpStatus;
             Address addressUpdate;
-
+            Contact contact = optContact.get();
             Address address = addressService.convertToEntity(addressDto);
             HttpHeaders responseHeaders = new HttpHeaders();
             responseHeaders.set(HttpHeaders.LOCATION, ServletUriComponentsBuilder.fromCurrentRequest().toUriString());
@@ -109,12 +112,13 @@ public class AddressController {
                 httpStatus = HttpStatus.CREATED;
             }
 
-            ContactEvent contactEventUpdate = contactEventService.createContactEvent(contact, ContactEventType.update, null);
+            ContactEvent contactEventUpdate = contactEventService.createContactEvent(contact, ContactEventType.update,
+                    null);
             contactEventService.saveContactEvent(contactEventUpdate);
             return ResponseEntity.status(httpStatus).headers(responseHeaders)
                     .body(addressService.convertToDto(addressUpdate));
 
-        } catch (NoSuchElementException e) {
+        } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Contact does not exist");
         }
 
