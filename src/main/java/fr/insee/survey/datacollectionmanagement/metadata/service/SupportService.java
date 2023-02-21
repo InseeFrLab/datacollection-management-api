@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Source;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Support;
+import lombok.NonNull;
 
 public interface SupportService {
 
@@ -19,5 +20,7 @@ public interface SupportService {
     void deleteSupportById(String id);
 
     void removeSourceFromSupport(Support support, Source source);
+
+    void addSourceFromSupport(Support support, Source source);
 
 }

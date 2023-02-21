@@ -24,7 +24,7 @@ public class Support {
     private String streetNumber;
     private String streetName;
     private String city;
-    private String zipCode; 
+    private String zipCode;
 
     @OneToMany
     @EqualsAndHashCode.Exclude
