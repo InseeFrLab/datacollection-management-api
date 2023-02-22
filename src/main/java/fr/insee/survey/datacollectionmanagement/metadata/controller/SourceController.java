@@ -32,12 +32,11 @@ import fr.insee.survey.datacollectionmanagement.metadata.domain.Campaign;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Owner;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Partitioning;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Source;
-import fr.insee.survey.datacollectionmanagement.metadata.dto.SourceDto;
+import fr.insee.survey.datacollectionmanagement.metadata.dto.SourceCompleteDto;
 import fr.insee.survey.datacollectionmanagement.metadata.dto.SurveyDto;
 import fr.insee.survey.datacollectionmanagement.metadata.service.OwnerService;
 import fr.insee.survey.datacollectionmanagement.metadata.service.SourceService;
 import fr.insee.survey.datacollectionmanagement.metadata.service.SupportService;
-import fr.insee.survey.datacollectionmanagement.metadata.util.PeriodicityEnum;
 import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningService;
 import fr.insee.survey.datacollectionmanagement.view.service.ViewService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -85,14 +84,14 @@ public class SourceController {
             @RequestParam(defaultValue = "id") String sort) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
         Page<Source> pageSource = sourceService.findAll(pageable);
-        List<SourceDto> listSources = pageSource.stream().map(c -> convertToDto(c)).collect(Collectors.toList());
+        List<SourceCompleteDto> listSources = pageSource.stream().map(c -> convertToDto(c)).collect(Collectors.toList());
         return ResponseEntity.ok().body(new SourcePage(listSources, pageable, pageSource.getTotalElements()));
     }
 
     @Operation(summary = "Search for a source by its id")
     @GetMapping(value = Constants.API_SOURCES_ID, produces = "application/json")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SourceDto.class))),
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SourceCompleteDto.class))),
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "400", description = "Bad request")
     })
@@ -110,31 +109,35 @@ public class SourceController {
     @Operation(summary = "Update or create a source")
     @PutMapping(value = Constants.API_SOURCES_ID, produces = "application/json", consumes = "application/json")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SourceDto.class))),
-            @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = SourceDto.class))),
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SourceCompleteDto.class))),
+            @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = SourceCompleteDto.class))),
             @ApiResponse(responseCode = "400", description = "Bad request")
     })
-    public ResponseEntity<?> putSource(@PathVariable("id") String id, @RequestBody SourceDto sourceDto) {
-        if (StringUtils.isBlank(sourceDto.getId()) || !sourceDto.getId().equalsIgnoreCase(id)) {
+    public ResponseEntity<?> putSource(@PathVariable("id") String id, @RequestBody SourceCompleteDto SourceCompleteDto) {
+        if (StringUtils.isBlank(SourceCompleteDto.getId()) || !SourceCompleteDto.getId().equalsIgnoreCase(id)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("id and source id don't match");
         }
 
         Source source;
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set(HttpHeaders.LOCATION,
-                ServletUriComponentsBuilder.fromCurrentRequest().buildAndExpand(sourceDto.getId()).toUriString());
+                ServletUriComponentsBuilder.fromCurrentRequest().buildAndExpand(SourceCompleteDto.getId()).toUriString());
         HttpStatus httpStatus;
 
         if (sourceService.findById(id).isPresent()) {
-            log.warn("Update source with the id {}", sourceDto.getId());
-            sourceService.findById(id);
+            log.warn("Update source with the id {}", SourceCompleteDto.getId());
             httpStatus = HttpStatus.OK;
         } else {
-            log.info("Create source with the id {}", sourceDto.getId());
+            log.info("Create source with the id {}", SourceCompleteDto.getId());
             httpStatus = HttpStatus.CREATED;
         }
 
-        source = sourceService.insertOrUpdateSource(convertToEntity(sourceDto));
+        source = sourceService.insertOrUpdateSource(convertToEntity(SourceCompleteDto));
+        if (source.getOwner() != null && httpStatus.equals(HttpStatus.CREATED))
+            ownerService.addSourceFromOwner(source.getOwner(), source);
+        if (source.getSupport()!=null&& httpStatus.equals(HttpStatus.CREATED))
+            supportService.addSourceFromSupport(source.getSupport(), source);
+        
         return ResponseEntity.status(httpStatus).headers(responseHeaders).body(convertToDto(source));
     }
 
@@ -205,17 +208,17 @@ public class SourceController {
 
     }
 
-    private SourceDto convertToDto(Source source) {
-        return modelmapper.map(source, SourceDto.class);
+    private SourceCompleteDto convertToDto(Source source) {
+        return modelmapper.map(source, SourceCompleteDto.class);
     }
 
-    private Source convertToEntity(SourceDto sourceDto) {
-        return modelmapper.map(sourceDto, Source.class);
+    private Source convertToEntity(SourceCompleteDto SourceCompleteDto) {
+        return modelmapper.map(SourceCompleteDto, Source.class);
     }
 
-    class SourcePage extends PageImpl<SourceDto> {
+    class SourcePage extends PageImpl<SourceCompleteDto> {
 
-        public SourcePage(List<SourceDto> content, Pageable pageable, long total) {
+        public SourcePage(List<SourceCompleteDto> content, Pageable pageable, long total) {
             super(content, pageable, total);
         }
     }

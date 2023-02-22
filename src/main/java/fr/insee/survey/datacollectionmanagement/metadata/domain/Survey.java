@@ -32,7 +32,6 @@ public class Survey {
     @Column(name = "YEAR_VALUE")
     @NonNull
     private Integer year;
-    private boolean isMandatory;
     private Integer sampleSize;
     private String longWording;
     private String shortWording;

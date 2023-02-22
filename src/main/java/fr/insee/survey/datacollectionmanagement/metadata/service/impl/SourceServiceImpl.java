@@ -8,7 +8,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Source;
+import fr.insee.survey.datacollectionmanagement.metadata.repository.OwnerRepository;
 import fr.insee.survey.datacollectionmanagement.metadata.repository.SourceRepository;
+import fr.insee.survey.datacollectionmanagement.metadata.repository.SupportRepository;
 import fr.insee.survey.datacollectionmanagement.metadata.service.SourceService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,7 +33,7 @@ public class SourceServiceImpl implements SourceService {
     @Override
     public Source insertOrUpdateSource(Source source) {
         Optional<Source> sourceBase = findById(source.getId());
-        if(!sourceBase.isPresent()) {
+        if (!sourceBase.isPresent()) {
             log.info("Create source with the id {}", source.getId());
             return sourceRepository.save(source);
         }

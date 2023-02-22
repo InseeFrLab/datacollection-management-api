@@ -51,7 +51,12 @@ public class SupportServiceImpl implements SupportService {
     public void removeSourceFromSupport(Support support, Source source) {
         support.getSources().remove(source);
         supportRepository.save(support);
+    }
 
+    @Override
+    public void addSourceFromSupport(Support support, Source source) {
+        support.getSources().add(source);
+        supportRepository.save(support);
     }
 
 }

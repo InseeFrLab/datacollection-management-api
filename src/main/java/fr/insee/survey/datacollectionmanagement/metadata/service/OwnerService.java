@@ -19,5 +19,7 @@ public interface OwnerService {
     void deleteOwnerById(String id);
 
     void removeSourceFromOwner(Owner owner, Source source);
+    
+    void addSourceFromOwner(Owner owner, Source source);
 
 }

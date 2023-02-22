@@ -12,7 +12,6 @@ public class SurveyDto {
     @NonNull
     private String sourceId;
     private Integer year;
-    private boolean isMandatory;
     private Integer sampleSize;
     private String longWording;
     private String shortWording;
