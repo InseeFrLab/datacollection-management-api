@@ -21,5 +21,6 @@ public class QuestioningAccreditationDto {
     private Date creationDate;
     private String creationAuthor;
     private String idContact;
+    private String sourceId;
 
 }

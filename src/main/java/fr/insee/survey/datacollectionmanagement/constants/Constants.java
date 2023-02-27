@@ -1,6 +1,10 @@
 package fr.insee.survey.datacollectionmanagement.constants;
 
 public class Constants {
+
+
+
+
     private Constants() {
         throw new IllegalStateException("Constants class");
     }
@@ -15,6 +19,15 @@ public class Constants {
     public static final String API_CONTACTS_ID_CONTACTEVENTS = "/api/contacts/{id}/contact-events";
     public static final String API_CONTACTEVENTS = "/api/contacts/contact-events";
     public static final String API_CONTACTEVENTS_ID = "/api/contacts/contact-events/{id}";
+
+    // API USER DOMAIN
+
+    public static final String API_USERS_ALL = "/api/users";
+    public static final String API_USERS_ID = "/api/users/{id}";
+    public static final String API_USERS_ID_USEREVENTS = "/api/users/{id}/user-events";
+    public static final String API_USEREVENTS = "/api/users/contact-events";
+    public static final String API_USEREVENTS_ID = "/api/users/user-events/{id}";
+    public static final String API_SOURCE_ID_SOURCE_ACCREDITATIONS = "/api/source/{id}/source-accreditations";
 
     //API QUESTIONING DOMAIN
     public static final String API_QUESTIONINGS = "/api/questionings";

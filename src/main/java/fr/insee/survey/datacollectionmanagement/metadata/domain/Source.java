@@ -1,22 +1,11 @@
 package fr.insee.survey.datacollectionmanagement.metadata.domain;
 
-import java.util.Set;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-
 import fr.insee.survey.datacollectionmanagement.metadata.util.PeriodicityEnum;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.ToString;
+import fr.insee.survey.datacollectionmanagement.user.domain.SourceAccreditation;
+import lombok.*;
+
+import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Data
@@ -37,6 +26,11 @@ public class Source {
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Set<Survey> surveys;
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private Set<SourceAccreditation> sourceAccreditations;
 
     @OneToOne
     @NonNull
