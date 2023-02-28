@@ -23,7 +23,6 @@ public class Owner {
 
     @OneToMany
     @EqualsAndHashCode.Exclude
-    @ToString.Exclude
     private Set<Source> sources;
 
 }

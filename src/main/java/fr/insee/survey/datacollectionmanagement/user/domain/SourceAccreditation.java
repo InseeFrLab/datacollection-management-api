@@ -14,10 +14,6 @@ import java.util.Date;
 @Entity
 @Data
 @NoArgsConstructor
-@Table(indexes = {
-        @Index(name = "idUser_index", columnList = "idUser"),
-        @Index(name = "source_index", columnList = "source_id")
-})
 public class SourceAccreditation {
 
     @Id

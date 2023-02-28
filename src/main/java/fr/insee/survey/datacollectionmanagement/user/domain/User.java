@@ -9,6 +9,7 @@ import java.util.Set;
 
 @Entity
 @Data
+@Table(name = "InternalUsers")
 public class User {
 
     public enum UserRoleType {

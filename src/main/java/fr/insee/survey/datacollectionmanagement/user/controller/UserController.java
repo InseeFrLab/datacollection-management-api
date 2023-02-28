@@ -3,6 +3,7 @@ package fr.insee.survey.datacollectionmanagement.user.controller;
 import fr.insee.survey.datacollectionmanagement.constants.Constants;
 import fr.insee.survey.datacollectionmanagement.contact.controller.ContactController;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
+import fr.insee.survey.datacollectionmanagement.contact.domain.ContactEvent;
 import fr.insee.survey.datacollectionmanagement.contact.dto.ContactDto;
 import fr.insee.survey.datacollectionmanagement.contact.dto.ContactFirstLoginDto;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Source;
@@ -12,6 +13,7 @@ import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningAc
 import fr.insee.survey.datacollectionmanagement.user.domain.SourceAccreditation;
 import fr.insee.survey.datacollectionmanagement.user.domain.User;
 import fr.insee.survey.datacollectionmanagement.user.dto.UserDto;
+import fr.insee.survey.datacollectionmanagement.user.exception.RoleException;
 import fr.insee.survey.datacollectionmanagement.user.service.SourceAccreditationService;
 import fr.insee.survey.datacollectionmanagement.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,6 +43,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RestController
 @PreAuthorize("@AuthorizeMethodDecider.isInternalUser() "
@@ -125,15 +128,23 @@ public class UserController {
             user = convertToEntity(userDto);
         } catch (ParseException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Impossible to parse user");
-        } catch (NoSuchElementException e) {
+
+        }
+        catch (RoleException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Role not recognized: only [" + Stream.of(User.UserRoleType.values())
+                            .map(User.UserRoleType::name).collect(Collectors.joining(", ")) + "] are possible");
+
+        }
+        catch (NoSuchElementException e) {
             LOGGER.info("Creating user with the identifier {}", userDto.getIdentifier());
             user = convertToEntityNewContact(userDto);
 
             User userCreate = userService.createUserEvent(user, null);
             return ResponseEntity.status(HttpStatus.CREATED).headers(responseHeaders).body(convertToDto(userCreate));
-
         }
 
+        LOGGER.info("Updating user with the identifier {}", userDto.getIdentifier());
         User userUpdate = userService.updateUserEvent(user, null);
         return ResponseEntity.ok().headers(responseHeaders).body(convertToDto(userUpdate));
     }
@@ -175,14 +186,16 @@ public class UserController {
 
 
 
-    private User convertToEntity(UserDto userDto) throws ParseException, NoSuchElementException {
+    private User convertToEntity(UserDto userDto) throws ParseException, NoSuchElementException, RoleException {
         User user = modelMapper.map(userDto, User.class);
 
         Optional<User> oldUser = userService.findByIdentifier(userDto.getIdentifier());
         if (!oldUser.isPresent()) {
             throw new NoSuchElementException();
         }
-        user.setRole(oldUser.get().getRole());
+        if(user.getRole()==null){
+            throw new RoleException("Role missing or not recognized. Only  [" + Stream.of(User.UserRoleType.values()).map(User.UserRoleType::name).collect(Collectors.joining(", ")) + "] are possible");
+        }
         user.setUserEvents(oldUser.get().getUserEvents());
 
         return user;
