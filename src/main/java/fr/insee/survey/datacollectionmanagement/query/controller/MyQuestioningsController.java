@@ -25,7 +25,8 @@ public class MyQuestioningsController {
     @GetMapping(value = Constants.API_MY_QUESTIONINGS_ID)
     @PreAuthorize("@AuthorizeMethodDecider.isInternalUser() "
             + "|| @AuthorizeMethodDecider.isWebClient() "
-            + "|| @AuthorizeMethodDecider.isRespondent()")
+            + "|| @AuthorizeMethodDecider.isRespondent()"
+            + "|| @AuthorizeMethodDecider.isAdmin() ")
     public List<MyQuestioningDto> findById(HttpServletRequest request) {
 
         List<MyQuestioningDto> listSurveys = mySurveysService.getListMySurveys(request.getRemoteUser().toUpperCase());

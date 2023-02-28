@@ -2,9 +2,6 @@ package fr.insee.survey.datacollectionmanagement.user.controller;
 
 
 import fr.insee.survey.datacollectionmanagement.constants.Constants;
-import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
-import fr.insee.survey.datacollectionmanagement.contact.domain.ContactEvent;
-import fr.insee.survey.datacollectionmanagement.contact.dto.ContactEventDto;
 import fr.insee.survey.datacollectionmanagement.exception.EventException;
 import fr.insee.survey.datacollectionmanagement.user.domain.User;
 import fr.insee.survey.datacollectionmanagement.user.domain.UserEvent;
@@ -35,7 +32,8 @@ import java.util.stream.Stream;
 
 @RestController(value="UserEvents")
 @PreAuthorize("@AuthorizeMethodDecider.isInternalUser() "
-        + "|| @AuthorizeMethodDecider.isWebClient() ")
+        + "|| @AuthorizeMethodDecider.isWebClient() "
+        + "|| @AuthorizeMethodDecider.isAdmin() ")
 @Slf4j
 @Tag(name = "7-User", description = "Enpoints to create, update, delete and find users, their events and accreditations")
 public class UserEventController {

@@ -50,9 +50,18 @@ public class AuthorizeMethodDecider {
     }
 
     public boolean isInternalUser(User user) throws JSONException {
-        log.info("Check if user is internal (admin, manager, helpdesk)");
-        return (hasRole(user, config.getRoleAdmin()) || hasRole(user, config.getRoleManager())
-                || hasRole(user, config.getRoleHelpdesk()));
+        log.info("Check if user is internal (responsable,gestionnaire,assistance)");
+        return (hasRole(user, config.getRoleInternalUser()));
+    }
+
+    public boolean isAdmin() throws JSONException {
+        User user = getUser();
+        return isAdmin(user);
+    }
+
+    public boolean isAdmin(User user) throws JSONException {
+        log.info("Check if user admin");
+        return (hasRole(user, config.getRoleAdmin()));
     }
 
     public boolean isWebClient() throws JSONException {

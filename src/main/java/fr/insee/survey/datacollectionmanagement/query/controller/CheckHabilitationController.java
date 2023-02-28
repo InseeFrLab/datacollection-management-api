@@ -28,7 +28,8 @@ public class CheckHabilitationController {
 
     @PreAuthorize("@AuthorizeMethodDecider.isInternalUser() "
             + "|| @AuthorizeMethodDecider.isWebClient() "
-            + "|| @AuthorizeMethodDecider.isRespondent()")
+            + "|| @AuthorizeMethodDecider.isRespondent()"
+            + "|| @AuthorizeMethodDecider.isAdmin()")
     @GetMapping(path = Constants.API_CHECK_HABILITATION)
     public ResponseEntity<?> checkHabilitation(
             @RequestParam(required = false) String role,

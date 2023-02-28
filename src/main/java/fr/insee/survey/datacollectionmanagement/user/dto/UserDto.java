@@ -1,7 +1,6 @@
 package fr.insee.survey.datacollectionmanagement.user.dto;
 
 
-import fr.insee.survey.datacollectionmanagement.contact.dto.AddressDto;
 import lombok.Getter;
 import lombok.Setter;
 

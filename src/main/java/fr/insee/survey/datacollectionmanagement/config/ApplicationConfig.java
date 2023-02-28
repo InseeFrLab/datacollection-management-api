@@ -31,11 +31,8 @@ public class ApplicationConfig {
     @Value("${fr.insee.datacollectionmanagement.roles.respondent.role}")
     private String roleRespondent;
 
-    @Value("${fr.insee.datacollectionmanagement.roles.helpdesk.role}")
-    private String roleHelpdesk;
-
-    @Value("${fr.insee.datacollectionmanagement.roles.manager.role}")
-    private String roleManager;
+    @Value("${fr.insee.datacollectionmanagement.roles.internal.user.role}")
+    private String roleInternalUser;
 
     @Value("${fr.insee.datacollectionmanagement.auth.mode}")
     private String authType;
