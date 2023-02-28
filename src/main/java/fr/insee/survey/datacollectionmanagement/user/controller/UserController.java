@@ -183,6 +183,23 @@ public class UserController {
         }
     }
 
+    @Operation(summary = "Get user accredited sources")
+    @GetMapping(value = Constants.API_USERS_ID_SOURCES)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "No Content"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "400", description = "Bad Request")
+    })
+    public ResponseEntity<?> getUserSources(@PathVariable("id") String id){
+        Optional<User> user = userService.findByIdentifier(id);
+        if (user.isPresent()) {
+           List<String> accreditedSources= userService.findAccreditedSources(id);
+           return ResponseEntity.status(HttpStatus.OK).body(accreditedSources);
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User does not exist");
+        }
+    }
 
 
 

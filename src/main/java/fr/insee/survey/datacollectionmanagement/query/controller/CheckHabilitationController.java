@@ -1,5 +1,6 @@
 package fr.insee.survey.datacollectionmanagement.query.controller;
 
+import fr.insee.survey.datacollectionmanagement.query.dto.HabilitationDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import fr.insee.survey.datacollectionmanagement.constants.Constants;
 import fr.insee.survey.datacollectionmanagement.query.service.CheckHabilitationService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @Tag(name = "4 - Cross domain")
@@ -28,11 +31,11 @@ public class CheckHabilitationController {
             + "|| @AuthorizeMethodDecider.isRespondent()")
     @GetMapping(path = Constants.API_CHECK_HABILITATION)
     public ResponseEntity<?> checkHabilitation(
-        @RequestParam(required = true) String identifier,
-        @RequestParam(required = true) String idSu,
-        @RequestParam(required = true) String campaignId) {
+            @RequestParam(required = false) String role,
+            @RequestParam(required = true) String id,
+            @RequestParam(required = true) String campaign, HttpServletRequest request) {
 
-        boolean res = checkHabilitationService.checkHabilitation(identifier, idSu, campaignId);
+        ResponseEntity<HabilitationDto> res = checkHabilitationService.checkHabilitation(role, id,campaign,request);
         return new ResponseEntity<>(res, HttpStatus.OK);
 
     }

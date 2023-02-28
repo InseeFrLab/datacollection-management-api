@@ -2,9 +2,6 @@ package fr.insee.survey.datacollectionmanagement.constants;
 
 public class Constants {
 
-
-
-
     private Constants() {
         throw new IllegalStateException("Constants class");
     }
@@ -28,6 +25,7 @@ public class Constants {
     public static final String API_USEREVENTS = "/api/users/contact-events";
     public static final String API_USEREVENTS_ID = "/api/users/user-events/{id}";
     public static final String API_SOURCE_ID_SOURCE_ACCREDITATIONS = "/api/source/{id}/source-accreditations";
+    public static final String API_USERS_ID_SOURCES = "/api/users/{id}/accredited-sources";
 
     //API QUESTIONING DOMAIN
     public static final String API_QUESTIONINGS = "/api/questionings";
@@ -75,7 +73,7 @@ public class Constants {
     public static final String API_MOOG_MAIL = "/api/moog/contact/{id}/mail";
     public static final String API_CONTACTS_SEARCH = "/api/contacts/search";
     public static final String API_CONTACTS_ACCREDITATIONS = "/api/contacts/{id}/accreditations";
-    public static final String API_MY_QUESTIONINGS_ID = "/api/my-questionings/{id}";
+    public static final String API_MY_QUESTIONINGS_ID = "/api/contacts/questionings";
     
     // API WEBCLIENT
     public static final String API_WEBCLIENT_FOLLOWUP = "/api/partitionings/{idPartitioning}/survey-units/{idSu}/follow-up";
@@ -84,5 +82,10 @@ public class Constants {
     public static final String API_WEBCLIENT_METADATA = "/api/metadata";
     public static final String API_WEBCLIENT_METADATA_ID = "/api/metadata/{id}";
     public static final String API_WEBCLIENT_QUESTIONINGS = "/api/questionings";
+
+    // CHECK HABILITATION ROLES
+
+    public static final String INTERVIEWER = "interviewer";
+    public static final String REVIEWER = "reviewer";
 
 }

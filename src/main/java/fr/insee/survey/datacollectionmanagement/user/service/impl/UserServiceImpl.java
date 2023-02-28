@@ -1,9 +1,12 @@
 package fr.insee.survey.datacollectionmanagement.user.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import fr.insee.survey.datacollectionmanagement.metadata.domain.Source;
+import fr.insee.survey.datacollectionmanagement.user.domain.SourceAccreditation;
 import fr.insee.survey.datacollectionmanagement.user.domain.User;
 import fr.insee.survey.datacollectionmanagement.user.domain.UserEvent;
 import fr.insee.survey.datacollectionmanagement.user.repository.UserRepository;
+import fr.insee.survey.datacollectionmanagement.user.service.SourceAccreditationService;
 import fr.insee.survey.datacollectionmanagement.user.service.UserEventService;
 import fr.insee.survey.datacollectionmanagement.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +14,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -24,6 +25,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    SourceAccreditationService sourceAccreditationService;
 
     @Override
     public Page<User> findAll(Pageable pageable) {
@@ -71,5 +75,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteContactAddressEvent(User user) {
         deleteUser(user.getIdentifier());
+    }
+
+    @Override
+    public List<String> findAccreditedSources(String identifier){
+
+        List<String> accreditedSources = new ArrayList<>();
+        List<SourceAccreditation> accreditations = sourceAccreditationService.findByUserIdentifier(identifier);
+        List<Source> accSource = accreditations.stream().map(SourceAccreditation::getSource).collect(Collectors.toList());
+        accSource.stream().forEach(acc -> accreditedSources.add(acc.getId()));
+
+        return accreditedSources;
     }
 }
