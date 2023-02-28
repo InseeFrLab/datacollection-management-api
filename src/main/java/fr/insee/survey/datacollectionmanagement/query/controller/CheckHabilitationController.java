@@ -30,14 +30,14 @@ public class CheckHabilitationController {
             + "|| @AuthorizeMethodDecider.isWebClient() "
             + "|| @AuthorizeMethodDecider.isRespondent()"
             + "|| @AuthorizeMethodDecider.isAdmin()")
-    @GetMapping(path = Constants.API_CHECK_HABILITATION)
-    public ResponseEntity<?> checkHabilitation(
+    @GetMapping(path = Constants.API_CHECK_HABILITATION,produces = "application/json")
+    public ResponseEntity<HabilitationDto> checkHabilitation(
             @RequestParam(required = false) String role,
             @RequestParam(required = true) String id,
             @RequestParam(required = true) String campaign, HttpServletRequest request) {
 
-        ResponseEntity<HabilitationDto> res = checkHabilitationService.checkHabilitation(role, id,campaign,request);
-        return new ResponseEntity<>(res, HttpStatus.OK);
+        return checkHabilitationService.checkHabilitation(role, id,campaign,request);
+
 
     }
 
