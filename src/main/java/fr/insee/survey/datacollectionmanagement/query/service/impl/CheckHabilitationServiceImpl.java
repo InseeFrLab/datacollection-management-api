@@ -51,52 +51,65 @@ public class CheckHabilitationServiceImpl implements CheckHabilitationService {
             return new ResponseEntity<>(resp, HttpStatus.OK);
         }
         String idec = request.getRemoteUser().toUpperCase();
-        //respondents
-        if (role == null || role.isBlank() || role.equals(Constants.INTERVIEWER) )
-        {
-            boolean habilitated = viewService.countViewByIdentifierIdSuCampaignId(idec, idSu, campaignId)!=0;
-            LOGGER.info("Check habilitation of interviewer {} for accessing survey-unit {} of campaign {} resulted in {}",idec,idSu,campaignId,habilitated);
-            resp.setHabilitated(habilitated);
-            return new ResponseEntity<>(resp, HttpStatus.OK);
-        }
         //admin
-        if(role.equals(Constants.REVIEWER) && request.isUserInRole(applicationConfig.getRoleAdmin())){
+        if(request.isUserInRole(applicationConfig.getRoleAdmin())){
             LOGGER.info("Check habilitation of admin {} for accessing survey-unit {} of campaign {} resulted in true",idec,idSu,campaignId);
             resp.setHabilitated(true);
             return new ResponseEntity<>(resp, HttpStatus.OK);
         }
 
+        //respondents
+        if (role == null || role.isBlank() || role.equals(Constants.INTERVIEWER) )
+        {
+            if(request.isUserInRole(applicationConfig.getRoleRespondent())) {
+                boolean habilitated = viewService.countViewByIdentifierIdSuCampaignId(idec, idSu, campaignId) != 0;
+                LOGGER.info("Check habilitation of interviewer {} for accessing survey-unit {} of campaign {} resulted in {}", idec, idSu, campaignId, habilitated);
+                resp.setHabilitated(habilitated);
+                return new ResponseEntity<>(resp, HttpStatus.OK);
+            }
+            LOGGER.warn("Check habilitation of interviewer {} for accessing survey-unit {} of campaign {} - no respondent habilitation found in token - check habilitation: false", idec, idSu, campaignId);
+            resp.setHabilitated(false);
+            return new ResponseEntity<>(resp, HttpStatus.OK);
+        }
+
+
         // internal users
         Optional<User> user=  userService.findByIdentifier(idec);
         if(role.equals(Constants.REVIEWER) ) {
-            if (user.isPresent()) {
-                String userRole;
-                List<String> accreditedSources = new ArrayList<>();
-                userRole = user.get().getRole().toString();
-                if (userRole.equals(User.UserRoleType.assistance)) {
-                    resp.setHabilitated(false);
-                    LOGGER.warn("User '{}' has assistance profile - check habilitation: false", idec);
-                    return new ResponseEntity<>(resp, HttpStatus.OK);
-                }
-                accreditedSources = userService.findAccreditedSources(user.get().getIdentifier());
-                Optional<Campaign> campaign = campaignService.findById(campaignId);
-                if (campaign.isPresent()) {
-                    String sourceSearched = campaign.get().getSurvey().getSource().getId();
-                    if (accreditedSources.contains(sourceSearched)) {
-                        LOGGER.info("User {} with profile {} -  accreditation found for campaign {} - Check habilitation:true", idec, userRole, campaignId);
-                        resp.setHabilitated(true);
+            if(request.isUserInRole(applicationConfig.getRoleInternalUser())) {
+                if (user.isPresent()) {
+                    String userRole;
+                    List<String> accreditedSources = new ArrayList<>();
+                    userRole = user.get().getRole().toString();
+                    if (userRole.equals(User.UserRoleType.assistance)) {
+                        resp.setHabilitated(false);
+                        LOGGER.warn("User '{}' has assistance profile - check habilitation: false", idec);
                         return new ResponseEntity<>(resp, HttpStatus.OK);
                     }
-                    LOGGER.info("User {} with profile {} -  has no accreditation for campaign {} - Check habilitation:false", idec, userRole, campaignId);
+                    accreditedSources = userService.findAccreditedSources(user.get().getIdentifier());
+                    Optional<Campaign> campaign = campaignService.findById(campaignId);
+                    if (campaign.isPresent()) {
+                        String sourceSearched = campaign.get().getSurvey().getSource().getId();
+                        if (accreditedSources.contains(sourceSearched)) {
+                            LOGGER.info("User {} with profile {} -  accreditation found for campaign {} - Check habilitation:true", idec, userRole, campaignId);
+                            resp.setHabilitated(true);
+                            return new ResponseEntity<>(resp, HttpStatus.OK);
+                        }
+                        LOGGER.warn("User {} with profile {} -  has no accreditation for campaign {} - Check habilitation:false", idec, userRole, campaignId);
+                        resp.setHabilitated(false);
+                        return new ResponseEntity<>(resp, HttpStatus.OK);
+                    }
+                    LOGGER.warn("Check habilitation of user {} for accessing survey-unit {} of campaign {} - campaign doesn't exist - check habilitation:false", idec, idSu, campaign);
                     resp.setHabilitated(false);
                     return new ResponseEntity<>(resp, HttpStatus.OK);
                 }
-                LOGGER.info("Check habilitation of user {} for accessing survey-unit {} of campaign {} - campaign doesn't exist - check habilitation:false", idec, idSu, campaign);
+
                 resp.setHabilitated(false);
+                LOGGER.warn("User '{}' doesn't exists", idec);
                 return new ResponseEntity<>(resp, HttpStatus.OK);
             }
             resp.setHabilitated(false);
-            LOGGER.warn("User '{}' doesn't exists", idec);
+            LOGGER.warn("User {}  -  internal user habilitation not found in token - Check habilitation:false", idec);
             return new ResponseEntity<>(resp, HttpStatus.OK);
         }
 
