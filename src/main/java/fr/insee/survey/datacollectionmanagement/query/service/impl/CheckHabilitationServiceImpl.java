@@ -5,18 +5,16 @@ import fr.insee.survey.datacollectionmanagement.constants.Constants;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Campaign;
 import fr.insee.survey.datacollectionmanagement.metadata.service.CampaignService;
 import fr.insee.survey.datacollectionmanagement.query.dto.HabilitationDto;
-import fr.insee.survey.datacollectionmanagement.questioning.controller.QuestioningEventController;
+import fr.insee.survey.datacollectionmanagement.query.service.CheckHabilitationService;
 import fr.insee.survey.datacollectionmanagement.user.domain.User;
 import fr.insee.survey.datacollectionmanagement.user.service.UserService;
+import fr.insee.survey.datacollectionmanagement.view.service.ViewService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import fr.insee.survey.datacollectionmanagement.query.service.CheckHabilitationService;
-import fr.insee.survey.datacollectionmanagement.view.service.ViewService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
