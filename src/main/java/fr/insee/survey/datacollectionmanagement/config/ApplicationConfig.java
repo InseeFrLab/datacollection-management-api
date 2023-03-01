@@ -19,9 +19,6 @@ public class ApplicationConfig {
     @Value("${jwt.id-claim}")
     private String idClaim;
 
-    @Value("${fr.insee.datacollectionmanagement.host}")
-    private String host;
-
     @Value("${fr.insee.datacollectionmanagement.roles.admin.role}")
     private String roleAdmin;
 

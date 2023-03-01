@@ -28,8 +28,6 @@ spec:
                 secretKeyRef:
                   name: my-postgresql-cocorico
                   key: postgres-password
-            - name: FR_INSEE_DATACOLLECTIONMANAGEMENT_HOST
-              value: "https://datacollection-management-api.dev.insee.io"
             - name: FR_INSEE_DATACOLLECTIONMANAGEMENT_API_QUESTIONING_URL
               value: "https://questionnaire-particuliers.dev.insee.io"
       restartPolicy: Always
