@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 public class CheckHabilitationServiceImpl implements CheckHabilitationService {
@@ -50,7 +51,7 @@ public class CheckHabilitationServiceImpl implements CheckHabilitationService {
         }
         String idec = request.getRemoteUser().toUpperCase();
         //admin
-        if(request.isUserInRole(applicationConfig.getRoleAdmin())){
+        if(isUserInRole(request, applicationConfig.getRoleAdmin())){
             LOGGER.info("Check habilitation of admin {} for accessing survey-unit {} of campaign {} resulted in true",idec,idSu,campaignId);
             resp.setHabilitated(true);
             return new ResponseEntity<>(resp, HttpStatus.OK);
@@ -59,7 +60,7 @@ public class CheckHabilitationServiceImpl implements CheckHabilitationService {
         //respondents
         if (role == null || role.isBlank() || role.equals(Constants.INTERVIEWER) )
         {
-            if(request.isUserInRole(applicationConfig.getRoleRespondent())) {
+            if(isUserInRole(request, applicationConfig.getRoleRespondent())) {
                 boolean habilitated = viewService.countViewByIdentifierIdSuCampaignId(idec, idSu, campaignId) != 0;
                 LOGGER.info("Check habilitation of interviewer {} for accessing survey-unit {} of campaign {} resulted in {}", idec, idSu, campaignId, habilitated);
                 resp.setHabilitated(habilitated);
@@ -74,7 +75,7 @@ public class CheckHabilitationServiceImpl implements CheckHabilitationService {
         // internal users
         Optional<User> user=  userService.findByIdentifier(idec);
         if(role.equals(Constants.REVIEWER) ) {
-            if(request.isUserInRole(applicationConfig.getRoleInternalUser())) {
+            if(isUserInRole(request, applicationConfig.getRoleInternalUser())) {
                 if (user.isPresent()) {
                     String userRole;
                     List<String> accreditedSources = new ArrayList<>();
@@ -115,6 +116,11 @@ public class CheckHabilitationServiceImpl implements CheckHabilitationService {
         LOGGER.warn("Only '{}' ans '{}' are accepted as a role in query argument", Constants.REVIEWER, Constants.INTERVIEWER);
         return new ResponseEntity<>(resp, HttpStatus.OK);
 
+    }
+
+    private boolean isUserInRole(HttpServletRequest request, List<String> role) {
+
+       return role.stream().anyMatch(r -> request.isUserInRole(r));
     }
 
 }

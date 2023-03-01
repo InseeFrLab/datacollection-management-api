@@ -1,5 +1,6 @@
 package fr.insee.survey.datacollectionmanagement.config;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -19,17 +20,18 @@ public class ApplicationConfig {
     @Value("${jwt.id-claim}")
     private String idClaim;
 
-    @Value("${fr.insee.datacollectionmanagement.roles.admin.role}")
-    private String roleAdmin;
 
-    @Value("${fr.insee.datacollectionmanagement.roles.webclient.role}")
-    private String roleWebClient;
+    @Value("#{'${fr.insee.datacollectionmanagement.roles.admin.role}'.split(',')}")
+    private List<String> roleAdmin;
 
-    @Value("${fr.insee.datacollectionmanagement.roles.respondent.role}")
-    private String roleRespondent;
+    @Value("#{'${fr.insee.datacollectionmanagement.roles.webclient.role}'.split(',')}")
+    private List<String> roleWebClient;
 
-    @Value("${fr.insee.datacollectionmanagement.roles.internal.user.role}")
-    private String roleInternalUser;
+    @Value("#{'${fr.insee.datacollectionmanagement.roles.respondent.role}'.split(',')}")
+    private List<String> roleRespondent;
+
+    @Value("#{'${fr.insee.datacollectionmanagement.roles.internal.user.role}'.split(',')}")
+    private List<String> roleInternalUser;
 
     @Value("${fr.insee.datacollectionmanagement.auth.mode}")
     private String authType;
