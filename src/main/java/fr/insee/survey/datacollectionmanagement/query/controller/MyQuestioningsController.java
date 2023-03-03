@@ -13,6 +13,8 @@ import fr.insee.survey.datacollectionmanagement.query.dto.MyQuestioningDto;
 import fr.insee.survey.datacollectionmanagement.query.service.MySurveysService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import javax.servlet.http.HttpServletRequest;
+
 @RestController
 @Tag(name = "4 - Cross domain")
 public class MyQuestioningsController {
@@ -23,10 +25,11 @@ public class MyQuestioningsController {
     @GetMapping(value = Constants.API_MY_QUESTIONINGS_ID)
     @PreAuthorize("@AuthorizeMethodDecider.isInternalUser() "
             + "|| @AuthorizeMethodDecider.isWebClient() "
-            + "|| @AuthorizeMethodDecider.isRespondent()")
-    public List<MyQuestioningDto> findById(@PathVariable("id") String id) {
+            + "|| @AuthorizeMethodDecider.isRespondent()"
+            + "|| @AuthorizeMethodDecider.isAdmin() ")
+    public List<MyQuestioningDto> findById(HttpServletRequest request) {
 
-        List<MyQuestioningDto> listSurveys = mySurveysService.getListMySurveys(id);
+        List<MyQuestioningDto> listSurveys = mySurveysService.getListMySurveys(request.getRemoteUser().toUpperCase());
 
         return listSurveys;
 

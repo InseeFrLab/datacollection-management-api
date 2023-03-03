@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 import fr.insee.survey.datacollectionmanagement.config.ApplicationConfig;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
+
 @Component("AuthorizeMethodDecider")
 @Slf4j
 public class AuthorizeMethodDecider {
@@ -39,7 +41,7 @@ public class AuthorizeMethodDecider {
 
         JSONArray roles = new JSONArray();
         roles.put("ROLE_offline_access");
-        roles.put(config.getRoleAdmin());
+        roles.put(config.getRoleAdmin().get(0));
         roles.put("ROLE_uma_authorization");
         return new User("GUEST", roles);
     }
@@ -50,9 +52,18 @@ public class AuthorizeMethodDecider {
     }
 
     public boolean isInternalUser(User user) throws JSONException {
-        log.info("Check if user is internal (admin, manager, helpdesk)");
-        return (hasRole(user, config.getRoleAdmin()) || hasRole(user, config.getRoleManager())
-                || hasRole(user, config.getRoleHelpdesk()));
+        log.info("Check if user is internal (responsable,gestionnaire,assistance)");
+        return (hasRole(user, config.getRoleInternalUser()));
+    }
+
+    public boolean isAdmin() throws JSONException {
+        User user = getUser();
+        return isAdmin(user);
+    }
+
+    public boolean isAdmin(User user) throws JSONException {
+        log.info("Check if user admin");
+        return (hasRole(user, config.getRoleAdmin()));
     }
 
     public boolean isWebClient() throws JSONException {
@@ -75,12 +86,13 @@ public class AuthorizeMethodDecider {
         return hasRole(user, config.getRoleRespondent());
     }
 
-    private boolean hasRole(User user, String role) throws JSONException {
+    private boolean hasRole(User user, List<String> role) throws JSONException {
         Boolean hasRole = false;
         JSONArray roles = user.getRoles();
         for (int i = 0; i < roles.length(); i++) {
-            if (roles.getString(i).equals(role)) {
+            if (role.contains(roles.getString(i))) {
                 hasRole = true;
+                log.info("role :"+roles.getString(i)+" has been found");
             }
         }
         return hasRole;

@@ -38,7 +38,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @PreAuthorize("@AuthorizeMethodDecider.isInternalUser() "
-        + "|| @AuthorizeMethodDecider.isWebClient() ")
+        + "|| @AuthorizeMethodDecider.isWebClient() "
+        + "|| @AuthorizeMethodDecider.isAdmin() ")
 @Tag(name = "1 - Contacts", description = "Enpoints to create, update, delete and find contacts")
 public class AddressController {
 
@@ -83,7 +84,8 @@ public class AddressController {
     @PutMapping(value = Constants.API_CONTACTS_ID_ADDRESS, produces = "application/json", consumes = "application/json")
     @PreAuthorize("@AuthorizeMethodDecider.isInternalUser() "
             + "|| @AuthorizeMethodDecider.isWebClient() "
-            + "|| @AuthorizeMethodDecider.isRespondent()")
+            + "|| @AuthorizeMethodDecider.isRespondent()"
+            + "|| @AuthorizeMethodDecider.isAdmin() ")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AddressDto.class))),
             @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = ContactDto.class))),

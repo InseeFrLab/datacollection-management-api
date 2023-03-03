@@ -83,7 +83,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @PreAuthorize("@AuthorizeMethodDecider.isInternalUser() "
-        + "|| @AuthorizeMethodDecider.isWebClient() ")
+        + "|| @AuthorizeMethodDecider.isWebClient() "
+        + "|| @AuthorizeMethodDecider.isAdmin() ")
 @Slf4j
 @Tag(name = "6 - Webclients", description = "Enpoints for webclients")
 public class WebclientController {

@@ -50,7 +50,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @PreAuthorize("@AuthorizeMethodDecider.isInternalUser() "
-        + "|| @AuthorizeMethodDecider.isWebClient() ")
+        + "|| @AuthorizeMethodDecider.isWebClient() "
+        + "|| @AuthorizeMethodDecider.isAdmin() ")
 @Tag(name = "3 - Metadata", description = "Enpoints to create, update, delete and find entities in metadata domain")
 @Slf4j
 public class SourceController {

@@ -42,7 +42,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController(value = "contactEvents")
 @PreAuthorize("@AuthorizeMethodDecider.isInternalUser() "
-        + "|| @AuthorizeMethodDecider.isWebClient() ")
+        + "|| @AuthorizeMethodDecider.isWebClient() "+ "|| @AuthorizeMethodDecider.isRespondent() "
+        + "|| @AuthorizeMethodDecider.isAdmin() ")
 @Tag(name = "1 - Contacts", description = "Enpoints to create, update, delete and find contacts")
 public class ContactEventController {
 

@@ -40,7 +40,8 @@ import lombok.extern.slf4j.Slf4j;
 @CrossOrigin
 @Slf4j
 @PreAuthorize("@AuthorizeMethodDecider.isInternalUser() "
-        + "|| @AuthorizeMethodDecider.isWebClient() ")
+        + "|| @AuthorizeMethodDecider.isWebClient() "
+        + "|| @AuthorizeMethodDecider.isAdmin() ")
 @Tag(name = "3 - Metadata", description = "Enpoints to create, update, delete and find entities in metadata domain")
 public class SupportController {
 

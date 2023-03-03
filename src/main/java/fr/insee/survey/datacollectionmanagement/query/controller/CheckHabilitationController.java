@@ -1,5 +1,6 @@
 package fr.insee.survey.datacollectionmanagement.query.controller;
 
+import fr.insee.survey.datacollectionmanagement.query.dto.HabilitationDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,8 @@ import fr.insee.survey.datacollectionmanagement.constants.Constants;
 import fr.insee.survey.datacollectionmanagement.query.service.CheckHabilitationService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import javax.servlet.http.HttpServletRequest;
+
 @RestController
 @Tag(name = "4 - Cross domain")
 public class CheckHabilitationController {
@@ -25,15 +28,16 @@ public class CheckHabilitationController {
 
     @PreAuthorize("@AuthorizeMethodDecider.isInternalUser() "
             + "|| @AuthorizeMethodDecider.isWebClient() "
-            + "|| @AuthorizeMethodDecider.isRespondent()")
-    @GetMapping(path = Constants.API_CHECK_HABILITATION)
-    public ResponseEntity<?> checkHabilitation(
-        @RequestParam(required = true) String identifier,
-        @RequestParam(required = true) String idSu,
-        @RequestParam(required = true) String campaignId) {
+            + "|| @AuthorizeMethodDecider.isRespondent()"
+            + "|| @AuthorizeMethodDecider.isAdmin()")
+    @GetMapping(path = Constants.API_CHECK_HABILITATION,produces = "application/json")
+    public ResponseEntity<HabilitationDto> checkHabilitation(
+            @RequestParam(required = false) String role,
+            @RequestParam(required = true) String id,
+            @RequestParam(required = true) String campaign, HttpServletRequest request) {
 
-        boolean res = checkHabilitationService.checkHabilitation(identifier, idSu, campaignId);
-        return new ResponseEntity<>(res, HttpStatus.OK);
+        return checkHabilitationService.checkHabilitation(role, id,campaign,request);
+
 
     }
 

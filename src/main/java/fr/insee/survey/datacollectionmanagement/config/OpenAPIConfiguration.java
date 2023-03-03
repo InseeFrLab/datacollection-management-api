@@ -49,7 +49,6 @@ public class OpenAPIConfiguration {
                 flows = flows.authorizationCode(flow);
 
                 return new OpenAPI()
-                        .addServersItem(new Server().url(applicationConfig.getHost()))
                         .components(
                         new Components().addSecuritySchemes("oauth2", new SecurityScheme().type(SecurityScheme.Type.OAUTH2).flows(flows)))
                         .info(new Info().title(buildProperties.getName()).version(buildProperties.getVersion()))
@@ -57,7 +56,6 @@ public class OpenAPIConfiguration {
 
             default:
                 return new OpenAPI()
-                        .addServersItem(new Server().url(applicationConfig.getHost()))
                         .info(new Info().title(buildProperties.getName()).version(buildProperties.getVersion()));
 
         }
