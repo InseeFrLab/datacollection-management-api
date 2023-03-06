@@ -20,14 +20,9 @@ import fr.insee.survey.datacollectionmanagement.query.dto.MyQuestioningDto;
 import fr.insee.survey.datacollectionmanagement.query.service.MySurveysService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import javax.servlet.http.HttpServletRequest;
-
 @RestController
 @Tag(name = "4 - Cross domain")
 public class MyQuestioningsController {
-    static final Logger LOGGER = LoggerFactory.getLogger(MyQuestioningsController.class);
-
-
 
     @Autowired
     private MySurveysService mySurveysService;
@@ -40,25 +35,20 @@ public class MyQuestioningsController {
             + "|| @AuthorizeMethodDecider.isWebClient() "
             + "|| @AuthorizeMethodDecider.isRespondent()"
             + "|| @AuthorizeMethodDecider.isAdmin() ")
-    public List<MyQuestioningDto> findById(HttpServletRequest request) {
-
+    public List<MyQuestioningDto> findById() {
 
         String idec=null;
 
         if (config.getAuthType().equals("OIDC")) {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             final Jwt jwt = (Jwt) authentication.getPrincipal();
-            idec=jwt.getClaimAsString(config.getIdClaim());
-            LOGGER.info("jwt claim is "+idec);
+            idec=jwt.getClaimAsString(config.getIdClaim()).toUpperCase();
         }
         else{
            idec="anonymous";
         }
-        LOGGER.info("Userprincipal name is " +request.getUserPrincipal().getName().toUpperCase());
 
-        LOGGER.info("remote user is "+request.getRemoteUser().toUpperCase());
-
-        List<MyQuestioningDto> listSurveys = mySurveysService.getListMySurveys(request.getRemoteUser().toUpperCase());
+        List<MyQuestioningDto> listSurveys = mySurveysService.getListMySurveys(idec);
 
         return listSurveys;
 

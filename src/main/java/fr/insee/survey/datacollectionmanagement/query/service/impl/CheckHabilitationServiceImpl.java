@@ -14,6 +14,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +43,7 @@ public class CheckHabilitationServiceImpl implements CheckHabilitationService {
     UserService userService;
 
     @Override
-    public ResponseEntity<HabilitationDto> checkHabilitation(String role, String idSu, String campaignId, HttpServletRequest request) {
+    public ResponseEntity<HabilitationDto> checkHabilitation(String role, String idSu, String campaignId) {
 
         HabilitationDto resp = new HabilitationDto();
 
@@ -49,9 +52,13 @@ public class CheckHabilitationServiceImpl implements CheckHabilitationService {
             resp.setHabilitated(true);
             return new ResponseEntity<>(resp, HttpStatus.OK);
         }
-        String idec = request.getRemoteUser().toUpperCase();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        final Jwt jwt = (Jwt) authentication.getPrincipal();
+        List<String> roles = jwt.getClaimAsStringList(applicationConfig.getRoleClaim());
+        String idec=jwt.getClaimAsString(applicationConfig.getIdClaim()).toUpperCase();
+
         //admin
-        if(isUserInRole(request, applicationConfig.getRoleAdmin())){
+        if(isUserInRole(roles, applicationConfig.getRoleAdmin())){
             LOGGER.info("Check habilitation of admin {} for accessing survey-unit {} of campaign {} resulted in true",idec,idSu,campaignId);
             resp.setHabilitated(true);
             return new ResponseEntity<>(resp, HttpStatus.OK);
@@ -60,7 +67,7 @@ public class CheckHabilitationServiceImpl implements CheckHabilitationService {
         //respondents
         if (role == null || role.isBlank() || role.equals(Constants.INTERVIEWER) )
         {
-            if(isUserInRole(request, applicationConfig.getRoleRespondent())) {
+            if(isUserInRole(roles, applicationConfig.getRoleRespondent())) {
                 boolean habilitated = viewService.countViewByIdentifierIdSuCampaignId(idec, idSu, campaignId) != 0;
                 LOGGER.info("Check habilitation of interviewer {} for accessing survey-unit {} of campaign {} resulted in {}", idec, idSu, campaignId, habilitated);
                 resp.setHabilitated(habilitated);
@@ -75,7 +82,7 @@ public class CheckHabilitationServiceImpl implements CheckHabilitationService {
         // internal users
         Optional<User> user=  userService.findByIdentifier(idec);
         if(role.equals(Constants.REVIEWER) ) {
-            if(isUserInRole(request, applicationConfig.getRoleInternalUser())) {
+            if(isUserInRole(roles, applicationConfig.getRoleInternalUser())) {
                 if (user.isPresent()) {
                     String userRole;
                     List<String> accreditedSources = new ArrayList<>();
@@ -118,9 +125,9 @@ public class CheckHabilitationServiceImpl implements CheckHabilitationService {
 
     }
 
-    private boolean isUserInRole(HttpServletRequest request, List<String> role) {
+    private boolean isUserInRole(List<String> roles, List<String> role) {
 
-       return role.stream().anyMatch(r -> request.isUserInRole(r));
+       return role.stream().anyMatch(r -> roles.contains(r));
     }
 
 }

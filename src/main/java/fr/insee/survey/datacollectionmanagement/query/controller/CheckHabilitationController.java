@@ -34,9 +34,9 @@ public class CheckHabilitationController {
     public ResponseEntity<HabilitationDto> checkHabilitation(
             @RequestParam(required = false) String role,
             @RequestParam(required = true) String id,
-            @RequestParam(required = true) String campaign, HttpServletRequest request) {
+            @RequestParam(required = true) String campaign) {
 
-        return checkHabilitationService.checkHabilitation(role, id,campaign,request);
+        return checkHabilitationService.checkHabilitation(role, id,campaign);
 
 
     }

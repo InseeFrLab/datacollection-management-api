@@ -10,6 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 @Service
 public interface CheckHabilitationService {
 
-    ResponseEntity<HabilitationDto> checkHabilitation(String role, String idSu, String campaign, HttpServletRequest request);
+    ResponseEntity<HabilitationDto> checkHabilitation(String role, String idSu, String campaign);
 
 }
