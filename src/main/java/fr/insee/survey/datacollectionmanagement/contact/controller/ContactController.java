@@ -81,9 +81,6 @@ public class ContactController {
     @Autowired
     private ModelMapper modelMapper;
 
-    @Value("${jwt.id-claim}")
-    private String jwtIdClaim;
-
     @Operation(summary = "Search for contacts, paginated")
     @GetMapping(value = Constants.API_CONTACTS_ALL, produces = "application/json")
     @ApiResponses(value = {
