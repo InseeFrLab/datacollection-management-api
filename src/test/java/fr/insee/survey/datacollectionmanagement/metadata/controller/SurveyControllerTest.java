@@ -14,12 +14,15 @@ import java.util.Optional;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.MethodMode;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -42,6 +45,7 @@ public class SurveyControllerTest {
     @Autowired
     private SurveyRepository surveyRepository;
 
+    @DirtiesContext(methodMode = MethodMode.BEFORE_METHOD)
     @Test
     public void getSurveyOk() throws Exception {
         String identifier = "SOURCE12022";
@@ -61,6 +65,7 @@ public class SurveyControllerTest {
     }
 
 
+    @DirtiesContext(methodMode = MethodMode.BEFORE_METHOD)
     @Test
     public void putSurveyCreateUpdateDelete() throws Exception {
         String identifier = "SURVEYPUT";
@@ -115,6 +120,7 @@ public class SurveyControllerTest {
 
     private Survey initSurvey(String identifier) {
         Survey surveyMock = new Survey();
+        surveyMock.setYear(2023);
         surveyMock.setId(identifier);
         surveyMock.setLongWording("Long wording about " + identifier);
         surveyMock.setShortWording("Short wording about " + identifier);
@@ -125,6 +131,7 @@ public class SurveyControllerTest {
     private String createJson(Survey survey, String idSource) throws JSONException {
         JSONObject jo = new JSONObject();
         jo.put("id", survey.getId());
+        jo.put("year", survey.getYear());
         jo.put("sourceId", idSource);
         jo.put("longWording", survey.getLongWording());
         jo.put("shortWording", survey.getShortWording());

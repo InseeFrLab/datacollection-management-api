@@ -20,6 +20,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.MethodMode;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -43,6 +45,7 @@ public class SourceControllerTest {
     @Autowired
     private SourceRepository sourceRepository;
 
+    @DirtiesContext(methodMode = MethodMode.BEFORE_METHOD)
     @Test
     public void getSourceOk() throws Exception {
         String identifier = "SOURCE1";
