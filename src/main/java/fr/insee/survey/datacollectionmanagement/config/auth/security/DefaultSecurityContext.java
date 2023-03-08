@@ -34,6 +34,7 @@ public class DefaultSecurityContext {
                 .antMatchers("/csrf", "/", "/webjars/**", "/swagger-resources/**").permitAll()
                 .antMatchers("/environnement").permitAll()// PublicResources
                 .antMatchers("/healthcheck").permitAll()
+                .antMatchers("/actuator/**").permitAll()
                 .antMatchers("/swagger-ui/*").permitAll()
                 .antMatchers("/v3/api-docs/swagger-config", "/v3/api-docs").permitAll()
                 .antMatchers("/openapi.json").permitAll()
