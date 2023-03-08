@@ -98,4 +98,9 @@ public class AuthorizeMethodDecider {
         return hasRole;
     }
 
+    public String getUsername() throws JSONException {
+        User user = getUser();
+        return user.getId().toUpperCase();
+    }
+
 }

@@ -12,6 +12,7 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -80,6 +81,9 @@ public class ContactController {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Value("${jwt.id-claim}")
+    private String jwtIdClaim;
+
     @Operation(summary = "Search for contacts, paginated")
     @GetMapping(value = Constants.API_CONTACTS_ALL, produces = "application/json")
     @ApiResponses(value = {
@@ -99,7 +103,7 @@ public class ContactController {
     @GetMapping(value = Constants.API_CONTACTS_ID, produces = "application/json")
     @PreAuthorize("@AuthorizeMethodDecider.isInternalUser() "
             + "|| @AuthorizeMethodDecider.isWebClient() "
-            + "|| @AuthorizeMethodDecider.isRespondent()"
+            + "|| (@AuthorizeMethodDecider.isRespondent() && (#id == @AuthorizeMethodDecider.getUsername()))"
             + "|| @AuthorizeMethodDecider.isAdmin() ")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ContactFirstLoginDto.class))),
@@ -123,7 +127,7 @@ public class ContactController {
     @PutMapping(value = Constants.API_CONTACTS_ID, produces = "application/json", consumes = "application/json")
     @PreAuthorize("@AuthorizeMethodDecider.isInternalUser() "
             + "|| @AuthorizeMethodDecider.isWebClient() "
-            + "|| @AuthorizeMethodDecider.isRespondent()"
+            + "|| (@AuthorizeMethodDecider.isRespondent() && (#id == @AuthorizeMethodDecider.getUsername()))"
             + "|| @AuthorizeMethodDecider.isAdmin() ")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ContactDto.class))),
