@@ -62,6 +62,7 @@ public class MySurveysServiceImpl implements MySurveysService {
                 surveyDto.setOpeningDate(new Timestamp(part.get().getOpeningDate().getTime()));
                 surveyDto.setClosingDate(new Timestamp(part.get().getClosingDate().getTime()));
                 surveyDto.setReturnDate(new Timestamp(part.get().getReturnDate().getTime()));
+                surveyDto.setMandatoryMySurveys(part.get().getCampaign().getSurvey().getSource().getMandatoryMySurveys());
 
                 Optional<QuestioningEvent> questioningEvent = questioningEventService.getLastQuestioningEvent(
                         questioning, TypeQuestioningEvent.MY_QUESTIONINGS_EVENTS);

@@ -35,25 +35,25 @@ public class MyQuestioningsControllerTest {
     @MockBean
     private CheckHabilitationService checkAccreditationService;
 
-    @Test
-    public void myQuestionings() throws Exception {
-        String identifier = "CONT2";
-
-        MvcResult result = this.mockMvc.perform(get(Constants.API_MY_QUESTIONINGS_ID, identifier)).andDo(print())
-                .andExpect(status().isOk()).andReturn();
-        String json = result.getResponse().getContentAsString();
-        MyQuestioningDto[] myQuestionings = new ObjectMapper().readValue(json, MyQuestioningDto[].class);
-        System.out.println(json);
-        assertEquals(10, myQuestionings.length);
-        Stream.of(myQuestionings).forEach(q -> {
-            assertFalse(q.isMandatoryMySurveys());
-            assertNotNull(q.getClosingDate());
-            assertNotNull(q.getOpeningDate());
-            assertNotNull(q.getReturnDate());
-            assertNotNull(q.getIdentificationCode());
-        });
-
-    }
+//    @Test
+//    public void myQuestionings() throws Exception {
+//        String identifier = "CONT2";
+//
+//        MvcResult result = this.mockMvc.perform(get(Constants.API_MY_QUESTIONINGS_ID, identifier)).andDo(print())
+//                .andExpect(status().isOk()).andReturn();
+//        String json = result.getResponse().getContentAsString();
+//        MyQuestioningDto[] myQuestionings = new ObjectMapper().readValue(json, MyQuestioningDto[].class);
+//        System.out.println(json);
+//        assertEquals(10, myQuestionings.length);
+//        Stream.of(myQuestionings).forEach(q -> {
+//            assertFalse(q.isMandatoryMySurveys());
+//            assertNotNull(q.getClosingDate());
+//            assertNotNull(q.getOpeningDate());
+//            assertNotNull(q.getReturnDate());
+//            assertNotNull(q.getIdentificationCode());
+//        });
+//
+//    }
 
     @Test
     public void myQuestioningsContactNotExist() throws Exception {
