@@ -61,6 +61,10 @@ public class AddressController {
             @ApiResponse(responseCode = "404", description = "Not found"),
             @ApiResponse(responseCode = "500", description = "Internal servor error")
     })
+    @PreAuthorize("@AuthorizeMethodDecider.isInternalUser() "
+            + "|| @AuthorizeMethodDecider.isWebClient() "
+            + "|| (@AuthorizeMethodDecider.isRespondent() && (#id == @AuthorizeMethodDecider.getUsername()))"
+            + "|| @AuthorizeMethodDecider.isAdmin() ")
     public ResponseEntity<?> getContactAddress(@PathVariable("id") String id) {
         try {
             Optional<Contact> contact = contactService.findByIdentifier(id);
@@ -84,7 +88,7 @@ public class AddressController {
     @PutMapping(value = Constants.API_CONTACTS_ID_ADDRESS, produces = "application/json", consumes = "application/json")
     @PreAuthorize("@AuthorizeMethodDecider.isInternalUser() "
             + "|| @AuthorizeMethodDecider.isWebClient() "
-            + "|| @AuthorizeMethodDecider.isRespondent()"
+            + "|| (@AuthorizeMethodDecider.isRespondent() && (#id == @AuthorizeMethodDecider.getUsername()))"
             + "|| @AuthorizeMethodDecider.isAdmin() ")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AddressDto.class))),
