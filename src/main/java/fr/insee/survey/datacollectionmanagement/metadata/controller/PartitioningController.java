@@ -55,6 +55,7 @@ public class PartitioningController {
     @Autowired
     private ModelMapper modelmapper;
 
+    @Autowired
     private QuestioningService questioningService;
 
     @Operation(summary = "Search for partitionings by the campaign id")
