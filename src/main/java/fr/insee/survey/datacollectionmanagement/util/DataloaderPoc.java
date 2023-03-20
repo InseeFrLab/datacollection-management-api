@@ -69,9 +69,10 @@ import fr.insee.survey.datacollectionmanagement.view.domain.View;
 import fr.insee.survey.datacollectionmanagement.view.repository.ViewRepository;
 
 @Component
-public class Dataloader {
+@Profile("poc")
+public class DataloaderPoc {
 
-    private static final Logger LOGGER = LogManager.getLogger(Dataloader.class);
+    private static final Logger LOGGER = LogManager.getLogger(DataloaderPoc.class);
 
     @Autowired
     private ContactRepository contactRepository;
@@ -133,12 +134,12 @@ public class Dataloader {
         Faker faker = new Faker();
         EasyRandom generator = new EasyRandom();
 
-         initOrder();
+//         initOrder();
 //         initContact(faker);
 //         initMetadata(faker, generator);
-//         initQuestionning(faker, generator);
+         initQuestionning(faker, generator);
         // initView();
-//        initSurveyUnitAddressAndOperators(faker);
+        initSurveyUnitAddressAndOperators(faker);
 
     }
 
