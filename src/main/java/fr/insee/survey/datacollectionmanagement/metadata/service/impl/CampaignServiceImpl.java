@@ -44,7 +44,7 @@ public class CampaignServiceImpl implements CampaignService {
             Optional<Date> dateMin = campaign.getPartitionings().stream().map(Partitioning::getOpeningDate)
                     .collect(Collectors.toList()).stream()
                     .min(Comparator.comparing(Date::getTime));
-            Optional<Date> dateMax = campaign.getPartitionings().stream().map(Partitioning::getOpeningDate)
+            Optional<Date> dateMax = campaign.getPartitionings().stream().map(Partitioning::getClosingDate)
                     .collect(Collectors.toList()).stream()
                     .max(Comparator.comparing(Date::getTime));
 
