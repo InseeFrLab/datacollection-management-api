@@ -65,6 +65,7 @@ public class CampaignController {
     @Autowired
     private ModelMapper modelmapper;
 
+    @Autowired
     private QuestioningService questioningService;
     
     @Operation(summary = "Search for campaigns, paginated")
