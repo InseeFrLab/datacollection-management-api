@@ -2,6 +2,8 @@ package fr.insee.survey.datacollectionmanagement.query.service;
 
 import java.util.List;
 
+import fr.insee.survey.datacollectionmanagement.config.JSONCollectionWrapper;
+import fr.insee.survey.datacollectionmanagement.query.dto.MoogExtractionRowDto;
 import org.springframework.stereotype.Service;
 
 import fr.insee.survey.datacollectionmanagement.query.dto.MoogQuestioningEventDto;
@@ -16,5 +18,7 @@ public interface MoogService {
     List<MoogSearchDto> transformListViewToListMoogSearchDto(List<View> listView);
 
     List<MoogQuestioningEventDto> getMoogEvents(String Campaign, String idSu);
+
+    JSONCollectionWrapper<MoogExtractionRowDto> getExtraction(String idCampaign);
 
 }

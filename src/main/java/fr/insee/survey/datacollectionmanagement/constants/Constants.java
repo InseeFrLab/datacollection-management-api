@@ -68,6 +68,8 @@ public class Constants {
 
     // API CROSS DOMAIN
     public static final String API_CHECK_HABILITATION = "/api/check-habilitation";
+    public static final String MOOG_API_CAMPAIGNS = "/api/moog/campaigns";
+    public static final String MOOG_API_CAMPAIGNS_ID = "/api/moog/campaigns/{id}";
     public static final String API_MOOG_SEARCH = "/api/moog/campaigns/survey-units";
     public static final String API_MOOG_EVENTS = "/api/moog/campaigns/{campaign}/survey-units/{id}/management-monitoring-infos";
     public static final String API_MOOG_MAIL = "/api/moog/contact/{id}/mail";

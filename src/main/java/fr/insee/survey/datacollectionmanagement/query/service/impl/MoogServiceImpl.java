@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import fr.insee.survey.datacollectionmanagement.config.JSONCollectionWrapper;
+import fr.insee.survey.datacollectionmanagement.query.dto.MoogExtractionRowDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -93,6 +95,10 @@ public class MoogServiceImpl implements MoogService {
         moogEvents.stream().forEach(e -> e.setSurveyUnit(surveyUnit));
 
         return moogEvents;
+    }
+
+    public JSONCollectionWrapper<MoogExtractionRowDto> getExtraction(String idCampaign) {
+        return new JSONCollectionWrapper<>(suiviRepo.getExtraction(idCampaign));
     }
 
 }
