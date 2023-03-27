@@ -28,7 +28,6 @@ public class AuthorizeMethodDecider {
         if (config.getAuthType().equals("OIDC")) {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             User currentUser = userProvider.getUser(authentication);
-            log.info("id and roles user {},{}", currentUser.getId(), currentUser.getRoles());
             return currentUser;
         }
         return noAuthUser();
@@ -52,7 +51,6 @@ public class AuthorizeMethodDecider {
     }
 
     public boolean isInternalUser(User user) throws JSONException {
-        log.info("Check if user is internal (responsable,gestionnaire,assistance)");
         return (hasRole(user, config.getRoleInternalUser()));
     }
 
@@ -62,7 +60,6 @@ public class AuthorizeMethodDecider {
     }
 
     public boolean isAdmin(User user) throws JSONException {
-        log.info("Check if user admin");
         return (hasRole(user, config.getRoleAdmin()));
     }
 
@@ -72,7 +69,6 @@ public class AuthorizeMethodDecider {
     }
 
     public boolean isWebClient(User user) throws JSONException {
-        log.info("Check if user is webclient");
         return hasRole(user, config.getRoleWebClient());
     }
 
@@ -82,7 +78,6 @@ public class AuthorizeMethodDecider {
     }
 
     public boolean isRespondent(User user) throws JSONException {
-        log.info("Check if user is respondent");
         return hasRole(user, config.getRoleRespondent());
     }
 

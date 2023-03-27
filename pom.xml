@@ -9,7 +9,7 @@
 	</parent>
 	<groupId>fr.insee.survey</groupId>
 	<artifactId>datacollection-management</artifactId>
-	<version>0.3.19</version>
+	<version>0.3.20</version>
 	<name>datacollection-management</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
@@ -79,6 +79,10 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-oauth2-client</artifactId>
 		</dependency>
 		<!-- Manage JSONObject and JSONArray -->
 		<dependency>
