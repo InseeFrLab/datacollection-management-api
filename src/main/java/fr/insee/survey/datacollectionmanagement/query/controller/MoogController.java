@@ -3,9 +3,18 @@ package fr.insee.survey.datacollectionmanagement.query.controller;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import fr.insee.survey.datacollectionmanagement.config.JSONCollectionWrapper;
+import fr.insee.survey.datacollectionmanagement.query.domain.Upload;
 import fr.insee.survey.datacollectionmanagement.query.dto.MoogExtractionRowDto;
+import fr.insee.survey.datacollectionmanagement.query.service.UploadService;
+import fr.insee.survey.datacollectionmanagement.query.service.impl.UploadServiceImpl;
+import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
+import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningEvent;
+import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningEventService;
+import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningService;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +47,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
         + "|| @AuthorizeMethodDecider.isWebClient() "
         + "|| @AuthorizeMethodDecider.isAdmin() ")
 @Tag(name = "5 - Moog", description = "Enpoints for moog")
+@Slf4j
 public class MoogController {
 
     static final Logger LOGGER = LoggerFactory.getLogger(MoogController.class);
@@ -47,6 +57,15 @@ public class MoogController {
 
     @Autowired
     private ContactService contactService;
+
+    @Autowired
+    QuestioningEventService questioningEventService;
+
+    @Autowired
+    QuestioningService questioningService;
+
+    @Autowired
+    UploadService uploadService;
 
     @GetMapping(path = Constants.API_MOOG_SEARCH)
     public ResponseEntity<?> moogSearch(@RequestParam(required = false) String filter1,
@@ -106,6 +125,36 @@ public class MoogController {
     public JSONCollectionWrapper<MoogExtractionRowDto> displaySurveyUnitsToFollowUp(@PathVariable String idCampaign) {
         LOGGER.info("Request GET for su to follow up - campaign {}", idCampaign);
         return new JSONCollectionWrapper<MoogExtractionRowDto>(moogService.getSurveyUnitsToFollowUp(idCampaign));
+    }
+
+    @Operation(summary = "Delete a questioning event from moog")
+    @DeleteMapping(value = Constants.API_MOOG_DELETE_QUESTIONING_EVENT, produces = "application/json")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "No Content"),
+            @ApiResponse(responseCode = "404", description = "Not found"),
+            @ApiResponse(responseCode = "400", description = "Bad Request")
+    })
+    public ResponseEntity<?> deleteQuestioningEvent(@PathVariable("id") Long id) {
+        try {
+
+            Optional<QuestioningEvent> questioningEvent = questioningEventService.findbyId(id);
+            if (questioningEvent.isPresent()) {
+                Upload upload = (questioningEvent.get().getUpload() != null ? questioningEvent.get().getUpload() : null);
+                Questioning quesitoning = questioningEvent.get().getQuestioning();
+                quesitoning.setQuestioningEvents(quesitoning.getQuestioningEvents().stream()
+                        .filter(qe -> !qe.equals(questioningEvent.get())).collect(Collectors.toSet()));
+                questioningService.saveQuestioning(quesitoning);
+                questioningEventService.deleteQuestioningEvent(id);
+                if(upload!=null && questioningEventService.findbyIdUpload(upload.getId()).size()==0 ){
+                    uploadService.delete(upload);
+                }
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Questioning event deleted");
+            } else
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Questioning event does not exist");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<String>("Error", HttpStatus.BAD_REQUEST);
+        }
     }
 
 

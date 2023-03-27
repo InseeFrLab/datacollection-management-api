@@ -38,13 +38,13 @@ public class UploadController {
         }
     }
 
-    @GetMapping(value = "/campaigns/{idCampaign}/uploads", produces = "application/json")
+    @GetMapping(value = "/api/moog/campaigns/{idCampaign}/uploads", produces = "application/json")
     public JSONCollectionWrapper<Upload> displayAllUploads(@PathVariable String idCampaign) {
         LOGGER.info("Request GET for uploads");
         return new JSONCollectionWrapper<Upload>(moogUploadService.findAllByIdCampaign(idCampaign));
     }
 
-    @PostMapping(value = "/campaigns/{idCampaign}/uploads", produces = "application/json")
+    @PostMapping(value = "/api/moog/campaigns/{idCampaign}/uploads", produces = "application/json")
     public ResultUpload addQuestioningEventViaUpload(@PathVariable String idCampaign,
                                                              @RequestBody UploadDto request) throws RessourceNotValidatedException {
         LOGGER.info("Request POST to add an upload");

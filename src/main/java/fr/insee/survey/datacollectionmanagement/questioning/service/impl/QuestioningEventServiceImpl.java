@@ -56,4 +56,11 @@ public class QuestioningEventServiceImpl implements QuestioningEventService {
         return listQuestioningEvent.stream().findFirst();
     }
 
+    @Override
+    public List<QuestioningEvent> findbyIdUpload(Long id){
+        List<QuestioningEvent> listQuestioningEvent = questioningEventRepository.findAll().stream().filter(qe -> qe.getUpload()!= null && qe.getUpload().getId().equals(id)).collect(Collectors.toList());
+
+        return listQuestioningEvent;
+    }
+
 }

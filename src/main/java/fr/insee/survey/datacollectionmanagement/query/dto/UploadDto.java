@@ -10,6 +10,6 @@ import java.util.List;
 @Setter
 public class UploadDto {
 
-    private List<MoogUploadQuestioningEventDto> moogUploadQuestioningEvents;
+    private List<MoogUploadQuestioningEventDto> data;
 
 }

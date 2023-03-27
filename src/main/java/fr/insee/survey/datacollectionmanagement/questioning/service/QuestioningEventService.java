@@ -29,4 +29,6 @@ public interface QuestioningEventService {
      * @return optional last Questioning event in order of importance
      */
     Optional<QuestioningEvent> getLastQuestioningEvent(Questioning questioning, List<TypeQuestioningEvent> events);
+
+    List<QuestioningEvent>  findbyIdUpload(Long id);
 }

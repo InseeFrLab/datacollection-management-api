@@ -58,25 +58,31 @@ public class UploadServiceImpl implements UploadService {
         // Creation of managementMonitoringInfo list and saving of link with upload
         List<QuestioningEvent> liste = new ArrayList<>();
 
-        for (MoogUploadQuestioningEventDto mmDto : uploadDto.getMoogUploadQuestioningEvents()) {
+        for (MoogUploadQuestioningEventDto mmDto : uploadDto.getData()) {
             String identifier = (mmDto.getIdSu() != null) ? mmDto.getIdSu() : mmDto.getIdContact();
             try {
                 QuestioningEvent qe = new QuestioningEvent();
                 Set<Questioning> questionings = questioningService.findBySurveyUnitIdSu(mmDto.getIdSu());
-                Optional<Questioning> quest = questionings.stream().filter(q -> q.getQuestioningAccreditations().stream().map(QuestioningAccreditation::getIdContact).equals(mmDto.getIdContact())).findFirst();
+                Optional<Questioning> quest = questionings.stream().filter(q -> q.getQuestioningAccreditations().stream().map(QuestioningAccreditation::getIdContact).collect(Collectors.toList()).contains(mmDto.getIdContact())).findFirst();
                 qe.setUpload(up);
                 qe.setType(TypeQuestioningEvent.valueOf(mmDto.getStatus()));
                 qe.setQuestioning(quest.get());
                 JSONObject jo = new JSONObject();
-                jo.put("source", "Moog IHM - Post Event");
+                jo.put("source", "Moog IHM - Post Event by upload");
                 ObjectMapper objectMapper = new ObjectMapper();
                 qe.setPayload(objectMapper.readTree(jo.toString()));
                 qe.setDate(today);
                 liste.add(questioningEventService.saveQuestioningEvent(qe));
+                if(quest.isPresent()){
+                    quest.get().getQuestioningEvents().add(qe);
+                    questioningService.saveQuestioning(quest.get());
+                }
+
                 result.addIdOk(identifier);
             } catch (Exception e) {
                 log.error("Error in request");
                 log.info("Info: id KO " + e.getMessage());
+                e.printStackTrace();
                 result.addIdKo(identifier, "RessourceNotFound or unprocessable request");
             }
         }
