@@ -112,7 +112,7 @@ public class QuestioningEventController {
     }
 
     @Operation(summary = "Delete a questioning event")
-    @DeleteMapping(value = Constants.API_QUESTIONING_QUESTIONING_EVENTS_ID, produces = "application/json")
+    @DeleteMapping(value = {Constants.API_QUESTIONING_QUESTIONING_EVENTS_ID, Constants.API_MOOG_DELETE_QUESTIONING_EVENT}, produces = "application/json")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "No Content"),
             @ApiResponse(responseCode = "404", description = "Not found"),

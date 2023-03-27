@@ -31,4 +31,5 @@ public interface QuestioningService {
      */
     public int deleteQuestioningsOfOnePartitioning(Partitioning partitioning);
 
+    public Set<Questioning> findBySurveyUnitIdSu(String idSu);
 }

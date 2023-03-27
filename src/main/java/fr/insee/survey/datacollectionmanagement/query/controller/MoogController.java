@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import fr.insee.survey.datacollectionmanagement.config.JSONCollectionWrapper;
+import fr.insee.survey.datacollectionmanagement.query.dto.MoogExtractionRowDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import fr.insee.survey.datacollectionmanagement.constants.Constants;
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
@@ -96,5 +95,18 @@ public class MoogController {
         return new ResponseEntity<>(Map.of("datas", moogService.getMoogEvents(campaignId, idSu)), HttpStatus.OK);
 
     }
+
+    @GetMapping(value = "/api/moog/campaigns/{idCampaign}/extraction", produces = "application/json")
+    public JSONCollectionWrapper<MoogExtractionRowDto> provideDataForExtraction(@PathVariable String idCampaign) {
+        LOGGER.info("Request GET for extraction of campaign : {}", idCampaign);
+        return moogService.getExtraction(idCampaign);
+    }
+
+    @GetMapping(value = "/api/moog/campaigns/{idCampaign}/survey-units/follow-up", produces = "application/json")
+    public JSONCollectionWrapper<MoogExtractionRowDto> displaySurveyUnitsToFollowUp(@PathVariable String idCampaign) {
+        LOGGER.info("Request GET for su to follow up - campaign {}", idCampaign);
+        return new JSONCollectionWrapper<MoogExtractionRowDto>(moogService.getSurveyUnitsToFollowUp(idCampaign));
+    }
+
 
 }

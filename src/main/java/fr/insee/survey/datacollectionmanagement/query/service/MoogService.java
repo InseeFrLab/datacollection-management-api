@@ -1,5 +1,6 @@
 package fr.insee.survey.datacollectionmanagement.query.service;
 
+import java.util.Collection;
 import java.util.List;
 
 import fr.insee.survey.datacollectionmanagement.config.JSONCollectionWrapper;
@@ -21,4 +22,5 @@ public interface MoogService {
 
     JSONCollectionWrapper<MoogExtractionRowDto> getExtraction(String idCampaign);
 
+    Collection<MoogExtractionRowDto> getSurveyUnitsToFollowUp(String idCampaign);
 }

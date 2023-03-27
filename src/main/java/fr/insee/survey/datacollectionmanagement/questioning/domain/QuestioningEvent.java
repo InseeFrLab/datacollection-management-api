@@ -2,14 +2,10 @@ package fr.insee.survey.datacollectionmanagement.questioning.domain;
 
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import fr.insee.survey.datacollectionmanagement.query.domain.Upload;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
@@ -34,6 +30,11 @@ public class QuestioningEvent {
 
     @OneToOne
     private Questioning questioning;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_upload")
+    @JsonManagedReference
+    private Upload upload;
 
     @Type(type = "jsonb")
     @Column(columnDefinition = "jsonb")
