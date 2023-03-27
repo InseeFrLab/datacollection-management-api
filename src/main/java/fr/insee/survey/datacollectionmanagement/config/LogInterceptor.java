@@ -45,7 +45,7 @@ public class LogInterceptor implements HandlerInterceptor {
             case "OIDC":
                 Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
                 User currentUser = userProvider.getUser(authentication);
-                userId=(currentUser.getId()!=null ?currentUser.getId() : "anonymous");
+                userId=(currentUser!=null && currentUser.getId()!=null ?currentUser.getId() : "anonymous");
                 ThreadContext.put("user", userId.toUpperCase());
                 break;
             default:
