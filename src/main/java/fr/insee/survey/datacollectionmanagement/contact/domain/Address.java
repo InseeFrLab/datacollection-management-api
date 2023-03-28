@@ -25,4 +25,19 @@ public class Address {
     private String specialDistribution;
     private String countryCode;
     private String countryName;
+
+    public String toStringMoog() {
+        return (streetNumber!=null?streetNumber:"") +
+                " "+ (repetitionIndex!=null?repetitionIndex:"")+
+                " " +(streetType!=null?streetType:"")+
+                "" + (streetName!=null?streetName:"")+
+                " " +(addressSupplement!=null?addressSupplement:"") +
+                " " + (cityName!=null?cityName:"")+
+                " " + (zipCode!=null?zipCode:"") +
+                " " + (cedexCode!=null?cedexCode:"") +
+                " " + (cedexName!=null?cedexName:"") +
+                " " + (specialDistribution!=null?specialDistribution:"")  +
+                " " + (countryCode!=null?countryCode:"") +
+                " " + (countryName!=null?countryName:"");
+    }
 }

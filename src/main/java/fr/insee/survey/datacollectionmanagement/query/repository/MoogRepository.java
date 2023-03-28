@@ -4,7 +4,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
+import fr.insee.survey.datacollectionmanagement.contact.domain.Address;
+import fr.insee.survey.datacollectionmanagement.contact.service.AddressService;
+import fr.insee.survey.datacollectionmanagement.contact.service.impl.AddressServiceImpl;
 import fr.insee.survey.datacollectionmanagement.query.dto.MoogExtractionRowDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -18,6 +22,9 @@ public class MoogRepository {
 
     @Autowired
     JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    AddressService addressService;
 
     final String getEventsQuery = "SELECT qe.id, extract(EPOCH from date)*1000 as date_timestamp, type, survey_unit_id_su, campaign_id "
     + " FROM questioning_event qe join questioning q on qe.questioning_id=q.id join partitioning p on q.id_partitioning=p.id "
@@ -38,21 +45,13 @@ public class MoogRepository {
         return progress;
     }
 
-    final String extractionQuery = "SELECT survey_unit.id_su as id_su, "
-            + "	survey_unit.id_contact as id_contact,"
-            + "	survey_unit.lastname as lastname,"
-            + "	survey_unit.firstname as firstname,"
-            + "	survey_unit.address as address,	\r\n"
-            + "	survey_unit.batch_num as batch_num,"
-            + "	B.type	as status,"
-            + "	B.date	as dateinfo "
-            + " FROM survey_unit "+
-            "			LEFT JOIN ( questioning_event LEFT JOIN uploads ON questioning_event.id_upload =uploads.id) AS B "+
-            "			ON ( " +
-            "     survey_unit.id_su=B.id_su AND " +
-            "     survey_unit.id_contact=B.id_contact AND " +
-            "     survey_unit.id_campaign=B.id_campaign) " +
-            "			WHERE survey_unit.id_campaign=?";
+    final String extractionQuery = " SELECT id_su,identifier as id_contact,first_name as firstname,last_name as lastname,address_id as address,date as dateinfo,type as status, batch_num FROM "
+            + " (SELECT id,campaign_id,A.id_su,A.identifier,first_name,last_name,address_id, id_partitioning AS batch_num FROM (SELECT campaign_id,id_su,contact.identifier,first_name,last_name,address_id "
+              +  "    FROM view "
+               + "      LEFT JOIN contact ON contact.identifier=view.identifier WHERE campaign_id=?  ) As A LEFT JOIN questioning ON A.id_su=questioning.survey_unit_id_su) As B LEFT JOIN questioning_event on B.id=questioning_event.questioning_id"
+    ;
+
+
 
 
     public List<MoogExtractionRowDto> getExtraction(String idCampaign) {
@@ -61,14 +60,19 @@ public class MoogRepository {
             public MoogExtractionRowDto mapRow(ResultSet rs, int rowNum) throws SQLException {
                 MoogExtractionRowDto ev = new MoogExtractionRowDto();
 
+                ev.setAddress("addresse non connue");
+                Optional<Address> address = addressService.findById(rs.getLong("address"));
+
                 ev.setStatus(rs.getString("status"));
-                ev.setDateInfo(Long.parseLong(rs.getString("dateinfo")));
+                ev.setDateInfo(rs.getString("dateinfo"));
                 ev.setIdSu(rs.getString("id_su"));
                 ev.setIdContact(rs.getString("id_contact"));
                 ev.setLastname(rs.getString("lastname"));
                 ev.setFirstname(rs.getString("firstname"));
-                ev.setAddress(rs.getString("address"));
-                ev.setBatchNumber(Integer.parseInt(rs.getString("batch_num")));
+                if(address.isPresent()){
+                ev.setAddress(address.get().toStringMoog());}
+
+                ev.setBatchNumber(rs.getString("batch_num"));
 
                 return ev;
             }
@@ -77,26 +81,14 @@ public class MoogRepository {
         return extraction;
     }
 
-    final String surveyUnitFollowUpQuery = "SELECT TABLE1.id_su, TABLE1.batch_num , CASE WHEN TABLE2.id_su IS NULL THEN 0 ELSE 1 END as PND FROM ("
-            + "SELECT DISTINCT ON (survey_unit.id_su) "
-            + "survey_unit.id_campaign, survey_unit.id_contact, survey_unit.id_su, address, batch_num, firstname, lastname, id_management_monitoring_info, dateinfo, status, id_upload "
-            + "FROM survey_unit JOIN management_monitoring_info ON ( "
-            + "survey_unit.id_su=management_monitoring_info.id_su AND "
-            + "survey_unit.id_contact=management_monitoring_info.id_contact AND "
-            + "survey_unit.id_campaign=management_monitoring_info.id_campaign) "
-            + " WHERE (	survey_unit.id_campaign = ? AND  survey_unit.id_su NOT IN ("
-            + "SELECT DISTINCT ON (survey_unit.id_su) survey_unit.id_su FROM survey_unit JOIN management_monitoring_info ON ( "
-            + "survey_unit.id_su=management_monitoring_info.id_su AND "
-            + "survey_unit.id_contact=management_monitoring_info.id_contact AND "
-            + "survey_unit.id_campaign=management_monitoring_info.id_campaign) "
-            + "WHERE status in ('VALINT','VALPAP','REFUSAL','WASTE','HC') AND survey_unit.id_campaign = ? )"
-            + ")  ORDER BY survey_unit.id_su"
-            + ") AS TABLE1 LEFT OUTER JOIN ("
-            + "SELECT DISTINCT ON (survey_unit.id_su) survey_unit.id_su FROM survey_unit JOIN management_monitoring_info ON ( "
-            + "survey_unit.id_su=management_monitoring_info.id_su AND "
-            + "survey_unit.id_contact=management_monitoring_info.id_contact AND "
-            + "survey_unit.id_campaign=management_monitoring_info.id_campaign) "
-            + "WHERE status in ('PND') AND survey_unit.id_campaign = ?) AS TABLE2 ON TABLE1.id_su=TABLE2.id_su";
+    final String surveyUnitFollowUpQuery = " SELECT DISTINCT ON (id_su) id_su,batch_num, CASE WHEN type in ('PND') THEN 1 ELSE 0 END as PND FROM (SELECT id_su, identifier, id, id_partitioning as batch_num FROM (SELECT id_su,identifier "+
+            " FROM public.view WHERE campaign_id=?)AS A LEFT JOIN questioning ON questioning.survey_unit_id_su=A.id_su) AS B "+
+            " LEFT JOIN questioning_event ON B.id=questioning_event.questioning_id "+
+            " WHERE id_su not in (SELECT DISTINCT ON (id_su) id_su FROM (SELECT id_su, identifier, id, id_partitioning as batch_num FROM (SELECT id_su,identifier FROM public.view "+
+            " WHERE campaign_id=?)AS A LEFT JOIN questioning ON questioning.survey_unit_id_su=A.id_su) AS B "+
+    " LEFT JOIN questioning_event ON B.id=questioning_event.questioning_id "+
+    " WHERE type IN ('VALINT','VALPAP','HC','REFUSAL','WASTE')) ORDER BY id_su,pnd DESC";
+    ;
 
     public List<MoogExtractionRowDto> getSurveyUnitToFollowUp(String idCampaign) {
 
@@ -106,11 +98,11 @@ public class MoogRepository {
                         MoogExtractionRowDto er = new MoogExtractionRowDto();
                         er.setIdSu(rs.getString("id_su"));
                         er.setPnd(rs.getInt("PND"));
-                        er.setBatchNumber(rs.getInt("batch_num"));
+                        er.setBatchNumber(rs.getString("batch_num"));
 
                         return er;
                     }
-                }, new Object[] { idCampaign, idCampaign, idCampaign });
+                }, new Object[] { idCampaign, idCampaign });
 
         return followUp;
 

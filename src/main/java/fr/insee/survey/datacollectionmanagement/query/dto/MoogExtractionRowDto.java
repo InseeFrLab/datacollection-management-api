@@ -11,13 +11,13 @@ import lombok.Setter;
 public class MoogExtractionRowDto {
 
     private String status;
-    private Long dateInfo;
+    private String dateInfo;
     private String idSu;
     private String idContact;
     private String lastname;
     private String firstname;
     private String address;
-    private int batchNumber;
+    private String batchNumber;
     private int pnd;
 
 }
