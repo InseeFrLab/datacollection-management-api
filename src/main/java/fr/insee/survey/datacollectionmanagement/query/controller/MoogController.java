@@ -115,13 +115,13 @@ public class MoogController {
 
     }
 
-    @GetMapping(value = "/api/moog/campaigns/{idCampaign}/extraction", produces = "application/json")
+    @GetMapping(value = Constants.MOOG_API_CAMPAIGN_EXTRACTION, produces = "application/json")
     public JSONCollectionWrapper<MoogExtractionRowDto> provideDataForExtraction(@PathVariable String idCampaign) {
         LOGGER.info("Request GET for extraction of campaign : {}", idCampaign);
         return moogService.getExtraction(idCampaign);
     }
 
-    @GetMapping(value = "/api/moog/campaigns/{idCampaign}/survey-units/follow-up", produces = "application/json")
+    @GetMapping(value = Constants.MOOG_API_CAMPAIGN_SURVEYUNITS_FOLLOWUP, produces = "application/json")
     public JSONCollectionWrapper<MoogExtractionRowDto> displaySurveyUnitsToFollowUp(@PathVariable String idCampaign) {
         LOGGER.info("Request GET for su to follow up - campaign {}", idCampaign);
         return new JSONCollectionWrapper<MoogExtractionRowDto>(moogService.getSurveyUnitsToFollowUp(idCampaign));
