@@ -119,7 +119,13 @@ public class UploadServiceImpl implements UploadService {
             return false;
         }
         Upload up = upOpt.get();
-        questioningEventService.deleteAll(up.getQuestioningEvents());
+        up.getQuestioningEvents().stream().forEach(q -> {
+            Questioning quesitoning = q.getQuestioning();
+            quesitoning.setQuestioningEvents(quesitoning.getQuestioningEvents().stream()
+                    .filter(qe -> !qe.equals(q)).collect(Collectors.toSet()));
+            questioningService.saveQuestioning(quesitoning);
+            questioningEventService.deleteQuestioningEvent(q.getId());
+        });
         delete(up);
         return true;
     }
