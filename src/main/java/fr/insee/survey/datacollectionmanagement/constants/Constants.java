@@ -68,9 +68,16 @@ public class Constants {
 
     // API CROSS DOMAIN
     public static final String API_CHECK_HABILITATION = "/api/check-habilitation";
+    public static final String MOOG_API_CAMPAIGNS = "/api/moog/campaigns";
+    public static final String MOOG_API_CAMPAIGNS_ID = "/api/moog/campaigns/{id}";
     public static final String API_MOOG_SEARCH = "/api/moog/campaigns/survey-units";
     public static final String API_MOOG_EVENTS = "/api/moog/campaigns/{campaign}/survey-units/{id}/management-monitoring-infos";
     public static final String API_MOOG_MAIL = "/api/moog/contact/{id}/mail";
+    public static final String MOOG_API_UPLOADS_ID = "/api/moog/uploads/{id}";
+    public static final String MOOG_API_CAMPAIGN_UPLOADS = "/api/moog/campaigns/{idCampaign}/uploads";
+    public static final String MOOG_API_CAMPAIGN_EXTRACTION = "/api/moog/campaigns/{idCampaign}/extraction";
+    public static final String MOOG_API_CAMPAIGN_SURVEYUNITS_FOLLOWUP = "/api/moog/campaigns/{idCampaign}/survey-units/follow-up";
+    public static final String API_MOOG_DELETE_QUESTIONING_EVENT="/api/moog/management-monitoring-infos/{id}";
     public static final String API_CONTACTS_SEARCH = "/api/contacts/search";
     public static final String API_CONTACTS_ACCREDITATIONS = "/api/contacts/{id}/accreditations";
     public static final String API_MY_QUESTIONINGS_ID = "/api/contacts/questionings";

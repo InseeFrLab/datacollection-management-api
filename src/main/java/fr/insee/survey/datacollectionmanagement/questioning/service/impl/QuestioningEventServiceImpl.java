@@ -41,6 +41,11 @@ public class QuestioningEventServiceImpl implements QuestioningEventService {
     }
 
     @Override
+    public void deleteAll(List<QuestioningEvent> questioningEvents) {
+        questioningEventRepository.deleteAll(questioningEvents);
+    }
+
+    @Override
     public Optional<QuestioningEvent> getLastQuestioningEvent(Questioning questioning,
             List<TypeQuestioningEvent> events) {
 
@@ -49,6 +54,13 @@ public class QuestioningEventServiceImpl implements QuestioningEventService {
                 .collect(Collectors.toList());
         Collections.sort(listQuestioningEvent, lastQuestioningEventComparator);
         return listQuestioningEvent.stream().findFirst();
+    }
+
+    @Override
+    public List<QuestioningEvent> findbyIdUpload(Long id){
+        List<QuestioningEvent> listQuestioningEvent = questioningEventRepository.findAll().stream().filter(qe -> qe.getUpload()!= null && qe.getUpload().getId().equals(id)).collect(Collectors.toList());
+
+        return listQuestioningEvent;
     }
 
 }

@@ -60,7 +60,6 @@ public class OpenIDConnectSecurityContext  {
             final Jwt jwt = (Jwt) auth.getPrincipal();
             List<String> tryRoles = jwt.getClaimAsStringList(config.getRoleClaim());
             String tryId=jwt.getClaimAsString(config.getIdClaim());
-            log.info("Current User is {},  with roles {}",tryId,tryRoles);
             return new User(tryId, tryRoles);
         };
     }

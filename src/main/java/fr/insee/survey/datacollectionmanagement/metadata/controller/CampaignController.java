@@ -162,7 +162,7 @@ public class CampaignController {
     }
 
     @Operation(summary = "Delete a campaign, its campaigns, partitionings, questionings ...")
-    @DeleteMapping(value = Constants.API_CAMPAIGNS_ID)
+    @DeleteMapping(value = {Constants.API_CAMPAIGNS_ID, Constants.MOOG_API_CAMPAIGNS_ID})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "No Content"),
             @ApiResponse(responseCode = "404", description = "Not found"),

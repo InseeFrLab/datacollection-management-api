@@ -9,4 +9,5 @@ import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningEv
 public interface QuestioningEventRepository extends JpaRepository<QuestioningEvent, Long> {
     
     List<QuestioningEvent> findByQuestioningId(Long questioningId);
+
 }

@@ -1,11 +1,13 @@
 package fr.insee.survey.datacollectionmanagement.query.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
 
+import fr.insee.survey.datacollectionmanagement.config.JSONCollectionWrapper;
+import fr.insee.survey.datacollectionmanagement.query.dto.MoogExtractionRowDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
 import fr.insee.survey.datacollectionmanagement.contact.domain.Contact;
@@ -93,6 +95,15 @@ public class MoogServiceImpl implements MoogService {
         moogEvents.stream().forEach(e -> e.setSurveyUnit(surveyUnit));
 
         return moogEvents;
+    }
+
+    public JSONCollectionWrapper<MoogExtractionRowDto> getExtraction(String idCampaign) {
+
+        return new JSONCollectionWrapper<>(moogRepository.getExtraction(idCampaign));
+    }
+
+    public Collection<MoogExtractionRowDto> getSurveyUnitsToFollowUp(String idCampaign) {
+        return moogRepository.getSurveyUnitToFollowUp(idCampaign);
     }
 
 }

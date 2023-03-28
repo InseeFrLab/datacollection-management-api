@@ -75,6 +75,11 @@ public class QuestioningServiceImpl implements QuestioningService {
     }
 
     @Override
+    public Set<Questioning> findBySurveyUnitIdSu(String idSu) {
+        return questioningRepository.findBySurveyUnitIdSu(idSu);
+    }
+
+    @Override
     public Questioning findByIdPartitioningAndSurveyUnitIdSu(String idPartitioning,
             String surveyUnitIdSu) {
         return questioningRepository.findByIdPartitioningAndSurveyUnitIdSu(idPartitioning,

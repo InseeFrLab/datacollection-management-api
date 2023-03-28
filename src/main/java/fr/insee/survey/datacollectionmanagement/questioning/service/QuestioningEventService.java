@@ -18,6 +18,8 @@ public interface QuestioningEventService {
 
     public void deleteQuestioningEvent(Long id);
 
+    public void deleteAll(List<QuestioningEvent> questioningEvents);
+
     /**
      * Get the last event sorted by order of importance among the event types
      * (TypeQuestioningEvent) passed in parameter
@@ -27,4 +29,6 @@ public interface QuestioningEventService {
      * @return optional last Questioning event in order of importance
      */
     Optional<QuestioningEvent> getLastQuestioningEvent(Questioning questioning, List<TypeQuestioningEvent> events);
+
+    List<QuestioningEvent>  findbyIdUpload(Long id);
 }
