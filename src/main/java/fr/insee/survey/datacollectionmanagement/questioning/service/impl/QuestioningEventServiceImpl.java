@@ -36,6 +36,7 @@ public class QuestioningEventServiceImpl implements QuestioningEventService {
 
     @Override
     public void deleteQuestioningEvent(Long id) {
+
         questioningEventRepository.deleteById(id);
 
     }

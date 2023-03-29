@@ -19,8 +19,6 @@ public interface UploadService {
 
     public List<Upload> findAllByIdCampaign(String idCampaign);
 
-    public boolean deleteUpload(Long id);
-
     public void delete(Upload up);
 
     public Upload saveAndFlush(Upload up);

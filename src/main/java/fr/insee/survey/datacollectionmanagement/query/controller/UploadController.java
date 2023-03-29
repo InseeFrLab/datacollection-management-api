@@ -7,6 +7,9 @@ import fr.insee.survey.datacollectionmanagement.query.domain.ResultUpload;
 import fr.insee.survey.datacollectionmanagement.query.domain.Upload;
 import fr.insee.survey.datacollectionmanagement.query.dto.UploadDto;
 import fr.insee.survey.datacollectionmanagement.query.service.UploadService;
+import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
+import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningEventService;
+import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +18,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @PreAuthorize("@AuthorizeMethodDecider.isInternalUser() "
@@ -27,16 +33,33 @@ public class UploadController {
     @Autowired
     UploadService moogUploadService;
 
+    @Autowired
+    QuestioningEventService questioningEventService;
+
+    @Autowired
+    QuestioningService questioningService;
+
     @DeleteMapping(value = Constants.MOOG_API_UPLOADS_ID)
-    public ResponseEntity<Upload> deleteOneUpload(@PathVariable Long id) {
+    public ResponseEntity<?> deleteOneUpload(@PathVariable Long id) {
         LOGGER.info("Request DELETE for upload n° {}", id);
-        if (moogUploadService.deleteUpload(id)) {
-            return new ResponseEntity<Upload>(HttpStatus.NO_CONTENT);
+
+        Optional<Upload> upOpt = moogUploadService.findById(id);
+        if(!upOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Upload does not exist");
         }
-        else {
-            LOGGER.error("Error : upload not found");
-            return new ResponseEntity<Upload>(HttpStatus.NOT_FOUND);
-        }
+        Upload up = upOpt.get();
+        up.getQuestioningEvents().stream().forEach(q -> {
+            Questioning quesitoning = q.getQuestioning();
+            quesitoning.setQuestioningEvents(quesitoning.getQuestioningEvents().stream()
+                    .filter(qe -> !qe.equals(q)).collect(Collectors.toSet()));
+            questioningService.saveQuestioning(quesitoning);
+            questioningEventService.deleteQuestioningEvent(q.getId());
+        });
+        moogUploadService.delete(up);
+
+        return new ResponseEntity<Upload>(HttpStatus.NO_CONTENT);
+
+
     }
 
     @GetMapping(value = Constants.MOOG_API_CAMPAIGN_UPLOADS, produces = "application/json")

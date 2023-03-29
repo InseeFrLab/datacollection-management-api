@@ -112,23 +112,6 @@ public class UploadServiceImpl implements UploadService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public boolean deleteUpload(Long id) {
-        Optional<Upload> upOpt = findById(id);
-        if(!upOpt.isPresent()) {
-            return false;
-        }
-        Upload up = upOpt.get();
-        up.getQuestioningEvents().stream().forEach(q -> {
-            Questioning quesitoning = q.getQuestioning();
-            quesitoning.setQuestioningEvents(quesitoning.getQuestioningEvents().stream()
-                    .filter(qe -> !qe.equals(q)).collect(Collectors.toSet()));
-            questioningService.saveQuestioning(quesitoning);
-            questioningEventService.deleteQuestioningEvent(q.getId());
-        });
-        delete(up);
-        return true;
-    }
 
     @Override
     public void delete(Upload up) {

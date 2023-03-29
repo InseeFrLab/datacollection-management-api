@@ -127,35 +127,5 @@ public class MoogController {
         return new JSONCollectionWrapper<MoogExtractionRowDto>(moogService.getSurveyUnitsToFollowUp(idCampaign));
     }
 
-    @Operation(summary = "Delete a questioning event from moog")
-    @DeleteMapping(value = Constants.API_MOOG_DELETE_QUESTIONING_EVENT, produces = "application/json")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "No Content"),
-            @ApiResponse(responseCode = "404", description = "Not found"),
-            @ApiResponse(responseCode = "400", description = "Bad Request")
-    })
-    public ResponseEntity<?> deleteQuestioningEvent(@PathVariable("id") Long id) {
-        try {
-
-            Optional<QuestioningEvent> questioningEvent = questioningEventService.findbyId(id);
-            if (questioningEvent.isPresent()) {
-                Upload upload = (questioningEvent.get().getUpload() != null ? questioningEvent.get().getUpload() : null);
-                Questioning quesitoning = questioningEvent.get().getQuestioning();
-                quesitoning.setQuestioningEvents(quesitoning.getQuestioningEvents().stream()
-                        .filter(qe -> !qe.equals(questioningEvent.get())).collect(Collectors.toSet()));
-                questioningService.saveQuestioning(quesitoning);
-                questioningEventService.deleteQuestioningEvent(id);
-                if(upload!=null && questioningEventService.findbyIdUpload(upload.getId()).size()==0 ){
-                    uploadService.delete(upload);
-                }
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Questioning event deleted");
-            } else
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Questioning event does not exist");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<String>("Error", HttpStatus.BAD_REQUEST);
-        }
-    }
-
 
 }
