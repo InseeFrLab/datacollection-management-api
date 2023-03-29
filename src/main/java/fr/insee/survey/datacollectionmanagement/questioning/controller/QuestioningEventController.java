@@ -2,11 +2,12 @@ package fr.insee.survey.datacollectionmanagement.questioning.controller;
 
 import java.text.ParseException;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import fr.insee.survey.datacollectionmanagement.questioning.domain.Upload;
+import fr.insee.survey.datacollectionmanagement.questioning.service.UploadService;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +55,9 @@ public class QuestioningEventController {
 
     @Autowired
     private QuestioningService questioningService;
+
+    @Autowired
+    UploadService uploadService;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -112,7 +116,7 @@ public class QuestioningEventController {
     }
 
     @Operation(summary = "Delete a questioning event")
-    @DeleteMapping(value = Constants.API_QUESTIONING_QUESTIONING_EVENTS_ID, produces = "application/json")
+    @DeleteMapping(value = {Constants.API_QUESTIONING_QUESTIONING_EVENTS_ID, Constants.API_MOOG_DELETE_QUESTIONING_EVENT}, produces = "application/json")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "No Content"),
             @ApiResponse(responseCode = "404", description = "Not found"),
@@ -122,11 +126,15 @@ public class QuestioningEventController {
         try {
             Optional<QuestioningEvent> questioningEvent = questioningEventService.findbyId(id);
             if (questioningEvent.isPresent()) {
+                Upload upload = (questioningEvent.get().getUpload() != null ? questioningEvent.get().getUpload() : null);
                 Questioning quesitoning = questioningEvent.get().getQuestioning();
                 quesitoning.setQuestioningEvents(quesitoning.getQuestioningEvents().stream()
                         .filter(qe -> !qe.equals(questioningEvent.get())).collect(Collectors.toSet()));
                 questioningService.saveQuestioning(quesitoning);
                 questioningEventService.deleteQuestioningEvent(id);
+                if(upload!=null && questioningEventService.findbyIdUpload(upload.getId()).size()==0 ){
+                    uploadService.delete(upload);
+                }
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Questioning event deleted");
             } else
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Questioning event does not exist");

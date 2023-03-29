@@ -1,4 +1,4 @@
-package fr.insee.survey.datacollectionmanagement.query.service.impl;
+package fr.insee.survey.datacollectionmanagement.questioning.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.survey.datacollectionmanagement.exception.RessourceNotValidatedException;
@@ -6,12 +6,11 @@ import fr.insee.survey.datacollectionmanagement.metadata.domain.Campaign;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Partitioning;
 import fr.insee.survey.datacollectionmanagement.metadata.service.CampaignService;
 import fr.insee.survey.datacollectionmanagement.query.domain.ResultUpload;
-import fr.insee.survey.datacollectionmanagement.query.domain.Upload;
-import fr.insee.survey.datacollectionmanagement.query.dto.MoogQuestioningEventDto;
+import fr.insee.survey.datacollectionmanagement.questioning.domain.Upload;
 import fr.insee.survey.datacollectionmanagement.query.dto.MoogUploadQuestioningEventDto;
-import fr.insee.survey.datacollectionmanagement.query.dto.UploadDto;
-import fr.insee.survey.datacollectionmanagement.query.repository.UploadRepository;
-import fr.insee.survey.datacollectionmanagement.query.service.UploadService;
+import fr.insee.survey.datacollectionmanagement.questioning.dto.UploadDto;
+import fr.insee.survey.datacollectionmanagement.questioning.repository.UploadRepository;
+import fr.insee.survey.datacollectionmanagement.questioning.service.UploadService;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningAccreditation;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningEvent;
@@ -82,10 +81,12 @@ public class UploadServiceImpl implements UploadService {
             } catch (Exception e) {
                 log.error("Error in request");
                 log.info("Info: id KO " + e.getMessage());
-                delete(up);
-                e.printStackTrace();
                 result.addIdKo(identifier, "RessourceNotFound or unprocessable request");
             }
+        }
+        if(result.getListIdOK().size()==0){
+            delete(up);
+            return result;
         }
         up.setQuestioningEvents(liste);
         up = saveAndFlush(up);
@@ -112,17 +113,6 @@ public class UploadServiceImpl implements UploadService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public boolean deleteUpload(Long id) {
-        Optional<Upload> upOpt = findById(id);
-        if(!upOpt.isPresent()) {
-            return false;
-        }
-        Upload up = upOpt.get();
-        questioningEventService.deleteAll(up.getQuestioningEvents());
-        delete(up);
-        return true;
-    }
 
     @Override
     public void delete(Upload up) {

@@ -1,5 +1,6 @@
-package fr.insee.survey.datacollectionmanagement.query.dto;
+package fr.insee.survey.datacollectionmanagement.questioning.dto;
 
+import fr.insee.survey.datacollectionmanagement.query.dto.MoogUploadQuestioningEventDto;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningEvent;
 import lombok.Getter;
 import lombok.Setter;

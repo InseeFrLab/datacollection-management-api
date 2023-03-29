@@ -1,9 +1,9 @@
-package fr.insee.survey.datacollectionmanagement.query.service;
+package fr.insee.survey.datacollectionmanagement.questioning.service;
 
 import fr.insee.survey.datacollectionmanagement.exception.RessourceNotValidatedException;
 import fr.insee.survey.datacollectionmanagement.query.domain.ResultUpload;
-import fr.insee.survey.datacollectionmanagement.query.domain.Upload;
-import fr.insee.survey.datacollectionmanagement.query.dto.UploadDto;
+import fr.insee.survey.datacollectionmanagement.questioning.domain.Upload;
+import fr.insee.survey.datacollectionmanagement.questioning.dto.UploadDto;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -18,8 +18,6 @@ public interface UploadService {
     public Optional<Upload> findById(long id);
 
     public List<Upload> findAllByIdCampaign(String idCampaign);
-
-    public boolean deleteUpload(Long id);
 
     public void delete(Upload up);
 

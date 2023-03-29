@@ -1,6 +1,6 @@
-package fr.insee.survey.datacollectionmanagement.query.repository;
+package fr.insee.survey.datacollectionmanagement.questioning.repository;
 
-import fr.insee.survey.datacollectionmanagement.query.domain.Upload;
+import fr.insee.survey.datacollectionmanagement.questioning.domain.Upload;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
