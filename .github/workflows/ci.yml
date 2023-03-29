@@ -38,7 +38,7 @@ jobs:
         id: version
         run: echo "pom_version=$(mvn -f pom.xml help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_OUTPUT
       - name: Publish to Registry
-        uses: elgohr/Publish-Docker-Github-Action@master
+        uses: elgohr/Publish-Docker-Github-Action@v5
         with:
           name: inseefrlab/datacollection-management-api
           username: ${{ secrets.DOCKERHUB_USERNAME }}
