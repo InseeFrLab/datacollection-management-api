@@ -42,11 +42,6 @@ public class QuestioningEventServiceImpl implements QuestioningEventService {
     }
 
     @Override
-    public void deleteAll(List<QuestioningEvent> questioningEvents) {
-        questioningEventRepository.deleteAll(questioningEvents);
-    }
-
-    @Override
     public Optional<QuestioningEvent> getLastQuestioningEvent(Questioning questioning,
             List<TypeQuestioningEvent> events) {
 

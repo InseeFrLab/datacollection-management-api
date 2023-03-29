@@ -82,10 +82,12 @@ public class UploadServiceImpl implements UploadService {
             } catch (Exception e) {
                 log.error("Error in request");
                 log.info("Info: id KO " + e.getMessage());
-                delete(up);
-                e.printStackTrace();
                 result.addIdKo(identifier, "RessourceNotFound or unprocessable request");
             }
+        }
+        if(result.getListIdOK().size()==0){
+            delete(up);
+            return result;
         }
         up.setQuestioningEvents(liste);
         up = saveAndFlush(up);
