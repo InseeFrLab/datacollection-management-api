@@ -1,12 +1,12 @@
-package fr.insee.survey.datacollectionmanagement.query.controller;
+package fr.insee.survey.datacollectionmanagement.questioning.controller;
 
 import fr.insee.survey.datacollectionmanagement.config.JSONCollectionWrapper;
 import fr.insee.survey.datacollectionmanagement.constants.Constants;
 import fr.insee.survey.datacollectionmanagement.exception.RessourceNotValidatedException;
 import fr.insee.survey.datacollectionmanagement.query.domain.ResultUpload;
-import fr.insee.survey.datacollectionmanagement.query.domain.Upload;
-import fr.insee.survey.datacollectionmanagement.query.dto.UploadDto;
-import fr.insee.survey.datacollectionmanagement.query.service.UploadService;
+import fr.insee.survey.datacollectionmanagement.questioning.domain.Upload;
+import fr.insee.survey.datacollectionmanagement.questioning.dto.UploadDto;
+import fr.insee.survey.datacollectionmanagement.questioning.service.UploadService;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
 import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningEventService;
 import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningService;

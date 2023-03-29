@@ -3,15 +3,10 @@ package fr.insee.survey.datacollectionmanagement.query.controller;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import fr.insee.survey.datacollectionmanagement.config.JSONCollectionWrapper;
-import fr.insee.survey.datacollectionmanagement.query.domain.Upload;
 import fr.insee.survey.datacollectionmanagement.query.dto.MoogExtractionRowDto;
-import fr.insee.survey.datacollectionmanagement.query.service.UploadService;
-import fr.insee.survey.datacollectionmanagement.query.service.impl.UploadServiceImpl;
-import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
-import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningEvent;
+import fr.insee.survey.datacollectionmanagement.questioning.service.UploadService;
 import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningEventService;
 import fr.insee.survey.datacollectionmanagement.questioning.service.QuestioningService;
 import lombok.extern.slf4j.Slf4j;

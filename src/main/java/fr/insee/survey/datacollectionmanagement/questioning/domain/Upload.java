@@ -1,4 +1,4 @@
-package fr.insee.survey.datacollectionmanagement.query.domain;
+package fr.insee.survey.datacollectionmanagement.questioning.domain;
 
 
 import com.fasterxml.jackson.annotation.JsonBackReference;

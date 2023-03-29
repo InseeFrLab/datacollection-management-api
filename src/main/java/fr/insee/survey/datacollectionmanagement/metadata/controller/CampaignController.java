@@ -5,8 +5,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import fr.insee.survey.datacollectionmanagement.query.domain.Upload;
-import fr.insee.survey.datacollectionmanagement.query.service.UploadService;
+import fr.insee.survey.datacollectionmanagement.questioning.domain.Upload;
+import fr.insee.survey.datacollectionmanagement.questioning.service.UploadService;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

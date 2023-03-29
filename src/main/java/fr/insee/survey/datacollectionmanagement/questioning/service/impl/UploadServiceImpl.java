@@ -1,4 +1,4 @@
-package fr.insee.survey.datacollectionmanagement.query.service.impl;
+package fr.insee.survey.datacollectionmanagement.questioning.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.survey.datacollectionmanagement.exception.RessourceNotValidatedException;
@@ -6,12 +6,11 @@ import fr.insee.survey.datacollectionmanagement.metadata.domain.Campaign;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Partitioning;
 import fr.insee.survey.datacollectionmanagement.metadata.service.CampaignService;
 import fr.insee.survey.datacollectionmanagement.query.domain.ResultUpload;
-import fr.insee.survey.datacollectionmanagement.query.domain.Upload;
-import fr.insee.survey.datacollectionmanagement.query.dto.MoogQuestioningEventDto;
+import fr.insee.survey.datacollectionmanagement.questioning.domain.Upload;
 import fr.insee.survey.datacollectionmanagement.query.dto.MoogUploadQuestioningEventDto;
-import fr.insee.survey.datacollectionmanagement.query.dto.UploadDto;
-import fr.insee.survey.datacollectionmanagement.query.repository.UploadRepository;
-import fr.insee.survey.datacollectionmanagement.query.service.UploadService;
+import fr.insee.survey.datacollectionmanagement.questioning.dto.UploadDto;
+import fr.insee.survey.datacollectionmanagement.questioning.repository.UploadRepository;
+import fr.insee.survey.datacollectionmanagement.questioning.service.UploadService;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.Questioning;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningAccreditation;
 import fr.insee.survey.datacollectionmanagement.questioning.domain.QuestioningEvent;

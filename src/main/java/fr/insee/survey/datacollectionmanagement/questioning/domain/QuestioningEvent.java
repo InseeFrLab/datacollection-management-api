@@ -5,7 +5,6 @@ import java.util.Date;
 import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import fr.insee.survey.datacollectionmanagement.query.domain.Upload;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 

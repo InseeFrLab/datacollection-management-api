@@ -2,13 +2,12 @@ package fr.insee.survey.datacollectionmanagement.questioning.controller;
 
 import java.text.ParseException;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import fr.insee.survey.datacollectionmanagement.query.domain.Upload;
-import fr.insee.survey.datacollectionmanagement.query.service.UploadService;
+import fr.insee.survey.datacollectionmanagement.questioning.domain.Upload;
+import fr.insee.survey.datacollectionmanagement.questioning.service.UploadService;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
