@@ -5,6 +5,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import fr.insee.survey.datacollectionmanagement.query.domain.Upload;
+import fr.insee.survey.datacollectionmanagement.query.service.UploadService;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +69,9 @@ public class CampaignController {
 
     @Autowired
     private QuestioningService questioningService;
+
+    @Autowired
+    UploadService uploadService;
     
     @Operation(summary = "Search for campaigns, paginated")
     @GetMapping(value = Constants.API_CAMPAIGNS, produces = "application/json")
@@ -180,6 +185,7 @@ public class CampaignController {
             Survey survey = campaign.get().getSurvey();
             survey.getCampaigns().remove(campaign.get());
             surveyService.insertOrUpdateSurvey(survey);
+            List<Upload> uploadsCamp = uploadService.findAllByIdCampaign(id);
             campaignService.deleteCampaignById(id);
             Set<Partitioning> listPartitionings = campaign.get().getPartitionings();
 
@@ -188,11 +194,13 @@ public class CampaignController {
             for (Partitioning partitioning : listPartitionings) {
                 nbQuestioningDeleted += questioningService.deleteQuestioningsOfOnePartitioning(partitioning);
             }
-            log.info("Campaign {} deleted with all its metadata children - {} questioning deleted - {} view deleted",
+            uploadsCamp.stream().forEach(up->uploadService.delete(up));
+            log.info("Campaign {} deleted with all its metadata children - {} questioning deleted - {} view deleted - {} uploads deleted",
                     id,
-                    nbQuestioningDeleted, nbViewDeleted);
+                    nbQuestioningDeleted, nbViewDeleted, uploadsCamp.size());
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Campaign deleted");
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
         }
     }
