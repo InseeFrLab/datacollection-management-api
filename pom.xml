@@ -20,7 +20,7 @@
 		<jeasy-version>4.0.0</jeasy-version>
 		<javafaker-version>1.0.2</javafaker-version>
 		<testcontainers-version>1.15.3</testcontainers-version>
-		<orgjson-version>20211205</orgjson-version>
+		<orgjson-version>20230227</orgjson-version>
 	</properties>
 	<dependencies>
 		<dependency>
