@@ -355,21 +355,17 @@ public class WebclientController {
                 httpStatus = HttpStatus.CREATED;
             }
 
-            Owner owner = ownerService.insertOrUpdateOwner(convertToEntity(metadataDto.getOwnerDto()));
-            Support support = supportService.insertOrUpdateSupport(convertToEntity(metadataDto.getSupportDto()));
-
-            Source source = sourceService.insertOrUpdateSource(convertToEntity(metadataDto.getSourceDto()));
-
+            Owner owner =convertToEntity(metadataDto.getOwnerDto());
+            Support support = convertToEntity(metadataDto.getSupportDto());
+            Source source = convertToEntity(metadataDto.getSourceDto());
             Survey survey = convertToEntity(metadataDto.getSurveyDto());
+            
             survey.setSource(source);
-            survey = surveyService.insertOrUpdateSurvey(survey);
-
             Campaign campaign = convertToEntity(metadataDto.getCampaignDto());
             campaign.setSurvey(survey);
-            campaign = campaignService.insertOrUpdateCampaign(campaign);
-
             Partitioning partitioning = convertToEntity(metadataDto.getPartitioningDto());
             partitioning.setCampaign(campaign);
+            
             partitioning = partitioningService.insertOrUpdatePartitioning(partitioning);
 
             Set<Partitioning> partitionings = (campaign.getPartitionings() == null) ? new HashSet<>()
