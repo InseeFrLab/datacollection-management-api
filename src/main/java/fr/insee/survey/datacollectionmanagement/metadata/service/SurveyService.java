@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import fr.insee.survey.datacollectionmanagement.metadata.domain.Campaign;
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Survey;
 
 public interface SurveyService {
@@ -19,5 +20,7 @@ public interface SurveyService {
     Survey insertOrUpdateSurvey(Survey survey);
 
     void deleteSurveyById(String id);
+
+    Survey addCampaignToSurvey(Survey survey, Campaign campaign);
 
 }
