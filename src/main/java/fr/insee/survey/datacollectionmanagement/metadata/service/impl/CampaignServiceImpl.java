@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -96,6 +98,29 @@ public class CampaignServiceImpl implements CampaignService {
     @Override
     public void deleteCampaignById(String id) {
         campaignRepository.deleteById(id);
+    }
+
+    @Override
+    public Campaign addPartitionigToCampaign(Campaign campaign, Partitioning partitioning) {
+        Optional<Campaign> campaignBase = findById(campaign.getId());
+        if (campaignBase.isPresent() && isPartitioningPresent(partitioning, campaignBase.get())) {
+            campaign.setPartitionings(campaignBase.get().getPartitionings());
+        } else {
+            Set<Partitioning> partitionings = (!campaignBase.isPresent()) ? new HashSet<>()
+                    : campaignBase.get().getPartitionings();
+            partitionings.add(partitioning);
+            campaign.setPartitionings(partitionings);
+        }
+        return campaign;
+    }
+
+    private boolean isPartitioningPresent(Partitioning p, Campaign c) {
+        for (Partitioning part : c.getPartitionings()) {
+            if (part.getId().equals(p.getId())) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

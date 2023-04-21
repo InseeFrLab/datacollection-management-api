@@ -355,35 +355,22 @@ public class WebclientController {
                 httpStatus = HttpStatus.CREATED;
             }
 
-            Owner owner =convertToEntity(metadataDto.getOwnerDto());
+            Owner owner = convertToEntity(metadataDto.getOwnerDto());
             Support support = convertToEntity(metadataDto.getSupportDto());
             Source source = convertToEntity(metadataDto.getSourceDto());
             Survey survey = convertToEntity(metadataDto.getSurveyDto());
-            
+
             survey.setSource(source);
             Campaign campaign = convertToEntity(metadataDto.getCampaignDto());
             campaign.setSurvey(survey);
             Partitioning partitioning = convertToEntity(metadataDto.getPartitioningDto());
             partitioning.setCampaign(campaign);
-            
 
-            Set<Partitioning> partitionings = (campaign.getPartitionings() == null) ? new HashSet<>()
-                    : campaign.getPartitionings();
-            partitionings.add(partitioning);
-            campaign.setPartitionings(partitionings);
-
-            Set<Campaign> campaigns = (survey.getCampaigns() == null) ? new HashSet<>()
-                    : survey.getCampaigns();
-            campaigns.add(campaign);
-            survey.setCampaigns(campaigns);
-
-            Set<Survey> surveys = (source.getSurveys() == null) ? new HashSet<>()
-                    : source.getSurveys();
-            surveys.add(survey);
-            source.setSurveys(surveys);
+            campaign = campaignService.addPartitionigToCampaign(campaign, partitioning);
+            survey = surveyService.addCampaignToSurvey(survey, campaign);
+            source = sourceService.addSurveyToSource(source, survey);
             source.setOwner(owner);
             source.setSupport(support);
-
 
             Set<Source> sourcesOwner = (owner.getSources() == null) ? new HashSet<>()
                     : owner.getSources();
@@ -394,14 +381,13 @@ public class WebclientController {
                     : support.getSources();
             sourcesSupport.add(source);
             support.setSources(sourcesSupport);
-            
+
             owner = ownerService.insertOrUpdateOwner(owner);
             support = supportService.insertOrUpdateSupport(support);
             source = sourceService.insertOrUpdateSource(source);
             survey = surveyService.insertOrUpdateSurvey(survey);
             campaign = campaignService.insertOrUpdateCampaign(campaign);
             partitioning = partitioningService.insertOrUpdatePartitioning(partitioning);
-
 
             metadataReturn.setOwnerDto(convertToDto(owner));
             metadataReturn.setSupportDto(convertToDto(support));

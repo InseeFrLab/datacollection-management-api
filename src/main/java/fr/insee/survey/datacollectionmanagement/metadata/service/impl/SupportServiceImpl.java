@@ -49,8 +49,10 @@ public class SupportServiceImpl implements SupportService {
 
     @Override
     public void removeSourceFromSupport(Support support, Source source) {
-        support.getSources().remove(source);
-        supportRepository.save(support);
+        if (support != null && support.getSources() != null) {
+            support.getSources().remove(source);
+            supportRepository.save(support);
+        }
     }
 
     @Override

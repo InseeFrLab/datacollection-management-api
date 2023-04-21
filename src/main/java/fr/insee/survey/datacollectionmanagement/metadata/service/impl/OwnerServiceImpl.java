@@ -49,10 +49,12 @@ public class OwnerServiceImpl implements OwnerService {
 
     @Override
     public void removeSourceFromOwner(Owner owner, Source source) {
-        owner.getSources().remove(source);
-        ownerRepository.save(owner);
+        if (owner != null && owner.getSources() != null) {
+            owner.getSources().remove(source);
+            ownerRepository.save(owner);
+        }
     }
-    
+
     @Override
     public void addSourceFromOwner(Owner owner, Source source) {
         owner.getSources().add(source);

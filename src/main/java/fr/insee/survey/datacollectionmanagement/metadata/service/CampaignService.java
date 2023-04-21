@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import fr.insee.survey.datacollectionmanagement.metadata.domain.Campaign;
+import fr.insee.survey.datacollectionmanagement.metadata.domain.Partitioning;
 import fr.insee.survey.datacollectionmanagement.metadata.dto.CampaignMoogDto;
 
 @Service
@@ -29,5 +30,7 @@ public interface CampaignService {
     Campaign insertOrUpdateCampaign(Campaign campaign);
 
     void deleteCampaignById(String id);
+
+    Campaign addPartitionigToCampaign(Campaign campaign, Partitioning partitioning);
 
 }
