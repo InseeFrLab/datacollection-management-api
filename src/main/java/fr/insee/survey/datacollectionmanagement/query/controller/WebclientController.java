@@ -369,6 +369,10 @@ public class WebclientController {
             campaign = campaignService.addPartitionigToCampaign(campaign, partitioning);
             survey = surveyService.addCampaignToSurvey(survey, campaign);
             source = sourceService.addSurveyToSource(source, survey);
+            owner = ownerService.insertOrUpdateOwner(owner);
+            support = supportService.insertOrUpdateSupport(support);
+            source = sourceService.insertOrUpdateSource(source);
+            
             source.setOwner(owner);
             source.setSupport(support);
 
