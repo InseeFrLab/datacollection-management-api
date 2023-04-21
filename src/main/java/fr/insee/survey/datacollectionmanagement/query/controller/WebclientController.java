@@ -355,53 +355,44 @@ public class WebclientController {
                 httpStatus = HttpStatus.CREATED;
             }
 
-            Owner owner =convertToEntity(metadataDto.getOwnerDto());
+            Owner owner = convertToEntity(metadataDto.getOwnerDto());
             Support support = convertToEntity(metadataDto.getSupportDto());
+
             Source source = convertToEntity(metadataDto.getSourceDto());
+//            owner = ownerService.insertOrUpdateOwner(owner);
+//            support = supportService.insertOrUpdateSupport(support);
+//            source = sourceService.insertOrUpdateSource(source);
+
             Survey survey = convertToEntity(metadataDto.getSurveyDto());
-            
+
             survey.setSource(source);
             Campaign campaign = convertToEntity(metadataDto.getCampaignDto());
             campaign.setSurvey(survey);
             Partitioning partitioning = convertToEntity(metadataDto.getPartitioningDto());
             partitioning.setCampaign(campaign);
-            
 
-            Set<Partitioning> partitionings = (campaign.getPartitionings() == null) ? new HashSet<>()
-                    : campaign.getPartitionings();
-            partitionings.add(partitioning);
-            campaign.setPartitionings(partitionings);
+            campaign = getCampaignPartitionings(campaign, partitioning);
+            survey = getSurveyCampaigns(survey, campaign);
+            source = getSourceSurveys(source, survey);
 
-            Set<Campaign> campaigns = (survey.getCampaigns() == null) ? new HashSet<>()
-                    : survey.getCampaigns();
-            campaigns.add(campaign);
-            survey.setCampaigns(campaigns);
+            Optional<Source> sourceBase = sourceService.findById(source.getId());
+            if (sourceBase.isPresent()) {
+                ownerService.removeSourceFromOwner(sourceBase.get().getOwner(), sourceBase.get());
+                supportService.removeSourceFromSupport(sourceBase.get().getSupport(), sourceBase.get());
 
-            Set<Survey> surveys = (source.getSurveys() == null) ? new HashSet<>()
-                    : source.getSurveys();
-            surveys.add(survey);
-            source.setSurveys(surveys);
+            }
             source.setOwner(owner);
             source.setSupport(support);
 
+            owner = getOwnerSource(owner, source);
+            support = getSupportSources(support, source);
 
-            Set<Source> sourcesOwner = (owner.getSources() == null) ? new HashSet<>()
-                    : owner.getSources();
-            sourcesOwner.add(source);
-            owner.setSources(sourcesOwner);
-
-            Set<Source> sourcesSupport = (support.getSources() == null) ? new HashSet<>()
-                    : support.getSources();
-            sourcesSupport.add(source);
-            support.setSources(sourcesSupport);
-            
             owner = ownerService.insertOrUpdateOwner(owner);
             support = supportService.insertOrUpdateSupport(support);
             source = sourceService.insertOrUpdateSource(source);
             survey = surveyService.insertOrUpdateSurvey(survey);
             campaign = campaignService.insertOrUpdateCampaign(campaign);
             partitioning = partitioningService.insertOrUpdatePartitioning(partitioning);
-
 
             metadataReturn.setOwnerDto(convertToDto(owner));
             metadataReturn.setSupportDto(convertToDto(support));
@@ -411,12 +402,132 @@ public class WebclientController {
             metadataReturn.setPartitioningDto(convertToDto(partitioning));
 
             return ResponseEntity.status(httpStatus).headers(responseHeaders).body(metadataReturn);
-        } catch (Exception e) {
+        } catch (
+
+        Exception e) {
             log.error("Error in put metadata {}", metadataDto.toString());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
 
         }
 
+    }
+
+    private Campaign getCampaignPartitionings(Campaign campaign, Partitioning partitioning) {
+        Optional<Campaign> campaignBase = campaignService.findById(campaign.getId());
+        if (campaignBase.isPresent() && isPartitioningPresent(partitioning, campaignBase.get())) {
+            campaign.setPartitionings(campaignBase.get().getPartitionings());
+        } else {
+            Set<Partitioning> partitionings = (!campaignBase.isPresent()) ? new HashSet<>()
+                    : campaignBase.get().getPartitionings();
+            partitionings.add(partitioning);
+            campaign.setPartitionings(partitionings);
+        }
+        return campaign;
+    }
+
+    private Survey getSurveyCampaigns(Survey survey, Campaign campaign) {
+
+        Optional<Survey> surveyBase = surveyService.findById(survey.getId());
+        if (surveyBase.isPresent() && isCampaignPresent(campaign, surveyBase.get())) {
+            survey.setCampaigns(surveyBase.get().getCampaigns());
+
+        } else {
+
+            Set<Campaign> campaigns = (!surveyBase.isPresent()) ? new HashSet<>()
+                    : surveyBase.get().getCampaigns();
+            campaigns.add(campaign);
+            survey.setCampaigns(campaigns);
+        }
+        return survey;
+    }
+
+    private Source getSourceSurveys(Source source, Survey survey) {
+        Optional<Source> sourceBase = sourceService.findById(source.getId());
+        if (sourceBase.isPresent() && isSurveyPresent(survey, sourceBase.get())) {
+            source.setSurveys(sourceBase.get().getSurveys());
+
+        } else {
+
+            Set<Survey> surveys = (!sourceBase.isPresent()) ? new HashSet<>()
+                    : sourceBase.get().getSurveys();
+            surveys.add(survey);
+            source.setSurveys(surveys);
+        }
+        return source;
+    }
+
+    private Owner getOwnerSource(Owner owner, Source source) {
+        Optional<Owner> ownerBase = ownerService.findById(owner.getId());
+        if (ownerBase.isPresent() && isSourcePresent(source, ownerBase.get())) {
+            owner.setSources(ownerBase.get().getSources());
+
+        } else {
+
+            Set<Source> sources = (!ownerBase.isPresent()) ? new HashSet<>()
+                    : ownerBase.get().getSources();
+            sources.add(source);
+            owner.setSources(sources);
+        }
+        return owner;
+    }
+
+    private Support getSupportSources(Support support, Source source) {
+        Optional<Support> supportBase = supportService.findById(support.getId());
+        if (supportBase.isPresent() && isSourcePresent(source, supportBase.get())) {
+            support.setSources(supportBase.get().getSources());
+        } else {
+
+            Set<Source> sources = (!supportBase.isPresent()) ? new HashSet<>()
+                    : supportBase.get().getSources();
+            sources.add(source);
+            support.setSources(sources);
+        }
+        return support;
+    }
+
+    private boolean isPartitioningPresent(Partitioning p, Campaign c) {
+        for (Partitioning part : c.getPartitionings()) {
+            if (part.getId().equals(p.getId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isCampaignPresent(Campaign c, Survey s) {
+        for (Campaign camp : s.getCampaigns()) {
+            if (camp.getId().equals(c.getId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isSurveyPresent(Survey su, Source s) {
+        for (Survey survey : s.getSurveys()) {
+            if (survey.getId().equals(su.getId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isSourcePresent(Source s, Owner o) {
+        for (Source source : o.getSources()) {
+            if (source.getId().equals(s.getId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isSourcePresent(Source s, Support sup) {
+        for (Source source : sup.getSources()) {
+            if (source.getId().equals(s.getId())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Operation(summary = "Search for main contact")
