@@ -359,9 +359,6 @@ public class WebclientController {
             Support support = convertToEntity(metadataDto.getSupportDto());
 
             Source source = convertToEntity(metadataDto.getSourceDto());
-//            owner = ownerService.insertOrUpdateOwner(owner);
-//            support = supportService.insertOrUpdateSupport(support);
-//            source = sourceService.insertOrUpdateSource(source);
 
             Survey survey = convertToEntity(metadataDto.getSurveyDto());
 
@@ -375,12 +372,12 @@ public class WebclientController {
             survey = getSurveyCampaigns(survey, campaign);
             source = getSourceSurveys(source, survey);
 
-            Optional<Source> sourceBase = sourceService.findById(source.getId());
-            if (sourceBase.isPresent()) {
-                ownerService.removeSourceFromOwner(sourceBase.get().getOwner(), sourceBase.get());
-                supportService.removeSourceFromSupport(sourceBase.get().getSupport(), sourceBase.get());
-
-            }
+//            Optional<Source> sourceBase = sourceService.findById(source.getId());
+//            if (sourceBase.isPresent()) {
+//                ownerService.removeSourceFromOwner(sourceBase.get().getOwner(), sourceBase.get());
+//                supportService.removeSourceFromSupport(sourceBase.get().getSupport(), sourceBase.get());
+//
+//            }
             source.setOwner(owner);
             source.setSupport(support);
 
