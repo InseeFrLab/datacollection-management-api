@@ -355,45 +355,41 @@ public class WebclientController {
                 httpStatus = HttpStatus.CREATED;
             }
 
-            Owner owner = convertToEntity(metadataDto.getOwnerDto());
+            Owner owner =convertToEntity(metadataDto.getOwnerDto());
             Support support = convertToEntity(metadataDto.getSupportDto());
-
             Source source = convertToEntity(metadataDto.getSourceDto());
-
             Survey survey = convertToEntity(metadataDto.getSurveyDto());
-
-            owner = ownerService.insertOrUpdateOwner(owner);
-            support = supportService.insertOrUpdateSupport(support);
-            source = sourceService.insertOrUpdateSource(source);
-
+            
             survey.setSource(source);
             Campaign campaign = convertToEntity(metadataDto.getCampaignDto());
             campaign.setSurvey(survey);
             Partitioning partitioning = convertToEntity(metadataDto.getPartitioningDto());
             partitioning.setCampaign(campaign);
-
+            
             campaign = getCampaignPartitionings(campaign, partitioning);
             survey = getSurveyCampaigns(survey, campaign);
             source = getSourceSurveys(source, survey);
-
-            Optional<Source> sourceBase = sourceService.findById(source.getId());
-            if (sourceBase.isPresent()) {
-                ownerService.removeSourceFromOwner(sourceBase.get().getOwner(), sourceBase.get());
-                supportService.removeSourceFromSupport(sourceBase.get().getSupport(), sourceBase.get());
-
-            }
             source.setOwner(owner);
             source.setSupport(support);
 
-            owner = getOwnerSource(owner, source);
-            support = getSupportSources(support, source);
 
+            Set<Source> sourcesOwner = (owner.getSources() == null) ? new HashSet<>()
+                    : owner.getSources();
+            sourcesOwner.add(source);
+            owner.setSources(sourcesOwner);
+
+            Set<Source> sourcesSupport = (support.getSources() == null) ? new HashSet<>()
+                    : support.getSources();
+            sourcesSupport.add(source);
+            support.setSources(sourcesSupport);
+            
             owner = ownerService.insertOrUpdateOwner(owner);
             support = supportService.insertOrUpdateSupport(support);
             source = sourceService.insertOrUpdateSource(source);
             survey = surveyService.insertOrUpdateSurvey(survey);
             campaign = campaignService.insertOrUpdateCampaign(campaign);
             partitioning = partitioningService.insertOrUpdatePartitioning(partitioning);
+
 
             metadataReturn.setOwnerDto(convertToDto(owner));
             metadataReturn.setSupportDto(convertToDto(support));
@@ -403,15 +399,14 @@ public class WebclientController {
             metadataReturn.setPartitioningDto(convertToDto(partitioning));
 
             return ResponseEntity.status(httpStatus).headers(responseHeaders).body(metadataReturn);
-        } catch (
-
-        Exception e) {
+        } catch (Exception e) {
             log.error("Error in put metadata {}", metadataDto.toString());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error");
 
         }
 
     }
+    
 
     private Campaign getCampaignPartitionings(Campaign campaign, Partitioning partitioning) {
         Optional<Campaign> campaignBase = campaignService.findById(campaign.getId());
@@ -530,6 +525,7 @@ public class WebclientController {
         }
         return false;
     }
+
 
     @Operation(summary = "Search for main contact")
     @GetMapping(value = Constants.API_MAIN_CONTACT, produces = "application/json")
