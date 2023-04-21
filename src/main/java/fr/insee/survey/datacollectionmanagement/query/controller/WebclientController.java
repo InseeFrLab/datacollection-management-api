@@ -372,12 +372,12 @@ public class WebclientController {
             survey = getSurveyCampaigns(survey, campaign);
             source = getSourceSurveys(source, survey);
 
-//            Optional<Source> sourceBase = sourceService.findById(source.getId());
-//            if (sourceBase.isPresent()) {
-//                ownerService.removeSourceFromOwner(sourceBase.get().getOwner(), sourceBase.get());
-//                supportService.removeSourceFromSupport(sourceBase.get().getSupport(), sourceBase.get());
-//
-//            }
+            Optional<Source> sourceBase = sourceService.findById(source.getId());
+            if (sourceBase.isPresent()) {
+                ownerService.removeSourceFromOwner(sourceBase.get().getOwner(), sourceBase.get());
+                supportService.removeSourceFromSupport(sourceBase.get().getSupport(), sourceBase.get());
+
+            }
             source.setOwner(owner);
             source.setSupport(support);
 
