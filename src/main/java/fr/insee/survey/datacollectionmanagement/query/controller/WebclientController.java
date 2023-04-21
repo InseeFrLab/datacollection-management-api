@@ -362,6 +362,10 @@ public class WebclientController {
 
             Survey survey = convertToEntity(metadataDto.getSurveyDto());
 
+            owner = ownerService.insertOrUpdateOwner(owner);
+            support = supportService.insertOrUpdateSupport(support);
+            source = sourceService.insertOrUpdateSource(source);
+
             survey.setSource(source);
             Campaign campaign = convertToEntity(metadataDto.getCampaignDto());
             campaign.setSurvey(survey);
